@@ -193,14 +193,14 @@ Sledeća komanda ilustruje način pokretanja alata Valgrind:
 \texttt{valgrind --tool=alat [argumenti alata] ./izvršniProgram [argumenti izvršnog programa]}
 \end{center}
 
-Svaki \textit{Valgrind}-ov alat je statički povezana izvršna datoteka koja sadrži k\^od alata i k\^od jezgra. Izvršna datoteka \textit{valgrind} predstavlja program omotač koji na osnovu \texttt{--tool} opcije bira alat koji treba pokrenuti. Sem opcije \texttt{--tool} postoji mnoštvo opcija koje precizno definišu rad \textit{Valgrind} alata izabranog tog korišćenjem opcije \texttt{--tool}, ili podrazumevano alata \textit{Memcheck}, kao npr.:
+Svaki \textit{Valgrind}-ov alat je statički povezana izvršna datoteka koja sadrži k\^od alata i k\^od jezgra. Izvršna datoteka \textit{valgrind} predstavlja program omotač koji na osnovu \texttt{--tool} opcije bira alat koji treba pokrenuti. Sem opcije \texttt{--tool} postoji mnoštvo opcija koje precizno definišu rad \textit{Valgrind} alata, kao npr.:
 \begin{itemize}
+\item \texttt{--log-file}  koja će izlaz alata \textit{Valgrind} proslediti u navedenu datoteku (podrazumevano \textit{Valgrind} svoj izlaz ispisuje na terminal),
 \item \texttt{--track-origins} koja daje bliže informacije i detaljniji izveštaj o greškama koje su izazvane, 
 \item \texttt{--leack-check} koja svako curenje memorije prikazuje detaljnjno,
-\item \texttt{--show-leack-kinds} koja prikazuje sve vrste curenja koje su definitivne, indirektne, moguće i dostupne u celom izveštaju,
-\item \texttt{--log-file}  koja će izlaz alata \textit{Valgrind} proslediti u navedenu datoteku (podrazumevano \textit{Valgrind} svoj izlaz ispisuje na terminal).
+\item \texttt{--show-leack-kinds} koja prikazuje sve vrste curenja koje su definitivne, indirektne, moguće i dostupne u celom izveštaju.
 \end{itemize} 
-Sve ove komande će biti detaljnije objašnjene u sekcijama koje slede. Naredni primer ilustruje pokretanje \textit{Valgrind}-a sa dodatnim argumentima.
+Poslednje tri odnose se na alat \textit{Memcheck}, i biće detaljnije objašnjene u sekcijama koje slede. Naredni primer ilustruje pokretanje \textit{Valgrind}-a sa dodatnim argumentima.
 \begin{center}
 \texttt{valgrind --track-origins=yes --leack-check=full --show-leak-kinds=all --log-file=LOG.txt ./a.out}.
 \end{center}
@@ -791,186 +791,112 @@ Da bismo kreirali datoteku osnovnog vektorskog bloka, neophodno je u komandnoj l
 
 % ------------------------------------------------------------------------------
 \chapter{Regularni izrazi}
-Računari su mašine koje vrše transformaciju informacija iz jednog oblika u drugi. Te infromacije se računaru predstavljaju u posebnom formatu označenim  kao podatak, a sam računar će zadatu transformaciju nad informacijama obaviti bez razumevanja značenja same informacije, kao ni transformacije koja se nad njom vrši.
 
-U skladu sa izrečenim zaključujemo da je program specifikacija transformacije koju računar izvršava, dok je programski jezik notacija koja omogućava zapisivanje programa. Program kao specifikacija transformacije koja će biti izvršena na računaru definiše šta će program raditi, ali ne i način na koji će to uraditi. Jasno, jedan program može biti napisan različitim notacijama, odnosno različitim programskim jezicima. Uloga kompilatora jeste da transformiše tekst programa iz reprezentacije na visokom programskom jeziku (eng. \textit{high-level programming language}) u evivalentnu reprezentaciju na mašinskom jeziku, tj.~jeziku razumljivom računaru u cilju izvršavanja samog programa. U tom smislu, kompilacija se sastoji u čitanju niske karaktera koja je sastavljena u skladu sa pravilima, a sa ciljem da se generiše druga reprezentacija informacije koju ti karakteri predstavljaju.
+U današnje vreme, programski jezici imaju veoma dobru podršku za rad sa regularnim izrazima i imaju širok dijapazon upotrebe. Jezici, a samim tim i regularni izrazi koji predstavljaju jednu klasu jezika, vrlo su važni za proces kompilacije. Kompilacija se sastoji iz nekoliko etapa, koje se kasnije dele u nekoliko faza. Jezici imaju važnu ulogu u etapi analize izvornog koda. Preduslov za ispitivanje izvornog koda jeste precizna definicija jezika \cite{Vitas}.
 
-Program napisan na nekom programskom jeziku nazivamo izvornim kodom  (eng. \textit{source code}), dok rezultat rada kompilatora nazivamo objektnim kodom (eng. \textit{object code}). Objektni k\^od može biti izražen na mašinskom jeziku, na asembleru ili na nekom drugom programskom jeziku \cite{Vitas}. 
+\section{Kratak pregled teorije jezika i regularnih izraza} 
 
-\section{Proces kompilacije}
-Transformacija teksta programa iz izvornog u objektni k\^od, koju izvršava kompilator, naziva se proces kompilacije.
+Definicija izvornog jezika mora sadržati konačan skup simbola koje možemo koristiti u jeziku, tj.~azbuku jezika. Takođe, mora sadržati sintaksička i semantička pravila jezika, tj.~opis svih reči koje pripadaju datom jeziku kao i njihovo značenje \cite{Vitas}.
 
-Proces kompilacije obično se razlaže na dve etape:
-\begin{enumerate}
-\item etapa analize izvornog koda – tokom ove etape izvorni program se prevodi u odgovarajuću posrednu reprezentaciju koja prikazuje strukturu izvornog programa u obliku drveta.
-\item etapa sinteze izvornog koda – tokom ove etape se koristeći rezultate iz prethodne etape na osnovu posredne reprezentacije generiše objektni k\^od.
-\end{enumerate}
-Svaka od etapa se kasnije deli na faze. U ovom tekstu biće detaljnije pojašnjena analiza izvornog koda, sa akcentom na regularnim izrazima, na kome ovaj rad počiva.
+Neka je $\Sigma$ konačan skup. Reč (eng. \textit{word}) nad $\Sigma$ je svaki konačan niz $$x = (a_1, a_2, …, a_n),$$ gde je $n \geq 0$, a $a_i \in \Sigma$ za svako $\textit{i} \in [1,n]$. Broj $n$ se naziva dužina reči i obeležava se sa $|x|$. Prazna reč  obeležava se simbolom $\varepsilon$, odnosno važi $| \varepsilon |=0$. Ako je $$y = (b_1, b_2, …, b_m)$$ neka druga reč nad $\Sigma$, tada je proizvod dopisivanja, tj.~konkatenacije reči $x$ i $y$ reč $$xy =(a_1, a_2, …, a_n, b_1, b_2, …, b_m).$$
+Elemente skupa $\Sigma$ nazivamo slova ili simboli, dok sam skup nazivamo alfabet ili azbuka \cite{Vitas}.
 
-Tokom analize, kompilator analizira izvorni program da bi odredio njegovu strukturu i značenje. Etapa analize izvornog koda se razlaže na tri posebne faze:
-\begin{enumerate}
-\item leksička analiza
-\item sintaksička analiza
-\item semantička analiza
-\end{enumerate}
-
-Leksička analiza je faza u kojoj se karakteri iz ulazne struje karaktera rastavljaju na leksičke jedinice ili lekseme analiziranog jezika. Lekseme su minimalni, nedeljivi konstituenti jezika. Sintaksička analiza je faza u kojoj se ispituje i rekonstruiše struktura programa kao celine na osnovu niza tokena koje prosleđuje leksički analizator. Sintaksičkom analizom se utvrđuje da li je program saglasan sa gramatičkim pravilima programskog jezika, ali ne i njegova semantička konzistentnost. Opis semantike programskog jezika obično se zadaje polazeći od značenja koju pojedinačni iskazi programskog jezika vrše. Shodno tome se opis dejstva pojedinačnih iskaza nekog programskog jezika naziva semantika programskog jezika. Faza semantičke analize, koja sledi nakon sintaksičke analize, najčešće se sastoji u izvršavanju akcija koje nalaže sintaksički analizator, a koje se sastoje u kreiranju i ažuriranju informacija u tabeli simbola \cite{Vitas}.
-
-\section{Teorija jezika}
-Da bi ispitivanje izvornog koda bilo moguće, potrebno je precizno definisati izvorni jezik. Jedna klasa jezika, koja je od značaja za leksičku analizu programskih jezika, opisuje se posebnom notacijom, tj.~regularnim izrazima.
-
-Definicija izvornog jezika mora obuhvatiti opis alfabeta ili azbuke jezika, tj.~konačan skup simbola čija je upotreba dozvoljena u jeziku, a zatim i opis svih onih niski simbola (reči) koje pripadaju tom jeziku uključujući i njihovo značenje, odnosno sintaksu i semantiku jezika. 
-
-Neka je $\Sigma$  konačan skup. Niska (eng. \textit{string}) ili reč (eng. \textit{word}) nad $\Sigma$ je svaki konačan niz $$x = (a_1, a_2, …, a_n),$$ gde je $n \geq 0$, a $a_i \in \Sigma$ za svako $\textit{i} \in [1,n]$. Broj $n$ se naziva dužina reči i obeležava se sa $|x|$. Ako je $n=0$, reč se naziva prazna niska ili prazna reč, i obeležava se simbolom $\varepsilon$, odnosno važi $| \varepsilon |=0$.  Ako je $$y = (b_1, b_2, …, b_m)$$ neka druga reč nad $\Sigma$, tada je proizvod dopisivanja, tj.~konkatenacije reči $x$ i $y$ reč $$xy =(a_1, a_2, …, a_n, b_1, b_2, …, b_m).$$
-Operacija dopisivanja je asocijativna. Skup $\Sigma$ nazivamo alfabet ili azbuka, a njegove elemente slova ili simboli.
-
-Skup svih niski nad azbukom $\Sigma$ obeležava se sa $\Sigma^*$. Ovaj skup se naziva Klinijevo zatvorenje azbuke $\Sigma$. Na primer, ukoliko je $\Sigma = \{a,b\}$, onda je $$\Sigma^* = { \varepsilon, a, b, aa, ab, ba, bb, …}.$$
-Prazna reč $\varepsilon$ je neutralni element u odnosu na dopisivanje, tj.~za $\forall x\in \Sigma, x\varepsilon = \varepsilon x = x$. Skup svih reči bez prazne reči označava se kao $\Sigma^+$, tj.~$\Sigma^+ = \Sigma^* - { \varepsilon }$. Na skupu $\Sigma^*$ nije definisan pojam inverznog elementa, tj.~ako $x \in \Sigma^+$, onda ne postoji $y \in \Sigma^+$, tdj. $xy = \varepsilon$.
-
-Elementi azbuke $\Sigma$ se ne mogu razložiti na druge elemente, tj.~za bilo koje $a \in \Sigma$, ne postoje $b,c  \in \Sigma^+$, takvi da $a = bc$, iz čega sledi da se bilo koja reč $x \in \Sigma^*$ rastavlja na jedinstven način na elemente azbuke $\Sigma$. Imajući u vidu ova svojstva zaključujemo da je $\Sigma^*$ slobodni monoid sa skupom generatora $\Sigma$.
-\begin{lem}
-(Levijeva lema) Neka su $t, u, v, w \in \Sigma^*$. Ako je $tu = vw$, onda $\exists !$ reč $z  \in \Sigma^*$, tako da važi
-	\begin{itemize}
-	\item ili je $t = vz$ i $zu = w$
-	\item ili je $v = tz$ i $zw = u.$
-	\end{itemize}
-\end{lem}
-
-Neka je $v \in \Sigma^*$. Za reč $u \in \Sigma^*$ se kaže da je faktor reči $v$ ako postoje reči $v_1, v_2 \in \Sigma^*$, takve da je $v = v_1uv_2$ i to:
-\begin{itemize}
-\item levi faktor ili prefiks, ako je $v=uv_2$
-\item desni faktor ili sufiks, ako je $v = v_1u$
-\item pravi faktor ili infiks, ako je $v = v_1uv_2, v_1 \neq \varepsilon, v_2 \neq \varepsilon.$
-\end{itemize}
-Faktorizacija jedne reči predstavlja zapis te reči kao proizvod dopisivanja faktora. Podreč reči $v \in \Sigma^*$ je svaki podniz slova koja čine reč $v$.
+Klinijevo zatvorenje azbuke $\Sigma$, u oznaci $\Sigma^*$, je skup svih niski nad azbukom $\Sigma$. Na primer, ukoliko je $\Sigma = \{a,b\}$, onda je $$\Sigma^* = { \varepsilon, a, b, aa, ab, ba, bb, …}.$$
+Neutral u odnosu na dopisivanje je prazna reč, tj.~za $\forall x\in \Sigma, x\varepsilon = \varepsilon x = x$. Skup svih reči bez prazne reči označava se kao $\Sigma^+$, tj.~$\Sigma^+ = \Sigma^* - { \varepsilon }$ \cite{Vitas}. 
 
 \begin{defn}
-(Formalni) jezik nad azbukom $\Sigma$ je bilo koji podskup skupa $\Sigma^*$: $L \subset \Sigma^*$. Ako niska $x \in L$, onda $x$ predstavlja rečenicu jezika $L$.
+Bilo koji podskup skupa $\Sigma^*$: $L \subset \Sigma^*$ predstavlja jedan (formalni) jezik nad azbukom $\Sigma$. Ako $x \in L$, onda $x$ predstavlja rečenicu jezika $L$.
 \end{defn}
 
-Neka je data azbuka simbola $\Sigma = \{ a, b, c\}$. Nad ovom azbukom, neki od jezika predstavljeni su sledećim skupovima:
+Neka je data azbuka $\Sigma = \{ a, b, c\}$. Neki od jezika nad ovom azbukom predstavljeni su sledećim skupovima:
 \begin{itemize}
-\item[] $L_1 = \{a_n | n > 0\}$ – jezik koji se sastoji od niski u kojima se proizvoljan broj puta pojavljuje simbol $a$.
-\item[] $L_2 = \{a_nb_m | m, n > 0\}$ – jezik koji se sastoji od niski u kojima se proizvoljan broj puta pojavljuje simbol $a$ iza čega sledi pojavljivanje simbola $b$ proizvoljan broj puta.
+\item[] $L_1 = \{a^n | n > 0\}$ – jezik koji se sastoji od niski u kojima se proizvoljan broj puta pojavljuje simbol $a$.
+\item[] $L_2 = \{a^nb^m | m, n > 0\}$ – jezik koji se sastoji od niski u kojima se proizvoljan broj puta pojavljuje simbol $a$, iza čega sledi pojavljivanje simbola $b$ proizvoljan broj puta.
+\item[] $L_3 = \{ca^ncccb^m | m, n > 0\}$ – jezik koji se sastoji od niski u kojima se nakon simbola $c$ proizvoljan broj puta pojavljuje simbol $a$, iza čega sledi tri pojavljivanja simbola $c$ i pojavljivanje simbola $b$ proizvoljan broj puta.
 \end{itemize}
 
-Jezici mogu biti konačni ili beskonačni. Konačni jezici se najjednostavnije definišu eksplicitnim navođenjem niski koje u njima predstavljaju rečenice. Problem je kako opisati na konačan način rečenice koje pripadaju jeziku koji nije konačan. Tu se dolazi do opšteg problema svakog jezika, a to je kako za datu nisku $x \in \Sigma^*$ odrediti da li je ona rečenica jezika $L$ ili ne. Najopštiju klasu algoritama koja rešava ovaj problem opisuju Tjuringove mašine. Prevelika opštost ovog mehanizma ne dozvoljava da se izrazi specifičnost koju zahtevaju programski  jezici. Uvodeći razna ograničenja, rešavanje problema pripadanja niske $x$ jeziku može se realizovati na znatno efikasniji način. Iz ugla kompilacije programskih jezika, dve klase takvih jezika su regularni jezici i kontekstno slobodni jezici.  
+%Nad jezicima se mogu izvršiti skupovne operacije kao što su unija, presek i razlika, kao i operacija proizvoda, kako su i sami jezici skupovi \cite{Vitas}. Pored pomenutih, nad jezicima definišemo još i operaciju proizvoda, $n$-tog stepena i zatvorenja jezika $L$.
+%\begin{defn}
+%Proizvod jezika $L_1$ i $L_2$ nad azbukom $\Sigma$ u oznaci $L_1L_2$ je jezik $$L_1L_2 = \{xy | x \in L_1, y \in L_2\}.$$
+%Proizvod jezika je asocijativna operacija, a {$\varepsilon$} je njen neutralni element.
+%\end{defn}
 
-Pre nego što uvedemo formalnu priču o regularnim izrazima, pomenućemo neke od skupovnih operacijama koje se mogu primeniti nad jezicima. Nad jezicima se mogu izvršiti operacije unije, preseka i razlike, kao i operacija proizvoda \cite{Vitas}. 
+%\begin{defn}
+%Za jezik $L$, $n$-ti stepen jezika $L$ je jezik: 
+%$$L_0 = \{ \varepsilon\} $$ 
+%$$L_1 = L$$
+%$$L_n = LL_(n-1), za n>1.$$
+%\end{defn}
 
-\begin{defn}
-Proizvod jezika $L_1$ i $L_2$ nad azbukom $\Sigma$ u oznaci $L_1L_2$ je jezik $$L_1L_2 = \{xy | x \in L_1, y \in L_2\}.$$
-Proizvod jezika je asocijativna operacija, a {$\varepsilon$} je njen neutralni element.
-\end{defn}
-
-\begin{defn}
-Za jezik $L$, $n$-ti stepen jezika $L$ je jezik: 
-$$L_0 = \{ \varepsilon\} $$ 
-$$L_1 = L$$
-$$L_n = LL_(n-1), za  n>1.$$
-\end{defn}
-
-\begin{defn}
-Iteracija ili (Klinijevo) zatvorenje jezika $L$, u oznaci $L^*$, je jezik:
-$$ L^* = \bigcup_{n\geq0}L^n.$$
-Pozitivno zatvorenje jezika $L$, u oznaci $L^+$, je jezik:
-$$ L^+ = \bigcup_{n\geq1}L^n = L^* - \{\varepsilon\}.$$
-\end{defn}
-
-\section{Regularni izrazi i jezici}
+%\begin{defn}
+%Iteracija ili (Klinijevo) zatvorenje jezika $L$, u oznaci $L^*$, je jezik:
+%$$ L^* = \bigcup_{n\geq0}L^n.$$
+%Pozitivno zatvorenje jezika $L$, u oznaci $L^+$, je jezik:
+%$$ L^+ = \bigcup_{n\geq1}L^n = L^* - \{\varepsilon\}.$$
+%\end{defn}
 
 \begin{defn}
-Regularni ili racionalni izrazi nad azbukom $\Sigma$ opisuju se rekurzivno na sledeći način:
+Regularni izrazi nad azbukom $\Sigma$ opisuju se rekurzivno na sledeći način:
 \begin{enumerate}
 \item Prazan skup je regularni izraz koji se prikazuje simpolom $\emptyset$;
 \item Regularni izraz $\varepsilon$ predstavlja jezik $\{\varepsilon\}$;
 \item Ako je $a \in \Sigma$, onda regularni izraz $a$ predstavlja jezik $\{a\}$;
 \item Ako su $p$ i $q$ regularni izrazi jezika $L(p)$ i $L(q)$, onda je:
-	\begin{itemize}
-	\item $(p+q)$ regularni izraz koji predstavlja jezik $L(p) \cup L(q)$.
-	\item $(pq)$ regularni izraz koji predstavlja jezik $L(p)L(q)$.
-	\item $(p)^*$ regularni izraz koji predstavlja jezik $(L(p))^*$.
-	\item $(p)$ regularni izraz koji predstavlja jezik $L(p)$.
-	\end{itemize}
+\begin{itemize}
+\item $(p+q)$ regularni izraz koji predstavlja jezik $L(p) \cup L(q)$.
+\item $(pq)$ regularni izraz koji predstavlja jezik $L(p)L(q)$.
+\item $(p)^*$ regularni izraz koji predstavlja jezik $(L(p))^*$.
+\item $(p)$ regularni izraz koji predstavlja jezik $L(p)$.
+\end{itemize}
 \end{enumerate}
 \end{defn}
 
-Poslednje pravilo ukazuje na to da se zagrade mogu izostaviti iz regularnog izraza, a da se pritom opisani jezik ne promeni. Prilikom izostavljanja zagrada, treba znati činjenicu da su operatori *, + i konkatenacija levo asocijativni, a da im je prioritet određen sa:
-\begin{center}
-\textit{prioritet(*) > prioritet(konkatenacija) > prioritet(+).}
-\end{center}
-
-Operacije sa regularnim izrazima nad jezikom $\Sigma$ imaju sledeća svojstva:
-\begin{itemize}
-\item Operacija + je idempotentna, asocijativna i komunikativna;
-\item Operacija konkatenacije je asocijativna i distributivna u odnosu na +;
-\item Sledeće jednakosti važe za svaki regularni izraz:
-$$\emptyset + p = p + \emptyset = p$$
-$$\varepsilon p = p\varepsilon = p$$
-$$\emptyset p = p\emptyset = \emptyset ;$$
-\item $\emptyset^* = \varepsilon^* = \varepsilon$.
-\end{itemize}
+Opisani jezik se neće promeniti ako se zagrade izostave iz regularnog izraza \cite{Vitas}. Kada prioritet operacija nije eksplicitno naveden, primenjuju se podrazumevani prioriteti nad operatorima regularnih izraza, tj.~jezika, u sledećem redosledu:
+\begin{enumerate}
+	\item operator $*$
+	\item konkatenacija
+	\item operator $+$
+\end{enumerate}
 
 \begin{defn}
-Za jedan jezik se kaže da je regularan ukoliko se može predstaviti regularnim izrazom. 
+Ukoliko se jezik može predstaviti regularnim izrazom, takav jezik se smatra regularnim.
 \end{defn}
 
-Na osnovu gore navedenih svojstava regularnih izraza, skup regularnih izraza sa uvedenim operacijama predstavlja jednu algebru koju ćemo obeležiti sa $I(\Sigma)$. Važnost ove notacije ogleda se u tome što se slovo azbuke, reč koja se sastoji od tog slova, regularni izraz koji predstavlja to slovo, i na kraju jezik predstavljen regularnim izrazom beleže na isti način. 
+Važnost ove notacije ogleda se u tome što se na isti način zapisuju simbol azbuke, reč koja se sastoji od tog simbola, regularni izraz koji predstavlja taj simbol, i na kraju jezik predstavljen tim regularnim izrazom \cite{Vitas}. Kažemo da je za neki regularni izraz $p$, jezik $L(p)$ jezik opisan regularnim izrazom $p$.
 
-Preslikavanje $L$ sa algebre $I(\Sigma)$ u skup regularnih izraza nad $\Sigma$ $$ L : I(\Sigma) \rightarrow P(\Sigma^*)$$ definisano je sledećim rekurzivnim pravilima:
-$$ L(\emptyset) = \emptyset, L(\varepsilon) = \varepsilon, L(a) = \{a\},$$
-$$ L(p+q) = L(p) \cup L(q), L(pq) = L(p)L(q), L(p^*) = L(p)^*.$$
-
-Kažemo da je za neki regularni izraz $p$, jezik $L(p)$ jezik opisan regularnim izrazom $p$. Dva regularna izraza $p$ i $q$ su ekvivalentna, u oznaci $p \approx q$, ako opisuju isti jezik, tj.~ako važi $L(p) = L(q)$. O tome govori naredna teorema.
-
-\begin{thm}
-Za bilo koje regularne izraze $p$ i $q$ važi sledeća ekvivalencija: $$(pq)^* = \varepsilon + p(qp)^* q$$.
-\end{thm}
-
-Kao što smo se već uverili, regularni izrazi se grade polazeći od drugih regularnih izraza. To može dovesti do nepreglednosti njihovog zapisa, što rešavamo uvođenjem regularnih definicjia koje omogućuju da se određenim regularnim izrazima dodeli ime. Regularne definicije zapisujemo u obliku:
-$$D_1  \rightarrow R_1$$
-$$D_2  \rightarrow R_2$$
-$$ ... $$
-$$D_n -> R_n, $$
-gde je svako $d_i$ niska nad azbukom koja je disjunktna sa azbukom $\Sigma$, različita od $d_1, d_2, …, d_{i-1}$, a svako $r_i$ regularni izraz nad azbukom $\Sigma \cup \{ d_1, d_2, …, d_{i-1}\}$.
-
-Radi pojednostavljenja zapisivanja regularnih izraza, definicija regularnih izraza se dopunjuje dodavanjem sledećih konvencija:
+Zapisivanje regularnih izraza može se znatno pojednostaviti uvođenjem sledećih konvencija:
 \begin{itemize}
-\item Neka je $r$ regularni izraz koji opisuje jezik $L(r)$. Tada je $(r)^+$ regularni izraz koji opisuje jezik $(L(r))(L(r))^*$, a $(r)?$ regularni izraz koji opisuje jezik $L(r) \cup \{\varepsilon\}$;
+\item Neka je $r$ regularni izraz koji opisuje jezik $L(r)$. Jezik $(L(r))(L(r))^*$ se opisuje regularnim izrazom $(r)^+$ , dok se jezik $L(r) \cup \{\varepsilon\}$ opisuje regularnim izrazom $(r)?$;
 \item Ako su $c_1, c_2, …, c_n$ karakteri, tada se regularni izraz $c_1 + c_2 + … + c_n$ može obeležiti sa $[c_1, c_2, …, c_n]$. Izraz $[c_1-c_2]$ označava sekvencu svih karaktera $c$ tdj. $c_1 \leq c \leq c_2$.
 \end{itemize}
 
-Tako na primer slova engleske abecede označavamo sa $[A-Za-z]$, dok cifre označavamo sa $[0-9]$, itd..
-
-Klasa jezika koji se mogu opisati regularnim izrazima je dovoljna da se opišu lekseme jednog programskog jezika. Treba imati u vidu da se složenije konstrukcije u programskom jeziku ne mogu izraziti regularnim izrazima \cite{Vitas}. 
-
+Tako na primer slova engleske abecede označavamo sa $[A-Za-z]$, dok cifre označavamo sa $[0-9]$.
+ 
 \section{Modul re}
 
-U današnje vreme, programski jezici imaju veoma dobru podršku za rad sa regularnim izrazima i imaju širok dijapazon upotrebe. Alat koji ovaj rad prati razvijen je u programskom jeziku Python, a \textit{re} je modul koji pruža podršku za rad sa regularnim izrazima u Python programima.
+Alat koji ovaj rad prati razvijen je u programskom jeziku Python, a \textit{re} je modul koji pruža podršku za rad sa regularnim izrazima u Python programima. Ovaj modul pruža operacije podudaranja regularnih izraza. Važno je napomenuti da je većina operacija sa regularnim izrazima dostupna u vidu funkcija i metoda na nivou modula sa kompajliranim regularnim izrazima. Funkcije su prečice koje ne zahtevaju da prvo kompajlirate objekat regularnog izraza, ali je mana što im nedostaju neki parametri za fino podešavanje. 
 
-Ovaj modul pruža operacije podudaranja regularnih izraza. Važno je napomenuti da je većina operacija sa regularnim izrazima dostupna u vidu funkcija i metoda na nivou modula sa kompajliranim regularnim izrazima. Funkcije su prečice koje ne zahtevaju da prvo kompajlirate objekat regularnog izraza, ali je mana što im nedostaju neki parametri za fino podešavanje. 
-
-Regularni izraz (ili RE) navodi niz karaktera koji mu odgovara, dok vam funkcije u ovom modulu omogućavaju da proverite da li se određeni niz karaktera poklapa sa datim regularnim izrazom (ili da li se regularni izraz podudara sa određenim nizom karaktera, što se svodi na istu stvar).
+Regularni izraz navodi niz karaktera koji mu odgovara, dok vam funkcije u ovom modulu omogućavaju da proverite da li se određeni niz karaktera poklapa sa datim regularnim izrazom (ili da li se regularni izraz podudara sa određenim nizom karaktera, što se svodi na istu stvar).
 Neke od funkcija koje ovaj modul pruža, a koje su iskorišćene u alatu koji ovaj rad prati su sledeće:
 
 \begin{itemize}
-\item[$\textendash$]  \textit{re.search(pattern, string, flags=0)} - Skenira kroz \textit{string} tražeći prvu lokaciju na kojoj obrazac regularnog izraza daje podudaranje i vraća odgovarajući objekt podudaranja. Vratiće \textit{None} ako nijedna pozicija u nizu karaktera ne odgovara obrascu. Imajte na umu da se ovo razlikuje od pronalaženja podudaranja nulte dužine u nekom trenutku niza.
+\item[$\textendash$]  \textit{re.search(pattern, string, flags=0)} - Skenira kroz \textit{string} tražeći prvu lokaciju na kojoj obrazac regularnog izraza daje podudaranje i vraća odgovarajući objekt podudaranja. Vratiće \textit{None} ako nijedna pozicija u nizu karaktera ne odgovara obrascu.
 \item[$\textendash$]  \textit{re.match(pattern, string, flags=0)} - Ako se nula ili više znakova na početku niza karaktera \textit{string}  podudaraju sa regularnim izrazom, vratiće odgovarajući objekt podudaranja. Vratiće \textit{None} ako se niz ne podudara sa obrascem.
 \item[$\textendash$]  \textit{re.split(pattern, string, maxsplit=0, flags=0)} - Podeliće nisku \textit{string} pojavljivanjima koja se poklapalu sa \textit{pattern}. 
 \item[$\textendash$]  \textit{re.findall(pattern, string, flags=0)} - Vraća sva podudaranja \textit{pattern}-a u \textit{string}-u kao listu stringova, tj.~niski. Niska u kojoj se traže preklapanja - \textit{string}, skenira se s leva na desno, a poklapanja se vraćaju u redosledu u kom se i javljaju. 
-\item[$\textendash$]  \textit{re.sub(pattern, repl, string, count=0, flags=0)} - Vraća string dobijen zamenom krajnjeg levog poklapanja sa \textit{pattern}-om u \textit{string}-u sa \textit{repl}. Ako poklapanje nije pronađeno, \textit{string} se vraća nepromenjen. \textit{Repl} može biti niz ili funkcija.
+\item[$\textendash$]  \textit{re.sub(pattern, repl, string, count=0, flags=0)} - Vraća string dobijen zamenom krajnjeg levog poklapanja sa \textit{pattern}-om u \textit{string}-u sa \textit{repl}. Ako poklapanje nije pronađeno, \textit{string} se vraća nepromenjen. Argument \textit{repl} može biti niz ili funkcija.
 \end{itemize}
 
 Kompajlirani objekti regularnog izraza podržavaju slične metode i atribute, s tim da je pozivanje istih u formi
 \begin{center}
-\texttt{Pattern.funkcija(argumenti).}
+\texttt{pattern.funkcija(argumenti).}
 \end{center}
 
-Objekti podudaranja uvek imaju logičku vrednost \textit{True}. Budući da \textit{match()} i \textit{search ()} vraćaju \textit{None} kada nema podudaranja, možete testirati da li je postojalo podudaranje jednostavnim \textit{if} izrazom. 
+Objekti podudaranja uvek imaju logičku vrednost \textit{True}. Budući da \textit{match()} i \textit{search()} vraćaju \textit{None} kada nema podudaranja, možete testirati da li je postojalo podudaranje jednostavnim \textit{if} izrazom. 
 
-Objekti podudaranja podržavaju mnoge metode i atribute, a najiskorišćenija u alatu koji se razvija, a u cilju izvlačenja potrebnih informacija iz poklapanja sa regularnim izrazom je:
+Objekti podudaranja podržavaju mnoge metode i atribute, a najiskorišćenija u alatu koji je razvijen, a u cilju izvlačenja potrebnih informacija iz poklapanja sa regularnim izrazom je:
 \begin{itemize}
-\item[$\textendash$]  \textit{Match.group([group1, ...])} - Vraća jednu ili više podgrupa podudaranja. Ako postoji jedan argument, rezultat je jedan string, dok ako postoji više argumenata, rezultat je t-orka sa jednom stavkom po argumentu. Bez argumenata, \textit{group1} je  podrazumevano nula, tj.~vraća se ceo \textit{Match} objekat. Ako je indeks \textit{group} u inkluzivnom opsegu [1..99], to je string koji odgovara odgovarajućoj grupi u zagradama na toj poziciji. Ako je broj grupe negativan ili veći od broja grupa definisanih u obrascu, biće izbačen izuzetak \textit{IndexError}. Ako je grupa sadržana u delu uzorka koji se ne podudara, odgovarajući rezultat je \textit{None}. Ako je grupa sadržana u delu uzorka koji se podudarao više puta, vraća se poslednje podudaranje \cite{reModule}.
+\item[$\textendash$]  \textit{Match.group([group1, ...])} - Vraća jednu ili više podgrupa podudaranja. Ako postoji jedan argument, rezultat je jedan string, dok ako postoji više argumenata, rezultat je t-orka sa jednom stavkom po argumentu. Bez argumenata, \textit{group1} je  podrazumevano nula, tj.~vraća se ceo \textit{Match} objekat. Ako je indeks \textit{group} u opsegu [1,99], to je string koji odgovara odgovarajućoj grupi u zagradama na toj poziciji. Ako je broj grupe negativan ili veći od broja grupa definisanih u obrascu, biće izbačen izuzetak \textit{IndexError}. Ako je grupa sadržana u delu uzorka koji se ne podudara, odgovarajući rezultat je \textit{None}. Ako je grupa sadržana u delu uzorka koji se podudarao više puta, vraća se poslednje podudaranje \cite{reModule}.
 \end{itemize}
 
 Primer korišćenja funkcije \textit{group} dat je na listingu \ref{lst:slika3.1}.
