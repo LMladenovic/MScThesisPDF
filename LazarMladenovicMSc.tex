@@ -100,11 +100,11 @@
 % Godina u kojoj je teza predana komisiji
 \godina{2020}
 % Ime i afilijacija mentora (u odabranom pismu)
-\mentor{doc. dr Milena \textsc{Vujošević Janičić}, docent \\ Univerzitet u Beogradu, Matematički fakultet}
+\mentor{dr Milena \textsc{Vujošević Janičić}, vanredni profesor \\ Univerzitet u Beogradu, Matematički fakultet}
 % Ime i afilijacija prvog člana komisije (u odabranom pismu)
-\komisijaA{prof. dr Miodrag \textsc{Živković}, redovan profesor\\ Univerzitet u Beogradu, Matematički fakultet}
+\komisijaA{dr Miodrag \textsc{Živković}, redovan profesor\\ Univerzitet u Beogradu, Matematički fakultet}
 % Ime i afilijacija drugog člana komisije (u odabranom pismu)
-\komisijaB{prof. dr Filip \textsc{Marić}, vanredni profesor\\ Univerzitet u Beogradu, Matematički fakultet}
+\komisijaB{dr Filip \textsc{Marić}, vanredni profesor\\ Univerzitet u Beogradu, Matematički fakultet}
 % Ime i afilijacija trećeg člana komisije (opciono)
 % \komisijaC{}
 % Ime i afilijacija četvrtog člana komisije (opciono)
@@ -468,42 +468,17 @@ int main(void){
 %\end{figure}
 
 \begin{lstlisting}[style=terminal,caption={Primer ispisa greške korišćenja neinicializovane ili neadresirane vrednosti u sistemskom pozivu}, label={lst:slika2.7},language={bash}] 
-==5695== Conditional jump or move depends on uninitialised value(s)
-==5695==	at 0x48E2E40: __vfprintf_internal (vfprintf-internal.c:1644)
-==5695==	by Ox48CD8D7: printf (printf.c:33)
-==5695==	by 0x109162: main (1.c:7)
-==5695== Uninitialised value was created by a stack allocation
-==5695==	at 0x109145: main (1.c:5)
-==5695==
-==5695== Use of uninitialised value of size 8 
-==5695==	at Ox48C732E: _itoa_word (_itoa.c:179)
-==5695==	by Ox48E29EF:	__vfprintf_internal (vfprintf-internal.c:1644)
-==5695==	by 0x48CD8D7: printf (printf.c:33)
-==5695==	by 0x109162: main (1.c:7)
-==5695== Uninitialised value was created by a stack allocation
-==5695==	at 0x109145: main (1.c:5)
-==5695==
-==5695== Conditional jump or move depends on uninitialised value(s)
-==5695==	at Ox48C7339: _itoa_word (_itoa.c:179)
-==5695==	by Ox48E29EF: __vfprintf_internal (vfprintf-internal.c:1644)
-==5695==	by Ox48CD8D7: printf (printf.c:33)
-==5695==	by 0x109162: main (1.c:7)
-==5695== Uninitialised value was created by a stack allocation
-==5695==	at 0x109145: main (1.c:S)
-==5695==
-==5695== Conditional jump or move depends on uninitialised value(s)
-==5695==	at Ox48E348B: __vfprintf_internal (vfprintf-internal.c:1644)
-==5695==	by Ox48CD8D7: printf (printf.c:33)
-==5695==	by 0x109162: main (1.c:7)
-==5695== Uninitialised value was created by a stack allocation
-==5695==	at 0x109145: main (1.c:5)
-==5695==
-==5695== Conditional jump or move depends on uninitialised value(s)
-==5695==	at Ox48E2B5A: __vfprintf_internal (vfprintf-internal.c:1644)
-==5695==	by Ox48CD8D7: printf (printf.c:33)
-==5695==	by 0x109162: main (1.c:7)
-==5695== Uninitialised value was created by a stack allocation
-==5695==	at 0x109145: main (1.c:5)
+Syscall param write(buf) points to uninitialised byte(s)
+   at 0x25A48723: __write_nocancel (in /lib/tls/libc-2.3.3.so)
+   by 0x259AFAD3: __libc_start_main (in /lib/tls/libc-2.3.3.so)
+   by 0x8048348: (within /auto/homes/njn25/grind/head4/a.out)
+ Address 0x25AB8028 is 0 bytes inside a block of size 10 alloc'd
+   at 0x259852B0: malloc (vg_replace_malloc.c:130)
+   by 0x80483F1: main (a.c:5)
+
+Syscall param exit(error_code) contains uninitialised byte(s)
+   at 0x25A21B44: __GI__exit (in /lib/tls/libc-2.3.3.so)
+   by 0x8048426: main (a.c:8)
 \end{lstlisting}
 
 Na listinzima \ref{lst:slika2.6} i \ref{lst:slika2.7} dat je primer programa koji ilustruje sistemski poziv sa neispravnim parametrima, kao i izveštaj koji dobijamo nakon analize pomenutog programa. Sa listinga \ref{lst:slika2.7} vidimo da je \textit{Memcheck} prikazao dve greške sa informacijama o korišćenju neinicijalizovanih vrednosti u sistemskim pozivima, kao i linije izvornog koda gde se ove vrednosti koriste. Prva greška posledica je korišćenja neinicijalizovane vrednosti \textit{arr} kao paramatra sistemskog poziva \textit{write()}, dok je druga greška posledica prosledjenog nedefinisanog argumenta sistemskom pozivu \textit{exit} \cite{Memcheck}. 
@@ -925,38 +900,48 @@ Primer korišćenja funkcije \textit{group} dat je na listingu \ref{lst:slika3.1
 
 % ------------------------------------------------------------------------------
 \chapter{Alat Koronka}
-Alat \textit{Koronka} predstavlja alat koji automatski otkriva greske u kodu napisanom u C-u koristeci alat \textit{Valgrind}-ove distribucije \textit{Memcheck}, a zatim ih ispravlja ukoliko je to u njegovoj moći. Razvijan pod \textit{Linux} okruženjem, a implementiran u programskom jeziku \textit{Python}. Alat je nazvan \textit{Koronka}, zbog situacije u kojoj se ceo svet našao početkom 2020. godine. Osnovna svrha alata je demonstracija rada alata \textit{Valgrind}, kao i tumačenje izveštaja o greškama koje \textit{Valgrind} daje i njihovo uspešno otklanjanje. Alat je slobodno dostupan i nalazi se na linku \url{https://github.com/LMladenovic/Error_fixing_tool}. Na pomenutom linku se nalaze neophodne datoteke alata, opis sistema, kao i skup test primera i njihova pokretanja.
+Alat \textit{Koronka} predstavlja alat koji automatski otkriva greske u kodu napisanom u programskom jeziku C koristeci alat \textit{Valgrind}-ove distribucije \textit{Memcheck}, a zatim ih ispravlja ukoliko je to u njegovoj moći. Razvijan pod \textit{Linux} okruženjem, a implementiran u programskom jeziku \textit{Python}. Alat je nazvan \textit{Koronka}, zbog situacije u kojoj se ceo svet našao početkom 2020. godine. Osnovna svrha alata je demonstracija rada alata \textit{Valgrind}, kao i tumačenje izveštaja o greškama koje \textit{Valgrind} daje i njihovo uspešno otklanjanje. Alat je slobodno dostupan i nalazi se na linku \url{https://github.com/LMladenovic/Error_fixing_tool}. Na pomenutom linku se nalaze neophodne datoteke alata, opis sistema, kao i skup test primera i njihova pokretanja.
 
 \section{Korišćenje alata}
-Da biste pokrenuli alat \textit{Koronka} neophodno je da prethodno instalirate \textit{GCC} kompajler, sam alat \textit{Valgrind}, kao i \textit{Python}. Alat se pokreće sledećom komandom:
+Da biste pokrenuli alat \textit{Koronka} neophodno je da prethodno instalirate \textit{GCC} kompajler, sam alat \textit{Valgrind}, kao i \textit{Python}. U razvoju alata korišćen je \textit{Python2.7}, pa su mogući neki neželjeni efekti prilikom pokretanja na novijim verzijama, što prilikom testiranja alata tokom razvoja nije bio slučaj. Alat se pokreće sledećom komandom:
 \begin{center}
-\texttt{python koronka.py [files=[list of files]] [structures=[list of user defined structures]] c file|path to c file [other arguments] .}
+\texttt{python koronka.py [files=[list of files]] [structures=[list of user defined structures]] path to c file [other arguments]}
 \end{center}
 Navedeni arumenti podrazumevaju sledeće:
 \begin{itemize}
-\item \texttt{files} - sadrži dodatne fajlove glavnog programa (\textit{c file}) koji se analizira (npr. \textit{.h} fajlove). Ukoliko se vаš program sastoji iz više fajlova, neophodno je da ih navedete kao argument. Bitni su iz razloga sto će \textit{Koronka} svo vreme svog rada imati niz \textit{files} u memoriji koji ce imati podatak o fajlovima nad kojima može da vrši promene. Ako se ne navede argument \textit{files}, niz \textit{files} će sadržati samo glavni program (\textit{c file}) i biće u mogućnosti da vrši promene samo nad njim.
+\item \texttt{files} - sadrži dodatne fajlove glavnog programa (\textit{c file}) koji se analizira (npr. \textit{.h} fajlove). Ukoliko se vаš program sastoji iz više fajlova, neophodno je da ih navedete kao argument. Ako se ne navede argument \textit{files}, niz \textit{files} će sadržati samo glavni program (\textit{c file}) i biće u mogućnosti da vrši promene samo nad njim.
 \item \texttt{structures} - predstavlja korisnički definisane strukture u okviru programa. Kako alat podrazumevano radi samo sa primitivnim tipovima podataka, ukoliko u programu postoje korisnički definisane strukture, a ne navedu se kao argument, \textit{Koronka} neće biti u mogućnosti da ispravi greške povezane sa tim strukturama, naravno, ukoliko postoje.
-\item \texttt{program args} - argumenti programa koji se analizira.
+\item \texttt{other args} - argumenti programa koji se analizira.
 \end{itemize}
 
-Takođe, alat \textit{Koronka} sadrži i opciju \texttt{--help } čijim će navođenjem na komandnu liniju biti ispisano uputstvo za upotrebu alata. 
+Takođe, alat \textit{Koronka} sadrži i opciju \texttt{--help } čijim će navođenjem biti ispisano uputstvo za upotrebu alata. 
 
-Sve argumente koji se navedu prilikom pokretanja alata \textit{Koronka} obradiće funkcija za obrađivanje argumenata komandne linije i rasporediće sve podatke tamo gde treba. Nakon pokretanja alata, u direktorijumu alata će se kreirati direktorijum u formatu \textit{datum pokretanja-vreme pokretanja}. U njega će se kopirati svi podaci navedeni kao arugment \textit{files}, kao i glavni program nad kojim se vrši analiza i nad njima će biti vršene odgovarajuće promene u skladu sa otkrivenim greškama. Originalni fajlovi ostaće nepromenjeni, tamo gde su i perzistirani. Po završetku rada alata, u pomenutom direktorijumu će se naći još dva fajla. Prvi je \textit{ExecutionReport} koji sadrži detaljan izveštaj o radu alata, koje greške je našao, na koji način ih je rešio, koje fajlove, ondosno linije koda u njima je izmenio. Drugi, pod nazivom \textit{ValgrindLOG}, predstavlja izalaz alata \textit{Valgrind}, koji će se u procesu rada alata koristiti za parsiranje grešaka koje nađe alat \textit{Memcheck}. Ukoliko analizirate ispravljeni program nakon završetka rada alata alatom \textit{Memcheck}, dobićete isti izlaz koji možete videti u datoteci \textit{ValgrindLOG}. Način i logika rada alata biće opisani u sekcijama koje slede.
+Sve argumente koji se navedu prilikom pokretanja alata \textit{Koronka} obradiće funkcija za obrađivanje argumenata komandne linije. Nakon pokretanja alata, u direktorijumu alata će se kreirati direktorijum u formatu \textit{datum pokretanja-vreme pokretanja}. U njega će se kopirati svi podaci navedeni kao arugment \textit{files}, kao i glavni program nad kojim se vrši analiza i nad njima će biti vršene odgovarajuće promene u skladu sa otkrivenim greškama. Originalni fajlovi ostaće nepromenjeni. Po završetku rada alata, u pomenutom direktorijumu će se naći još dva fajla. Prvi je \textit{ExecutionReport} koji sadrži detaljan izveštaj o radu alata, koje greške je našao, na koji način ih je rešio, koje fajlove, ondosno linije koda u njima je izmenio. Drugi, pod nazivom \textit{ValgrindLOG}, predstavlja izalaz alata \textit{Valgrind}, koji će se u procesu rada alata koristiti za parsiranje grešaka koje nađe alat \textit{Memcheck}. Ukoliko analizirate ispravljeni program nakon završetka rada alata alatom \textit{Memcheck}, dobićete isti izlaz koji možete videti u datoteci \textit{ValgrindLOG}. Način i logika rada alata biće opisani u sekcijama koje slede.
+
+\section{Algoritam izvršavanja}\label{algoritam}
+Pri pokretanju alata generiše se odgovarajući direktorijum, u njega se kopiraju svi navedeni (potrebni) fajlovi, formiraju se nizovi \textit{structures}, \textit{files} i \textit{history}. Nakon početnih podešavanja sledi iterativno kompilacija programa i analiza \textit{Valgrind}-ovim alatom \textit{Memcheck} čiji izlaz se smešta u datoteku \textit{ValgrindLOG.txt}. Ovaj fajl se parsira, i iz njega se čitaju informacije o greškama iterativno. Kad alat naiđe na grešku, parsira je, nakon čega proba da je ispravi ukoliko je u mogućnosti. Ukoliko nađe rešenje koje već nije primenjeno, biće implementirano nakon čega alat ide u novu iteraciju kompilacije i provere grešaka, uz prethodno ažuriranje istorije i izveštaja o ispravljenim greškama. Proces se ponavlja dokle god ima grešaka koje nisu ispravljene, a koje je \textit{Koronka} u mogućnosti da ispravi. Grafički prikaz algoritma dat je na slici \ref{fig:slika4.4}.
+
+\begin{figure}[!ht]
+  \centering
+  \includegraphics[width=0.9\textwidth]{ExecutingAlgorithm.png}
+  \caption{Algoritam izvršavanja alata \textit{Koronka} sa pratećim fajlovima koji se koriste za njegovu realizaciju}
+  \label{fig:slika4.4}
+\end{figure}
 
 \section{Klasa greške}
-Prilikom ispravljanja grešaka, greška koja se trenutno obrađuje biće predstavljena kao objekat klase \textit{ErrorInfo}. Na listingu \ref{lst:slika4.1} je predstavljen potpis pomenute klase.
+Prilikom ispravljanja grešaka, greška koja se trenutno obrađuje biće predstavljena kao objekat klase \textit{ErrorInfo}. Na listingu \ref{lst:slika4.1} prikazana je pomenuta klasa.
 
 Podaci koje klasa sadrži su sledeći:
 \begin{itemize}
-\item \textit{errorType} - sadrži informaciju o tipu greške, npr. nevalidno oslobađanje memorije, nedozvoljeno čitanje/pisanje itd..
-\item \textit{valgrindOutput} - sadrži kompletan sadržaj sa slike \ref{fig:slika4.3}, za potrebe dodatnog parsiranja informacija o grešci.
+\item \textit{errorType} - sadrži informaciju o tipu greške, npr. nevalidno oslobađanje memorije, nedozvoljeno čitanje/pisanje itd.
+\item \textit{valgrindOutput} - sadrži kompletan segment teksta koji je \textit{Valgrind} ispisao za grešku koja se trenutno obrađuje za potrebe dodatnog parsiranja informacija o grešci. Primer onoga što će ovaj atribut sadržati za jednu grešku prikazan je na slici \ref{fig:slika4.3}.
 \item \textit{files} - sadrži niz fajlova koji su povezani sa greškom, a koji bi eventualno bili ispravljeni.
 \item \textit{changedFile} - sadrži ime fajla koji će biti promenjen.
 \item \textit{changedLine} - sadrži tačnu liniju koda u fajlu \textit{changedFile} koja će biti promenjena.
 \item \textit{problemLines} - sadrži linije u kodu koje su izazvale grešku koja se ispravlja.
 \item \textit{errorReason} - sadrži razlog koji je izazvao grešku, npr. upotreba neinicijalizovane vrednosti sa steka, odnosno hipa.
 \item \textit{bug} - sadrži bag u kodu, tj.~sadržaj linije koda koji je izazvao grešku.
-\item \textit{bugFix} - sadrži ispravku baga, tj.~sadržaj kojim treba zameniti \textit{changedLine} da bi se greška uspešno ispravila.
+\item \textit{bugFix} - sadrži ispravku greške, tj.~sadržaj kojim treba zameniti \textit{changedLine} da bi greška bila ispravljena.
 \end{itemize}
 
 \begin{lstlisting}[style=mystyle,caption={Potpis klase \textit{ErrorInfo}}, label={lst:slika4.1},language={Python}] 
@@ -981,7 +966,7 @@ class ErrorInfo:
 %  \label{fig:slika4.1}
 %\end{figure}
 
-Za sve atribute klasa sadrži odgovarajuće \textit{get}-ere i \textit{set}-ere, kao i funkciju koja će proveravati da li je razlog greške poslat kao arument, zaista razlog koji je izazvao grešku koja se obrađuje. Prikaz funkcije dat je na listingu \ref{lst:slika4.2}.
+Za sve atribute klasa sadrži odgovarajuće metode za postavljanje i čitanje vrednosti, kao i funkciju  \textit{isKnownReason} koja proverava da li je razlog greške poslat kao arument, zaista razlog koji je izazvao grešku koja se obrađuje. Prikaz funkcije dat je na listingu \ref{lst:slika4.2}.
 
 \begin{lstlisting}[style=mystyle,caption={Prikaz funkcije koja proverava validnost razloga greške}, label={lst:slika4.2},language={Python}] 
 def isKnownReason(self, newReason):
@@ -999,7 +984,7 @@ def isKnownReason(self, newReason):
 %  \label{fig:slika4.2}
 %\end{figure}
 
-Na slici \ref{fig:slika4.3} prikazan je segment izveštaja alata \textit{Valgrind} koji predstavlja jednu grešku koju treba ispraviti. Žutom bojom je obeležen deo koji predstavlja tip greške, zelenom bojom deo koji predstavlja razlog greške, dok su plavom bojom obeležene sumnjive(problematične) linije. Ti podaci će redom biti smešteni u \textit{errorType}, \textit{errorReason} i \textit{problemLines}. Sve potrebne informacije od značaja iz datog iz datog segmenta izveštaja dobićemo upotrebom regularnih izraza.
+Na slici \ref{fig:slika4.3} prikazan je segment izveštaja alata \textit{Valgrind} koji predstavlja jednu grešku koju treba ispraviti. Žutom bojom je obeležen deo koji predstavlja tip greške, zelenom bojom deo koji predstavlja razlog greške, dok su plavom bojom obeležene sumnjive(problematične) linije. Ti podaci će redom biti smešteni u \textit{errorType}, \textit{errorReason} i \textit{problemLines}. Sve potrebne informacije od značaja iz datog segmenta izveštaja dobićemo upotrebom regularnih izraza.
 
 \begin{figure}[!ht]
   \centering
@@ -1011,27 +996,17 @@ Na slici \ref{fig:slika4.3} prikazan je segment izveštaja alata \textit{Valgrin
 Na osnovu \textit{errorType} i \textit{errorReason} biće određeno koji će šablon biti upotrebljen za ispravljanje greške. Na osnovu \textit{problemLines} biće pronađena tačna linija koda koja je izazvala grešku, a iz nje izvučeni podaci koji su neophodni za ispravljanje greške, kao i iz ostalih linija ukoliko sadrže informacije od značaja. Kada se neophodni podaci o grešci izvuku i nađe njeno rešenje, biće postavljene vrednosti \textit{changedFile}, \textit{changedLine}, \textit{bug}, \textit{bugFix}. Kada se obezbede svi podaci, dalje izvršavanje alata prepušta se sistemu za praćenje istorije promena koji je opisan u \ref{istorija}.
 
 \section{Mehanizam praćenja istorije}\label{istorija}
-Sve promene koje je alat \textit{Коronka} izvršio nad fajlovima biće praćene pomoću mehanizma za praćenje istorije. Svaka promena biće sačuvana pojedinačno u nizu \textit{history} u vidu uređene trojke \textit{(izmena u kodu, promenjena linja koda, fajl nad kojim se vrši promena)}. Ovakav vid praćenja istorije je dobar iz više razloga. Na primer, može se desiti da imamo istu liniju koda koja izaziva grešku koja se nalazi u dva različita fajla. Promena tih linija bez praćenja fajla nad kojim se vrši promena neće biti moguća u oba fajla, kako je ispravka greške opet ista linija koda sa određenim dodacima. Takođe, može se desiti na primer da u istom fajlu imamo dva bloka unutar kojih postoji linija koja izaziva problem. To su dakle dve greške, čije će rešenje biti dve potupuno iste linije koda, izmenjene u dve različite linije koda u istom fajlu. Ukoliko mehanizam praćenja istorije ne pamti i liniju koda u kojoj su promene izvršene, to neće biti moguće.  
+Sve promene koje je alat \textit{Коronka} izvršio nad fajlovima biće praćene pomoću mehanizma za praćenje istorije. Svaka promena biće sačuvana pojedinačno u nizu \textit{history} u vidu uređene trojke \textit{(izmena u kodu, promenjena linja koda, fajl nad kojim se vrši promena)}. Ovakav vid praćenja istorije je dobar iz više razloga. Na primer, može se desiti da imamo iste naredbe koje izazivaju grešku u dva različita fajla. Promena tih naredbi bez praćenja fajla nad kojim se vrši promena ne bi bila moguća u oba fajla, ukoliko je ispravka greške opet ista naredba sa određenim dodacima. Takođe, može se desiti na primer da u istom fajlu imamo dva bloka unutar kojih postoji linija koja izaziva problem. To su dakle dve greške, čije rešenje mogu biti dve potupuno iste naredbe, izmenjene u dve različite linije koda u istom fajlu. Ukoliko mehanizam praćenja istorije ne pamti i liniju koda u kojoj su promene izvršene, to neće biti moguće.  
 
-Prilikom pokretanja alata niz \textit{history} sadrži samo jednu trojku, tj.~\textit{(' ', -1, ' ')}. Kako se greške iterativno ispravljaju, svaka iteracija predstavlja pokušaj alata da datu grešku ispravi, što je bliže opisano u sekciji \ref{algoritam}. Za mehanizam praćenja istorije je to važno jer će on biti taj koji će validirati trenutni predlog za ispravku greške koje je alat našao. Prvi slučaj je da se predlog ispravke ne nalazi u istoriji, on će biti implementiran i dodat isoriji izmena u nadi da će se greška uspešno ispraviti. U drugom slučaju, predlog ispravke se već nalazi u istoriji izmena, što je signal alatu da je predlog rešenja već implementiran i da ta implementacija nije ispravila grešku, te da alat nastavi sa traženjem optimalnog rešenja. U teoriji, ukoliko alat iskoristi sve mehanizme za ispravljanje određene greške koje poseduje, tj.~implementira sve predloge rešenja koje je u mogućnosti da predloži, a greška ostane neispravljena, alat će nastaviti sa radom i pokušati da ispravi ostale greške, ukoliko postoje, a navedena greška će ostati neispravljena, a korisnik će biti obavešten da postoji greška koja nažalost nije ispravljena. Jasno, prilikom nalaženja rešenja koje će biti zaista i biti implementirano, to rešenje biva dodato u istoriju, a alat nastavlja sa iteracijama ispravljanja ostalih grešaka.
-
-\section{Algoritam izvršavanja}\label{algoritam}
-Kao što je već rečeno, pri pokretanju alata generiše se odgovarajući direktorijum, u njega se kopiraju svi navedeni (potrebni) fajlovi, formiraju se nizovi \textit{structures}, \textit{files} i \textit{history}. Nakon početnih podešavanja sledi iterativno kompilacija programa i analiza \textit{Valgrind}-ovim alatom \textit{Memcheck} čiji izlaz se smešta u datoteku \textit{ValgrindLOG.txt}. Ovaj fajl se parsira, i iz njega se čitaju informacije o greškama iterativno. Kad alat naiđe na gresku, parsira je, nakon čega proba da je ispravi ukoliko je u mogućnosti. Ukoliko nađe resenje koje već nije primenjeno, biće implementirano nakon čega alat ide u novu iteraciju kompilacije i provere grešaka, uz prethodno ažuriranje istorije i izveštaja o ispravljenim greškama. Proces se ponavlja dokle god ima grešaka koje nisu ispravljene, a koje je \textit{Koronka} u mogućnosti da ispravi. Grafički prikaz algoritma dat je na slici \ref{fig:slika4.4}.
-
-\begin{figure}[!ht]
-  \centering
-  \includegraphics[width=0.9\textwidth]{ExecutingAlgorithm.png}
-  \caption{Algoritam izvršavanja alata \textit{Koronka}}
-  \label{fig:slika4.4}
-\end{figure}
+Prilikom pokretanja alata niz \textit{history} sadrži samo jednu trojku, tj.~\textit{(' ', -1, ' ')}. Kako se greške iterativno ispravljaju, svaka iteracija predstavlja pokušaj alata da datu grešku ispravi, što je bliže opisano u sekciji \ref{algoritam}. Za mehanizam praćenja istorije je to važno jer će on biti taj koji će validirati trenutni predlog za ispravku greške koje je alat našao. Prvi slučaj je da se predlog ispravke ne nalazi u istoriji, on će biti implementiran i dodat isoriji izmena u nadi da će se greška uspešno ispraviti. U drugom slučaju, predlog ispravke se već nalazi u istoriji izmena, što je signal alatu da je predlog rešenja već implementiran i da ta implementacija nije ispravila grešku, te da alat nastavi sa traženjem novog rešenja. U teoriji, ukoliko alat iskoristi sve mehanizme za ispravljanje određene greške koje poseduje, tj.~implementira sve predloge rešenja koje je u mogućnosti da predloži, a greška ostane neispravljena, alat će nastaviti sa radom i pokušati da ispravi ostale greške, ukoliko postoje. Navedena greška će ostati neispravljena, a korisnik će biti obavešten da postoji greška koja nažalost nije ispravljena, samim tim što će se izveštaj o njoj nalaziti u datoteci \textit{ValgrindLOG.txt}. Prilikom nalaženja rešenja koje će zaista i biti implementirano, to rešenje biva dodato u istoriju, a alat nastavlja sa iteracijama ispravljanja ostalih grešaka.
 
 \section{Šabloni za ispravljanje grešaka}
-Alat \textit{Koronka} sadrži nekoliko šablona od kojih svaki ispravlja određenu vrstu grešaka. Šablon koji će biti primenjen za ispravljanje date greške određen je vrstom greške kao i razlogom koji je datu grešku izazvao, što znači da su šabloni ekskluzivno mapirani tipom i razlogom greške. Bez obzira na optimizaciju koji \textit{Memcheck} poseduje za ispisivanje izveštaja o grešci, i dalje ispisuje par paragrafa koji se odnose na istu grešku, sa različitim razlogom, odnosno tipom (pogledati npr. listing \ref{lst:slika2.7}). Razlog tome je taj što \textit{Memcheck} prati izvršavanje od početka, odnosno prati indirektan put te greške. To dalje znači da ne moramo da mapiramo sve tipove i razloge grešaka, već samo one koje će nam dati dovoljno informacija za ispravljanje greške. Kada ispravimo grešku, iz izveštaja koji je sadržao par paragrafa za istu, nestaće svi paragrafi kako je greška otklonjena, a za njeno otklanjanje smo koristili samo neophodnu količinu podataka, a ne sve podatke koje smo imali. Na taj način doprinosimo efikasnosti alata. Šabloni su smešteni u fajlove sa sufiksom \textit{Fix}, dok u imenu sadrže i tip greške koji ispravljaju. 
+Alat \textit{Koronka} sadrži nekoliko šablona od kojih svaki ispravlja određenu vrstu grešaka. Šablon koji će biti primenjen za ispravljanje date greške određen je vrstom greške kao i razlogom koji je datu grešku izazvao, a koje dobijamo iz izveštaja koji daje \textit{Memcheck}. Bez obzira na optimizaciju koji \textit{Memcheck} poseduje za ispisivanje izveštaja o grešci, i dalje ispisuje par paragrafa koji se odnose na istu grešku, sa različitim razlogom, odnosno tipom (pogledati npr. listing \ref{lst:slika2.7}). To je posledica principa rada alata \textit{Memcheck}, koji prati izvršavanje od početka, odnosno prati indirektan put te greške. To dalje znači da ne moramo da mapiramo sve tipove i razloge grešaka, već samo one koje će nam dati dovoljno informacija za ispravljanje greške. Nakon što se greška ispravi i program pusti na novu fazu kompilacije i analize alatom \textit{Memcheck}, izveštaj koji će se generisati neće sadržati paragrafe koje je sadržao ranije, a za čije smo ispravljanje koristili samo jedan paragraf. Ovakva implementacija doprinosi efikasnosti alata, kako smo za otklanjanje određene greške koristili samo neophodnu količinu podataka, a ne sve podatke koje smo imali. Šabloni su smešteni u fajlove sa sufiksom \textit{Fix}, dok u imenu sadrže i tip greške koji ispravljaju. 
 
 Kao što je već rečeno, šabloni su orijentisani prvenstveno prema tipu greške koju ispravljaju, pa će njihovo izlaganje biti realizovano kroz tipove grešaka koje ispravljaju. 
 
 \subsection{Korišćenje neinicijalizovane vrednosti}
-Šablon koji ispravlja ovaj tip grešaka mapiran je tipom \textit{''Conditional jump or move depends on uninitialised value(s)''}, dok razlozi za grešku mogu biti \textit{''Uninitialised value was created by a stack allocation''} i \textit{''Uninitialised value was created by a heap allocation''}, u zavisnosti od toga da li je reč o statičkoj, odnosno dinamički alociranoj memoriji. Ispis alata \textit{Valgrind} koji dobijamo za ovaj tip greške u slučaju statičke memorije, a na osnovu kog je ispravljamo, dat je na listingu \ref{lst:slika4.5}.
+Šablon koji ispravlja greške korišćenja neinicijalizovane vrednosti mapiran je na osnovu opisa koji daje alat \textit{Memcheck}, tj.~\textit{''Conditional jump or move depends on uninitialised value(s)''}, dok razlozi za grešku mogu biti \textit{''Uninitialised value was created by a stack allocation''} i \textit{''Uninitialised value was created by a heap allocation''}, u zavisnosti od toga da li je reč o statičkoj, odnosno dinamički alociranoj memoriji. Ispis alata \textit{Valgrind} koji dobijamo za ovaj tip greške u slučaju statičke memorije, a na osnovu kog je ispravljamo, dat je na listingu \ref{lst:slika4.5}.
 
 %\begin{figure}[!ht]
 %  \centering
@@ -1051,7 +1026,14 @@ Kao što je već rečeno, šabloni su orijentisani prvenstveno prema tipu grešk
 
 Iz datog izveštaja dobijamo informacije od važnosti za ispravljanje greške kao što su linije koda u kojima se koristi neinicijalizovana promenljiva, kao i liniju koda i fajl u kom počinje blok u kom je ta promenljiva definisana. Kako nemamo tačnu liniju koda u kojoj je promenljiva definisana, već blok, grešku ćemo ispraviti inicijalizovanjem svih neinicijalizovanih vrednosti u okviru tog bloka. 
 
-Analizom linija koda datog bloka poklapanjem sa regularnim izrazom $ ([ \\t]*)([a-zA-Z_-]+)[ ]+([a-zA-Z_-]+).*; $ dobijamo liniju koda gde imamo neinicijalizovanu definisanu promenljivu. Ona može biti i višedimenziona, pa pre inicijalizacije vršimo i tu proveru da bi je, ukoliko je to slučaj, adekvatno inicijalizovali. Iz rezultata dobijenih poklapanjem sa regularnim izrazima izvlačimo podatke poput tipa promenljive, imena, a u slučaju višedimenzionog niza još i dimenzije. Za inicijalizaciju promenljivih koristimo funkciju prikazanu na listingu \ref{lst:slika4.6}, dok u slučaju nizova, odnosno višedimenzionih nizova, koristimo pomoćnu funkciju koja koristi petlje za inicijalizaciju, a koja se suštinski oslanja na funkciju sa listinga \ref{lst:slika4.6}.
+Analizom linija koda datog bloka poklapanjem sa regularnim izrazom 
+$$ ([\quad\textbackslash t]*)([a-zA-Z_-]+)[\quad]+([a-zA-Z0-9_-]+).*; $$
+dobijamo liniju koda gde imamo neinicijalizovanu definisanu promenljivu. Ona može biti i višedimenziona, pa pre inicijalizacije vršimo i tu proveru da bi je, ukoliko je to slučaj, adekvatno inicijalizovali. Iz rezultata dobijenih poklapanjem sa regularnim izrazima izvlačimo podatke poput tipa promenljive, imena, a u slučaju višedimenzionog niza još i dimenzije. Na primer, primenom navedenog regularnog izraza koristeći funkciju \textit{search} modula \textit{re} nad odgovarajućom linijom koda dobijamo objekat poklapanja. Iz datog objekta, primenom funkcije \textit{group} dobijamo segmente koje odgovaraju uparenim zagradama, i to:
+\begin{itemize}
+\item tip promenljive na osnovu \textit{matchObject.group(2)}
+\item ime promenljive na osnovu \textit{matchObject.group(3)}
+\end{itemize} 
+Za inicijalizaciju promenljivih koristimo funkciju prikazanu na listingu \ref{lst:slika4.6}, dok u slučaju nizova, odnosno višedimenzionih nizova, koristimo pomoćnu funkciju koja koristi petlje za inicijalizaciju, a koja se suštinski oslanja na funkciju sa listinga \ref{lst:slika4.6}.
 
 \begin{lstlisting}[style=mystyle,caption={Funkcija inicijalizacije}, label={lst:slika4.6},language={Python}] 
 def initialise(varType):
@@ -1080,7 +1062,7 @@ def initialise(varType):
 
 U slučaju da je neinicijalizovana promenljiva korisnički definisana struktura, ukoliko je ona navedena kao argument komandne linije, alat će biti u mogućnosti da ispravi ovu grešku. Ispravljanje se sastoji u tome što će alat pronaći kako je ta struktura definisana, odnosno koji su njeni činioci. Koristeći odgovarajuću funkciju iz \textit{userDefinedStructuresHandler}-a, u kome su definisane sve operacije nad korisnčkim strukturama, inicijalizovaće celu strukturu, redom, inicijalizujući njene činioce, indirektno koristeći funkciju sa listinga \ref{lst:slika4.6}. Takođe, podržana je i inicijalizacija nizova, odnosno višedimenzionih nizova korisničkih struktura. 
 
-Nakon što smo opisali mehanizam inicijalizacije, ispravku greške formiramo tako što zamenimo problematičnu liniju koda linijom gde je promenljiva definisana i inicijalizovana, dok u slučaju nizova i višedimenzionih nizova, problematičnu liniju menjamo blokom koda koji se sastoji iz definicije promenljive nakon koje sledi inicijalizacija korišćenjem petlje, odnosno petlji u slučaju višedimenzionih nizova. 
+Ispravku greške formiramo tako što zamenimo problematičnu liniju koda linijom gde je promenljiva definisana i inicijalizovana, dok u slučaju nizova i višedimenzionih nizova, problematičnu liniju menjamo blokom koda koji se sastoji iz definicije promenljive nakon koje sledi inicijalizacija korišćenjem petlje, odnosno petlji u slučaju višedimenzionih nizova. 
 
 Ispis alata \textit{Valgrind} koji dobijamo za ovaj tip greške u slučaju dinamički alocijrane memorije, tj.~upotrebe pokazivača, a na osnovu kog je ispravljamo, dat je na listingu \ref{lst:slika4.7}.
 
@@ -1101,12 +1083,14 @@ Ispis alata \textit{Valgrind} koji dobijamo za ovaj tip greške u slučaju dinam
 ==3756==      by Ox10917C: main (1.c:9)
 \end{lstlisting}
 
-Za razliku od greške upotrebe neinicijalizovane promenljive koja je statički definisana, ovde, u izveštaju pored linija koda u kojima se koristi ta promenljiva dobijamo i informaciju o tačnoj liniji koda i fajlu u kom je promenljiva definisana. Način inicijalizacije je isti kao kod statički definisanih promenljivih, dok potrebne informacije dobijamo primenom nešto izmenjenim regularnim izrazima. Takođe, ukoliko je promenljiva samo pokazivač, bez alokacije memorije prilikom definicije iste, njena vrednost biće postavljena na \textit{NULL}. Regularni izraz koji koristimo u ovom slučaju jeste $ (malloc|calloc|realloc)(.+); $, dok se preciznije dobijanje informacije o grešci dobija specijalizacijom pomenutog izraza. Na osnovu rezultata primene pomenutih regularnih izraza dobijamo informacije o tipu pokazivača, imena pokazivača kao i veličini alocirane memorije. Takođe, i u ovom slučaju imamo podršku za rad sa korisnički definisanim strukturama. 
+Za razliku od greške upotrebe neinicijalizovane promenljive koja je statički definisana, ovde, u izveštaju pored linija koda u kojima se koristi ta promenljiva dobijamo i informaciju o tačnoj liniji koda i fajlu u kom je promenljiva definisana. Način inicijalizacije je isti kao kod statički definisanih promenljivih, dok potrebne informacije dobijamo primenom odgovarajućih regularnih izraza. Takođe, ukoliko je promenljiva samo pokazivač, bez alokacije memorije prilikom definicije iste, njena vrednost biće postavljena na \textit{NULL}. Regularni izraz koji koristimo u ovom slučaju jeste 
+$$ (malloc|calloc|realloc)(.+); $$
+dok se preciznije dobijanje informacije o grešci dobija specijalizacijom pomenutog izraza. Na osnovu rezultata primene pomenutih regularnih izraza dobijamo informacije o tipu pokazivača, imena pokazivača kao i veličini alocirane memorije. Primenom funkcije \textit{search} koristeći navedeni regularni izraz na osnovu \textit{matchObject.group(1)} dobijamo informaciju koja funkcija alokacije je iskorišćena. Dalje, u zavisnosti od te fukncije primenjuju se pomenuti specijalizovani regularni izrazi i odgovarajuće transformacije nad  \textit{matchObject.group(2)} u cilju dobijanja svih preostalih neophodnih informacija. Takođe, i u ovom slučaju alat poseduje podršku za rad sa korisnički definisanim strukturama. 
 
-Nakon sakupljanja potrebnih informacija ispravku greške formiramo na isti način kao i kod statiči definisanih promenljivih, tj.~problematičnu liniju menjamo blokom koji pored te linije sadrži i k\^od koji vrši inicijalizaciju, indirektno naslonjen na funkciju sa listinga \ref{lst:slika4.6} i inicijalizacione funkcije koje koriste petlje.
+Nakon sakupljanja potrebnih informacija, ispravku greške formiramo na isti način kao i kod statiči definisanih promenljivih, tj.~problematičnu liniju menjamo blokom koji pored te linije sadrži i k\^od koji vrši inicijalizaciju, indirektno naslonjen na funkciju sa listinga \ref{lst:slika4.6} i inicijalizacione funkcije koje koriste petlje.
 
 \subsection{Nevalidno čitanje/pisanje}
-Ovakav tip grešaka mapiran je tipom greške \textit{''Invalid read of size x''} u slučaju nevalidnog čitanja, odnosno \textit{''Invalid write of size x''} u slučaju nevalidnog pisanja, gde je \textit{x} broj bajtova. Razlog greške kojim se ova greška mapira je \textit{''Address adr is y bytes after a block of size z alloc'd''} u slučaju prekoračenja s desne strane, odnosno \textit{''Address adr is y bytes before a block of size z alloc'd''} u slučaju prekoračenja s leve strane, gde \textit{adr} predstavlja heksadekadni zapis adrese, a \textit{y} i \textit{z} broj bajtova. To se jasno može videti na listingu \ref{lst:slika4.8}.
+Šablon koji ispravlja greške nevalidnog čitanja/pisanja mapiran je na osnovu opisa koji daje alat \textit{Memcheck}, tj.~\textit{''Invalid read of size x''} u slučaju nevalidnog čitanja, odnosno \textit{''Invalid write of size x''} u slučaju nevalidnog pisanja, gde je \textit{x} broj bajtova. Razlog greške kojim se ova greška mapira je \textit{''Address adr is y bytes after a block of size z alloc'd''} u slučaju prekoračenja s desne strane, odnosno \textit{''Address adr is y bytes before a block of size z alloc'd''} u slučaju prekoračenja s leve strane, gde \textit{adr} predstavlja heksadekadni zapis adrese, a \textit{y} i \textit{z} broj bajtova. To se jasno može videti na listingu \ref{lst:slika4.8}.
 
 %\begin{figure}[!ht]
 %  \centering
@@ -1123,11 +1107,13 @@ Ovakav tip grešaka mapiran je tipom greške \textit{''Invalid read of size x''}
 ==4289==      by Ox10916D: main (4.c:7)
 \end{lstlisting}
 
-Analizom segmenta sa listinga \ref{lst:slika4.8}, odnosno samo razloga i tipa greške, možemo da dobijemo informaciju koliko je velika memorija kojoj pokušavamo da pristupimo, ili da je izmenimo, a koja nije alocirana. Ispravka bi bila da memoriju koju program alocira, a sa kojom je pokušana interakcija, proširimo za vrednost koju dobijamo primenom pomenutih informacija. Takođe, na listingu \ref{lst:slika4.8} vidimo da dobijamo i tačnu liniju koda, odnosno fajl gde je memorija alocirana. Baš tu liniju koda menjamo ispravnom, a ispravka se sastoji u tome da pogrešnu veličinu memorije koja se alocira zamenimo ispravnom, uvećanom za broj bitova koji dobijemo analizom greške. Na ovaj način ispravljamo greške koje su povezane sa prekoračenjem s desne strane. U slučaju prekoračenja s leve strane, pristupamo memoriji kojoj nam nije dozvoljeno, odnosno arument pristupa je vrednost manja od 0, kako znamo da indeksi pristupa alociranoj memoriji kreću od 0. Ovu grešku ispravljamo tako što pogrešan indeks pristupa zamenimo njegovom apsolutnom vrednošću i na taj način ispravni indeksi ostaju takvi, dok pogrešne stavljamo u interval ispravnih. U slučaju da apsolutna vrednost pomenutog indeksa izaziva grešku prekoračenja s desne strane, memorija će biti proširena, odnosno ispravljaće se greška nevalidnog čitanja/pisanja u slučaju prekoračenja s desne strane.  
+Analizom segmenta sa listinga \ref{lst:slika4.8}, odnosno samo razloga i tipa greške, možemo da dobijemo informaciju koliko je velika memorija kojoj pokušavamo da pristupimo, ili da je izmenimo, a koja nije alocirana. Moguća ispravka je adkevatno računanje izraza koji se koristi za indeksiranje, ali tu vrstu ispravke ovde nije moguće uraditi. Druga ispravka bi bila da memoriju koju program alocira, a sa kojom je pokušana interakcija, proširimo za vrednost koju dobijamo primenom pomenutih informacija. Takođe, na listingu \ref{lst:slika4.8} vidimo da dobijamo i tačnu liniju koda, odnosno fajl gde je memorija alocirana. Baš tu liniju koda menjamo ispravnom, a ispravka se sastoji u tome da pogrešnu veličinu memorije koja se alocira zamenimo ispravnom, uvećanom za broj bitova koji dobijemo analizom greške. Na ovaj način ispravljamo greške koje su povezane sa prekoračenjem s desne strane. 
+
+U slučaju prekoračenja s leve strane, pristupamo memoriji kojoj nam nije dozvoljeno, odnosno arument pristupa je vrednost manja od 0, kako znamo da indeksi pristupa alociranoj memoriji kreću od 0. Ovu grešku ispravljamo tako što pogrešan indeks pristupa zamenimo njegovom apsolutnom vrednošću i na taj način ispravni indeksi ostaju takvi, dok pogrešne stavljamo u interval ispravnih. U slučaju da apsolutna vrednost pomenutog indeksa izaziva grešku prekoračenja s desne strane, memorija će biti proširena, odnosno ispravljaće se greška nevalidnog čitanja/pisanja u slučaju prekoračenja s desne strane.  
 
 
 \subsection{Nevalidno oslobađanje memorije}
-Ovakav tip grešaka mapiran je tipom greške \textit{''Invalid free() / delete / delete[] / realloc()''}. Za ovaj tip greške razlog nije od presudnog značaja, tako da se mapiranje vrši samo nad tipom greške. Na listingu \ref{lst:slika4.9} prikazan je segment ispisa greške koji koristimo da bismo je ispravili. Analizom ispisa sa slike dobijamo preciznu informaciju o liniji koda, kao i o fajlu gde je izvršeno nevalidno oslobađanje memorije. Ovu grešku ispravljamo tako što tu liniju izbrišemo, odnosno otklonimo nevalidno oslobađanje memorije. 
+Šablon koji ispravlja greške nevalidnog oslobađanja memorije mapiran je na osnovu opisa koji daje alat \textit{Memcheck}, tj.~\textit{''Invalid free() / delete / delete[] / realloc()''}. Za ovaj tip greške razlog nije od presudnog značaja, tako da se mapiranje vrši samo nad opisom greške. Na listingu \ref{lst:slika4.9} prikazan je segment ispisa greške koji koristimo da bismo je ispravili. Analizom ispisa sa slike dobijamo preciznu informaciju o liniji koda, kao i o fajlu gde je izvršeno nevalidno oslobađanje memorije. Ovu grešku ispravljamo tako što tu liniju izbrišemo, odnosno otklonimo nevalidno oslobađanje memorije. 
 
 %\begin{figure}[!ht]
 %  \centering
@@ -1149,7 +1135,7 @@ Ovakav tip grešaka mapiran je tipom greške \textit{''Invalid free() / delete /
 \end{lstlisting}
 
 \subsection{Sumnjive vrednosti argumenata}
-Ovakav tip grešaka mapiran je tipom greške \textit{'' Argument 'size' of function x has a fishy (possibly negative) value: y''}, gde je \textit{x} naziv funkcije, a \textit{y} vrednost argumenta. Za ovaj tip greške mapiranje se vrši samo nad tipom greške, kako je sam razlog nedozvoljena vrednost argumenta, što \textit{Memcheck} ispisuje u okviru tipa greške. Na listingu \ref{lst:slika4.10} prikazan je ispis greške koji koristimo da bismo je ispravili. Analizom ispisa sa slike dobijamo preciznu informaciju o liniji koda, kao i o fajlu gde gde je pozvana funkcija koja sadrži sumnjivi arugment. U zavisnosti od funkcije, primenom adekvatnog regularnog izraza nalazimo mesto gde je sumnjivi arugment, i isti menjamo njegovom apsolutnom vrednošću, da bi dobili ispravnu vrednost argumenta. Dakle, ovu grešku ispravljamo tako što izmenimo sumnjivi argument u pozivu funkcije u okviru problematične linije ispravnim, odnosno računamo apsolutnu vrednost sumnjivog argumenta. 
+Šablon koji ispravlja greške sumnjivih vrednosti argumenata mapiran je na osnovu opisa koji daje alat \textit{Memcheck}, tj.~\textit{''Argument 'size' of function x has a fishy (possibly negative) value: y''}, gde je \textit{x} naziv funkcije, a \textit{y} vrednost argumenta. Za ovaj tip greške mapiranje se vrši samo nad opisom greške, kako je sam razlog nedozvoljena vrednost argumenta, što \textit{Memcheck} ispisuje u okviru opisa greške. Na listingu \ref{lst:slika4.10} prikazan je ispis greške koji koristimo da bismo je ispravili. Analizom ispisa sa slike dobijamo preciznu informaciju o liniji koda, kao i o fajlu gde gde je pozvana funkcija koja sadrži sumnjivi arugment. U zavisnosti od funkcije, odgovarajućim transformacijama nad linijom koda u kojoj je poziv te funkcije, nalazimo mesto gde je sumnjivi arugment, i isti menjamo njegovom apsolutnom vrednošću, da bi dobili ispravnu vrednost argumenta. Nažalost, nije uvek moguće automatsko ispravljanje grešaka ovog tipa na uniforman način. Nedozvoljena vrednost argumenata može biti na primer posledica pogrešno sračunatog izraza, što nije moguće ispraviti automatski. Ispravka koja je implemntirana obezbeđuje da program nema \textit{Runtime Error}, pa omogućava da se vrši debagovanje i lakše pronađu semantičke greške programa. Dakle, ovu grešku ispravljamo tako što izmenimo sumnjivi argument u pozivu funkcije u okviru problematične linije ispravnim, odnosno računamo apsolutnu vrednost sumnjivog argumenta. 
 
 %\begin{figure}[!ht]
 %  \centering
@@ -1164,8 +1150,39 @@ Ovakav tip grešaka mapiran je tipom greške \textit{'' Argument 'size' of funct
 ==3565==      by 0x109194: main (15.c:7)
 \end{lstlisting}
 
-\section{Primer rada alata}
-Analiza i ispravka programa sa listinga \ref{lst:slika2.4} predstavljena je u ovoj sekciji. Dati program sadrži grešku upotrebe neinicijalizovane promenljive koja će biti ispravljena. Alat pokrećemo komandom u komandnoj liniji:
+\subsection{Korišćenje neadresirane ili neinicijalizovane vrednosti u sistemskom pozivu}
+Šablon koji ispravlja greške korišćenja neadresirane ili neinicijalizovane vrednosti u sistemskom pozivu mapiran je na osnovu opisa koji daje alat \textit{Memcheck}, npr.~\textit{''Syscall param write(buf) points to uninitialised byte(s)''}, \textit{''Syscall param exit\_group(status) contains uninitialised byte(s)''}, ili nekim drugim opisom karakterističnim za određenu vrstu funkcije. Za ovaj tip greške mapiranje se vrši samo nad opisom greške, kako grešku izazivaju loši argumenti funkcija sistemskog poziva. Na listingu \ref{lst:slika4.11} prikazan je jedan od ispisa ove greške, u konkretnom slučaju korišćenja funkcije \textit{write} koji koristimo da bismo je ispravili. Analizom ispisa sa slike dobijamo preciznu informaciju o liniji koda, kao i o fajlu gde gde je pozvana funkcija koja izaziva grešku, kao i linije koda gde je definisana neinicijalizovana ili neadresirana vrednost koja je u pozivu funkcije iskorišćena. Ispravka greške sastoji se u pronalaženju linije gde je definisana promenljiva i njena zamena ispravljenom linijom ili blokom koda koji sadrži tu liniju i dodatni kod koji ispravlja grešku.  
+
+\begin{lstlisting}[style=terminal,caption={Primer ispisa greške korišćenja neinicializovane ili neadresirane vrednosti u sistemskom pozivu}, label={lst:slika4.11},language={bash}] 
+==5695==  Syscall param write(buf) points to uninitialised byte(s)
+==5695==     at 0x25A48723: __write_nocancel (in /lib/tls/libc-2.3.3.so)
+==5695==     by 0x259AFAD3: __libc_start_main (in /lib/tls/libc-2.3.3.so)
+==5695==     by 0x8048348: (within /auto/homes/njn25/grind/head4/a.out)
+==5695==   Address 0x25AB8028 is 0 bytes inside a block of size 10 alloc'd
+==5695==     at 0x259852B0: malloc (vg_replace_malloc.c:130)
+==5695==     by 0x80483F1: main (a.c:5)
+\end{lstlisting}
+
+\section{Primeri rada alata}
+U ovoj sekciji biće predstavljeni primeri rada alata za svaku od grešaka koje alat ispravlja. Prvi primer će dati kompletan pregled onoga što alat \textit{Koronka} radi sa programom koji analizira i šta ostavlja nakon svog rada. Ostali primeri biće izneti u formi listinga sa sledećom sadržinom:
+\begin{itemize}
+\item[$\textendash$] program koji sadrži greške;
+\item[$\textendash$] ispravljeni program alatom \textit{Koronka};
+\item[$\textendash$] izveštaj koji je formirao alat \textit{Koronka}.
+\end{itemize} 
+
+Primeri koji su prikazani u ovoj sekciji deo su skupa test primera koji se nalaze u direktorijumu \textit{Examples} u okviru glavnog direktorijuma alata. Podeljeni su po direktorijumima tako da svaki direktorijum sadrži program koji sadrži određene vrste grešaka. Takođe, mogu se naći i pokretanja i ispravke koje je \textit{Koronka} implementirala nad tim test primerima. Ti fajlovi smešteni su u odgovarajući direktorijum formata \textit{datum pokretanja-vreme pokretanja}, koje je alat \textit{Koronka} kreirala prilikom izvršavanja. Skup test primera dostupan je na linku \url{https://github.com/LMladenovic/Error_fixing_tool/tree/master/Examples}.  
+
+Analiza i ispravka programa sa slike \ref{fig:slika4.15} predstavljena je u ovom primeru. 
+
+\begin{figure}[!ht]
+  \centering
+  \includegraphics[width=0.6\textwidth]{ProgramWithError.png}
+  \caption{Izgled programa koji sadrži grešku}
+  \label{fig:slika4.15}
+\end{figure}
+
+Dati program sadrži grešku upotrebe neinicijalizovane promenljive koja će biti ispravljena. Alat pokrećemo komandom u komandnoj liniji:
 \begin{center}
 \textit{python koronka.py program.c}.
 \end{center}
@@ -1200,18 +1217,419 @@ Direktorijum koji je formiran i dodeljen ovom konkretnom pokretanju alata i njeg
   \label{fig:slika4.14}
 \end{figure}
 
-Prikazani primer deo je skupa test primera nalazi se u direktorijumu \textit{Example} u okviru glavnog direktorijuma alata. Podeljeni su po folderima, a takođe se mogu i naći pokretanja i ispravke koje je \textit{Koronka} implementirala nad tim test primerima. Skup test primera dostupan je na linku \url{https://github.com/LMladenovic/Error_fixing_tool/tree/master/Example}. 
+\newpage
+Primer programa koji sadrži greške korišćenja neinicializovanih ili neadresiranih vrednosti u sistemskom pozivu dat je na listingu \ref{lst:program1}, dok su ispravljeni program alatom \textit{Koronka} i prateći izveštaj dati na listinzima \ref{lst:program1Fix} i \ref{lst:program1Report}.
+
+\begin{lstlisting}[style=mystyle,caption={Program koji sadrži greške korišćenja neinicializovanih ili neadresiranih vrednosti u sistemskom pozivu}, label={lst:program1},language={Python}] 
+#include <stdlib.h>
+#include <unistd.h>
+
+int main( void ){
+  char* arr  = malloc(10);
+  int*  arr2 = malloc(sizeof(int));
+  write( 1 /* stdout */, arr, 10 );
+  exit(arr2[0]);
+}
+\end{lstlisting}
+
+\begin{lstlisting}[style=mystyle,caption={Ispravljeni program sa listinga \ref{lst:program1} alatom \textit{Koronka}}, label={lst:program1Fix},language={Python}] 
+#include <stdlib.h>
+#include <unistd.h>
+
+int main( void ){
+  char* arr  = calloc( sizeof(char), 10);
+  int*  arr2 = malloc(sizeof(int));
+  write( 1 /* stdout */, arr, 10 );
+  exit(0);
+}
+\end{lstlisting}
+
+\begin{lstlisting}[style=terminal,caption={Izveštaj o radu alata \textit{Koronka} za program sa listinga \ref{lst:program1}}, label={lst:program1Report},language={bash}]   
+#####  Based on Valgrind output:  #####
+
+Syscall param write(buf) points to uninitialised byte(s)
+at 0x4978024: write (write.c:26)
+by 0x10918E: main (16.c:7)
+Address 0x4a59040 is 0 bytes inside a block of size 10 alloc'd
+at 0x483874F: malloc (in /usr/lib/x86_64-linux-gnu/valgrind/vgpreload_memcheck-amd64-linux.so)
+by 0x109166: main (16.c:5)
+Uninitialised value was created by a heap allocation
+at 0x483874F: malloc (in /usr/lib/x86_64-linux-gnu/valgrind/vgpreload_memcheck-amd64-linux.so)
+by 0x109166: main (16.c:5)
+
+#####  Koronka made following changes in 16.c  #####
+
+Changed 5. line 
+  char* arr  = malloc(10);
+ with 
+  char* arr  = calloc( sizeof(char), 10);
+
+#####  Based on Valgrind output:  #####
+
+Syscall param exit_group(status) contains uninitialised byte(s)
+at 0x494C926: _Exit (_exit.c:31)
+by 0x48B23A9: __run_exit_handlers (exit.c:132)
+by 0x48B23D9: exit (exit.c:139)
+by 0x1091B0: main (16.c:8)
+Uninitialised value was created by a heap allocation
+at 0x483874F: malloc (in /usr/lib/x86_64-linux-gnu/valgrind/vgpreload_memcheck-amd64-linux.so)
+by 0x109189: main (16.c:6)
+
+#####  Koronka made following changes in 16.c  #####
+
+Changed 8. line 
+  exit(arr2[0]);
+ with 
+  exit(0);
+\end{lstlisting}
+
+Primer programa koji sadrži grešku nevalidnog oslobađanja memorije dat je na listingu \ref{lst:program2}, dok su ispravljeni program alatom \textit{Koronka} i prateći izveštaj dati na listinzima \ref{lst:program2Fix} i \ref{lst:program2Report}.
+
+\begin{lstlisting}[style=mystyle,caption={Program koji sadrži grešku nevalidnog oslobađanja memorije}, label={lst:program2},language={Python}] 
+#include <stdio.h>
+#include <stdlib.h>
+
+int main()
+{
+  char *p, q;
+
+  p = (char *) malloc(19);
+  p = (char *) malloc(12);
+  free(p);
+  free(p);
+
+  p = &q;
+  free(p); 			
+  				
+  return 0;
+}
+\end{lstlisting}
+
+\begin{lstlisting}[style=mystyle,caption={Ispravljeni program sa listinga \ref{lst:program2} alatom \textit{Koronka}}, label={lst:program2Fix},language={Python}] 
+#include <stdio.h>
+#include <stdlib.h>
+
+int main()
+{
+  char *p, q;
+
+  p = (char *) malloc(19);
+  p = (char *) malloc(12);
+  free(p);
+
+
+  p = &q;
+
+  				
+  return 0;
+}
+\end{lstlisting}
+
+\begin{lstlisting}[style=terminal,caption={Izveštaj o radu alata \textit{Koronka} za program sa listinga \ref{lst:program2}}, label={lst:program2Report},language={bash}]   
+#####  Based on Valgrind output:  #####
+
+Invalid free() / delete / delete[] / realloc()
+at 0x483997B: free (in /usr/lib/x86_64-linux-gnu/valgrind/vgpreload_memcheck-amd64-linux.so)
+by 0x10919F: main (2.c:11)
+Address 0x4a590a0 is 0 bytes inside a block of size 12 free'd
+at 0x483997B: free (in /usr/lib/x86_64-linux-gnu/valgrind/vgpreload_memcheck-amd64-linux.so)
+by 0x109193: main (2.c:10)
+Block was alloc'd at
+at 0x483874F: malloc (in /usr/lib/x86_64-linux-gnu/valgrind/vgpreload_memcheck-amd64-linux.so)
+by 0x109183: main (2.c:9)
+
+#####  Koronka made following changes in 2.c  #####
+
+Removed 11. line
+  free(p);
+
+#####  Based on Valgrind output:  #####
+
+Invalid free() / delete / delete[] / realloc()
+at 0x483997B: free (in /usr/lib/x86_64-linux-gnu/valgrind/vgpreload_memcheck-amd64-linux.so)
+by 0x1091A7: main (2.c:14)
+Address 0x1ffefffcef is on thread 1's stack
+in frame #1, created by main (2.c:5)
+
+#####  Koronka made following changes in 2.c  #####
+
+Removed 14. line
+  free(p); 			
+\end{lstlisting}
+
+Primer programa koji sadrži grešku nevalidnog čitanja/pisanja dat je na listingu \ref{lst:program3}, dok su ispravljeni program alatom \textit{Koronka} i prateći izveštaj dati na listinzima \ref{lst:program3Fix} i \ref{lst:program3Report}.
+
+\begin{lstlisting}[style=mystyle,caption={Program koji sadrži grešku nevalidnog čitanja/pisanja}, label={lst:program3},language={Python}] 
+#include <stdio.h>
+#include <stdlib.h>
+
+int main(){
+
+	int *t = malloc(4*sizeof(int));
+
+	printf("Right side overdraft: %d\n", t[4]);
+	printf("Left side overdraft: %d\n", t[4-5]);
+	free(t); 
+	return 0;
+}
+\end{lstlisting}
+
+\begin{lstlisting}[style=mystyle,caption={Ispravljeni program sa listinga \ref{lst:program3} alatom \textit{Koronka}}, label={lst:program3Fix},language={Python}] 
+#include <stdio.h>
+#include <stdlib.h>
+
+int main(){
+
+	int *t = malloc(4*sizeof(int) + 1*sizeof(int));
+		int __index__;
+	for( __index__ = 0; __index__ < 5; __index__ ++)
+		t[__index__] = 0;
+
+
+	printf("Right side overdraft: %d\n", t[4]);
+	printf("Left side overdraft: %d\n", t[abs(4-5)]);
+	free(t); 
+	return 0;
+}
+\end{lstlisting}
+
+\begin{lstlisting}[style=terminal,caption={Izveštaj o radu alata \textit{Koronka} za program sa listinga \ref{lst:program3}}, label={lst:program3Report},language={bash}]   
+#####  Based on Valgrind output:  #####
+
+Invalid read of size 4
+at 0x109173: main (14.c:8)
+Address 0x4a59050 is 0 bytes after a block of size 16 alloc'd
+at 0x483874F: malloc (in /usr/lib/x86_64-linux-gnu/valgrind/vgpreload_memcheck-amd64-linux.so)
+by 0x109166: main (14.c:6)
+
+#####  Koronka made following changes in 14.c  #####
+
+Changed 6. line 
+	int *t = malloc(4*sizeof(int));
+ with 
+	int *t = malloc(4*sizeof(int) + 1*sizeof(int));
+
+#####  Based on Valgrind output:  #####
+
+Conditional jump or move depends on uninitialised value(s)
+at 0x48E2E40: __vfprintf_internal (vfprintf-internal.c:1644)
+by 0x48CD8D7: printf (printf.c:33)
+by 0x109187: main (14.c:8)
+Uninitialised value was created by a heap allocation
+at 0x483874F: malloc (in /usr/lib/x86_64-linux-gnu/valgrind/vgpreload_memcheck-amd64-linux.so)
+by 0x109166: main (14.c:6)
+
+#####  Koronka made following changes in 14.c  #####
+
+Changed 6. line 
+	int *t = malloc(4*sizeof(int) + 1*sizeof(int));
+ with 
+	int *t = malloc(4*sizeof(int) + 1*sizeof(int));
+		int __index__;
+	for( __index__ = 0; __index__ < 5; __index__ ++)
+		t[__index__] = 0;
+
+#####  Based on Valgrind output:  #####
+
+Invalid read of size 4
+at 0x1091BD: main (14.c:13)
+Address 0x4a5903c is 4 bytes before a block of size 20 alloc'd
+at 0x483874F: malloc (in /usr/lib/x86_64-linux-gnu/valgrind/vgpreload_memcheck-amd64-linux.so)
+by 0x109166: main (14.c:6)
+
+#####  Koronka made following changes in 14.c  #####
+
+Changed 13. line 
+	printf("Left side overdraft: %d\n", t[4-5]);
+ with 
+	printf("Left side overdraft: %d\n", t[abs(4-5)]);	
+\end{lstlisting}
+
+Primer programa koji sadrži grešku sumnjive vrednosti arguenata dat je na listingu \ref{lst:program4}, dok su ispravljeni program alatom \textit{Koronka} i prateći izveštaj dati na listinzima \ref{lst:program4Fix} i \ref{lst:program4Report}.
+
+\begin{lstlisting}[style=mystyle,caption={Program koji sadrži grešku sumnjive vrednosti arguenata}, label={lst:program4},language={Python}] 
+#include <stdio.h>
+#include <stdlib.h>
+
+int main(int argv, char** argc){
+	char *r = malloc(-15);
+	int *t = malloc(3);
+	t = (int *)realloc(t, -3*sizeof(int)); 
+	free(r);
+	free(t);
+	return 0;
+}
+\end{lstlisting}
+
+\begin{lstlisting}[style=mystyle,caption={Ispravljeni program sa listinga \ref{lst:program4} alatom \textit{Koronka}}, label={lst:program4Fix},language={Python}] 
+#include <stdio.h>
+#include <stdlib.h>
+
+int main(int argv, char** argc){
+	char *r = malloc(abs(-15));
+	int *t = malloc(3);
+	t = (int *)realloc(t,abs( -3*sizeof(int))); 
+	free(r);
+	free(t);
+	return 0;
+}
+\end{lstlisting}
+
+\begin{lstlisting}[style=terminal,caption={Izveštaj o radu alata \textit{Koronka} za program sa listinga \ref{lst:program4}}, label={lst:program4Report},language={bash}]   
+#####  Based on Valgrind output:  #####
+
+Argument 'size' of function malloc has a fishy (possibly negative) value: -15
+at 0x483874F: malloc (in /usr/lib/x86_64-linux-gnu/valgrind/vgpreload_memcheck-amd64-linux.so)
+by 0x10916F: main (15.c:5)
+
+#####  Koronka made following changes in 15.c  #####
+
+Changed 5. line 
+	char *r = malloc(-15);
+ with 
+	char *r = malloc(abs(-15));
+
+#####  Based on Valgrind output:  #####
+
+Argument 'size' of function realloc has a fishy (possibly negative) value: -12
+at 0x483AD4B: realloc (in /usr/lib/x86_64-linux-gnu/valgrind/vgpreload_memcheck-amd64-linux.so)
+by 0x109192: main (15.c:7)
+
+#####  Koronka made following changes in 15.c  #####
+
+Changed 7. line 
+	t = (int *)realloc(t, -3*sizeof(int)); 
+ with 
+	t = (int *)realloc(t,abs( -3*sizeof(int))); 
+
+\end{lstlisting}
+
+Primer programa koji sadrži grešku za čije ispravljanje se koriste funkcije inicijalizacije korisnički definisanih struktura dat je na listingu \ref{lst:program5}, dok su ispravljeni program alatom \textit{Koronka} i prateći izveštaj dati na listinzima \ref{lst:program5Fix} i \ref{lst:program5Report}.
+
+\begin{lstlisting}[style=mystyle,caption={Program koji sadrži grešku za čije ispravljanje se koriste funkcije inicijalizacije korisnički definisanih struktura}, label={lst:program5},language={Python}] 
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct _point{
+int x;
+int y;
+int consts[3];
+}Point;
+
+int main(){
+
+	Point A;
+
+	Point B[5];
+
+	printf("Point A(%d,%d)\n", A.x, A.y);
+	
+	int i;
+	for (i=0;i<5;i++)
+		printf("B[%d] = (%d, %d)\n", i+1, B[i].x, B[i].y);
+
+	return 0;
+}
+\end{lstlisting}
+
+\begin{lstlisting}[style=mystyle,caption={Ispravljeni program sa listinga \ref{lst:program5} alatom \textit{Koronka}}, label={lst:program5Fix},language={Python}] 
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct _point{
+int x;
+int y;
+int consts[3];
+}Point;
+
+int main(){
+
+	Point A;
+	A.x=0;
+	A.y=0;
+	int __index__;
+	for( __index__ = 0; __index__ < 3; __index__ ++)
+		A.consts[__index__] = 0;
+
+	Point B[5];
+	int __index2__;
+	for( __index2__ = 0; __index2__ < 5; __index2__ ++){
+			B[__index2__].x=0;
+			B[__index2__].y=0;
+			int __index3__;
+			for( __index3__ = 0; __index3__ < 3; __index3__ ++)
+				B[__index2__].consts[__index3__] = 0;
+		
+	}
+
+	printf("Point A(%d,%d)\n", A.x, A.y);
+	
+	int i;
+	for (i=0;i<5;i++)
+		printf("B[%d] = (%d, %d)\n", i+1, B[i].x, B[i].y);
+
+	return 0;
+}
+\end{lstlisting}
+
+\begin{lstlisting}[style=terminal,caption={Izveštaj o radu alata \textit{Koronka} za program sa listinga \ref{lst:program5}}, label={lst:program5Report},language={bash}]   
+#####  Based on Valgrind output:  #####
+
+Conditional jump or move depends on uninitialised value(s)
+at 0x48E2E40: __vfprintf_internal (vfprintf-internal.c:1644)
+by 0x48CD8D7: printf (printf.c:33)
+by 0x10917D: main (12.c:16)
+Uninitialised value was created by a stack allocation
+at 0x109149: main (12.c:10)
+
+#####  Koronka made following changes in 12.c  #####
+
+Changed 12. line 
+	Point A;
+ with 
+	Point A;
+	A.x=0;
+	A.y=0;
+	int __index__;
+	for( __index__ = 0; __index__ < 3; __index__ ++)
+		A.consts[__index__] = 0;
+
+#####  Based on Valgrind output:  #####
+
+Conditional jump or move depends on uninitialised value(s)
+at 0x48E2E40: __vfprintf_internal (vfprintf-internal.c:1644)
+by 0x48CD8D7: printf (printf.c:33)
+by 0x109228: main (12.c:25)
+Uninitialised value was created by a stack allocation
+at 0x109145: main (12.c:10)
+
+#####  Koronka made following changes in 12.c  #####
+
+Changed 19. line 
+	Point B[5];
+ with 
+	Point B[5];
+	int __index2__;
+	for( __index2__ = 0; __index2__ < 5; __index2__ ++){
+		B[__index2__].x=0;
+		B[__index2__].y=0;
+		int __index3__;
+		for( __index3__ = 0; __index3__ < 3; __index3__ ++)
+			B[__index2__].consts[__index3__] = 0;
+		
+	}
+\end{lstlisting}
 
 % ------------------------------------------------------------------------------
 
 % ------------------------------------------------------------------------------
 \chapter{Zaključak}
-Alatima \textit{Valgrind} distribucije mogu se otkriti greške i kritične tačke programa čijim ispravljanjem direktno poboljšavamo konzistentnost, funkcionalnost i performanse programa koji se razvija. Ručno otkrivanje tih grešaka obično je mukotrpan i najčešće neefikasan postupak. Srećom, alat \textit{Valgrind} je tu da pomogne u prevazilaženju tog problema. Alat \textit{Memcheck}, koji je deo \textit{Valgrind} distribucije, otkriva greške u radu sa memorijom koje mogu da dovedu do pada programa, a koje kompilator nije u mogućnosti da otkrije, zauzima centralno mesto ovog rada. Princip funkcionisanja ovog alata detaljno je obrađen u ovom radu. Ostali alati \textit{Valgrind} distribucije mogu da otkriju druge probleme, poput grešaka u radu sa nitima i sl., čijom detekcijom i ispravljanjem možete doprineti performansama i boljem radu softvera koji razvijate. 
+Alatima \textit{Valgrind} distribucije mogu se otkriti greške i kritične tačke programa čijim ispravljanjem direktno poboljšavamo konzistentnost, funkcionalnost i performanse programa koji se razvija. Ručno otkrivanje tih grešaka obično je mukotrpan i najčešće neefikasan postupak. Srećom, alat \textit{Valgrind} je tu da pomogne u prevazilaženju tog problema. Alat \textit{Memcheck}, koji je deo \textit{Valgrind} distribucije, otkriva greške u radu sa memorijom koje mogu da dovedu do pada programa, a koje kompilator nije u mogućnosti da otkrije. Pomenuti alat zauzima centralno mesto ovog rada. Princip funkcionisanja ovog alata detaljno je obrađen u ovom radu. Ostali alati \textit{Valgrind} distribucije mogu da otkriju druge probleme, poput grešaka u radu sa nitima i sl., čijom se detekcijom i ispravljanjem može doprineti performansama i boljem radu softvera koji se razvija. 
 
-Nakon što analizom programa nekim od alata distibucije \textit{Valgrind} detektujemo greške, ukoliko postoje, neophodno je da razumemo izlaz koji nam je alat dao, i da na osnovu njega pokušamo da popravimo greške. Alat koji je iznet u ovom radu pokušava da taj proces automatizuje, odnosno da razume izlaz koji je alat \textit{Memcheck} dao, i da na osnovu njega korišćenjem adekvatnih šablona ispravi otkrivene greške. Pokriven je širok dijapazon grešaka, što ne isključuje da postoje greške koje mogu biti otkrivene daljim razvojem, a koje alat \textit{Koronka} ne pokriva. Greške koje alat \textit{Koronka} uspešno otklanja su :
+Nakon što analizom programa nekim od alata distibucije \textit{Valgrind} detektujemo greške, ukoliko postoje, neophodno je da razumemo izlaz koji nam je alat dao, i da na osnovu njega pokušamo da popravimo greške. Alat koji je razvijen u ovom radu pokušava da taj proces automatizuje, odnosno da razume izlaz koji je alat \textit{Memcheck} dao, i da na osnovu njega korišćenjem adekvatnih šablona ispravi otkrivene greške. Alat pokriva širok dijapazon grešaka, što ne isključuje da postoje greške koje mogu biti otkrivene daljim razvojem, a koje alat \textit{Koronka} u ovom trenutku ne pokriva. Greške koje alat \textit{Koronka} uspešno otklanja su :
 \begin{itemize}
 \item korišćenje neinicijalizovanih vrednosti kako primitivnog tipa, tako i korisnički definisanih struktura, bilo da su one statički definisane, ili dinamički alocirane;
-\item nedozvoljeno čitanje i pisanje u memoriju u koju nije dozvoljeno, kako s leve, tako i s desne strane, a koja je dinamički alocirana;
+\item nedozvoljeno čitanje i pisanje u memoriju, kako s leve, tako i s desne strane, a koja je dinamički alocirana;
 \item sumnjive vrednosti argumenata;
 \item nevalidna oslobađanja memorije;
 \item nevalidni arugmenti sistemskih poziva.
