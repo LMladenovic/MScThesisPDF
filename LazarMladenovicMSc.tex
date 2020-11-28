@@ -282,9 +282,9 @@ Kopiranje vrednosti ne dovodi do toga da \textit{Memcheck} proverava greške ili
 
 Većina operacija na niskom nivou, kao što je sabiranje, uzrokuje da \textit{Memcheck} koristi \texttt{V} bitove za operande za izračunavanje \texttt{V} bitova za rezultat. Čak i ako je rezultat delimično ili u potpunosti nedefinisan, alat ne prijavljuje grešku. Provere definisanosti dešavaju se samo na tri mesta:
 \begin{itemize}
-\item  kada se vrednost koristi za generisanje memorijske adrese;
-\item  kada treba doneti odluku o kontroli toka izvršavanja programa; 
-\item  kada se detektuje sistemski poziv, u kom slučaju će \textit{Memcheck} proveravati definisanost parametara prema potrebi.
+\item  Kada se vrednost koristi za generisanje memorijske adrese.
+\item  Kada treba doneti odluku o kontroli toka izvršavanja programa. 
+\item  Kada se detektuje sistemski poziv, u kom slučaju će \textit{Memcheck} proveravati definisanost parametara prema potrebi.
 \end{itemize}
 
 Kada provera detektuje nedefinisanost, izdaje se poruka o grešci. Dobijena vrednost se na dalje smatra dobro definisanom, kako bi se izbegli dugi lanci poruka o greškama. Drugim rečima, kada \textit{Memcheck} prijavi grešku nedefinisane vrednosti, pokušava da izbegne prijavljivanje daljih grešaka izvedenih iz te iste nedefinisane vrednosti. Ideja o proveravanju svih čitanja iz memorije i žalbi ukoliko je nedefinisana vrednost učitana u registar procesora ne funkcioniše dobro, jer savršeno legitimni C programi rutinski kopiraju neinicijalizovane vrednosti u memoriji, što bi u slučaju primene pomenute ideje dovelo do enormno velikog broja prijavljenih grešaka. Primer sa listinga \ref{lst:slika2.2} ilustruje tu problematiku.
@@ -365,7 +365,7 @@ Ove greške se javljaju kada program čita ili piše u memoriju na mestu za koje
 
 U ovom primeru \textit{Memcheck} ne može da identifikuje adresu. Zapravo se adresa nalazi na steku, ali iz nekog razloga ovo nije važeća adresa steka - nalazi se ispod pokazivača steka i to nije dozvoljeno. U ovom konkretnom slučaju greška je verovatno uzrokovana GCC-om koji generiše nevažeći k\^od, što je poznata greška u nekim drevnim verzijama GCC-a.
 
-Treba imati na umu da \textit{Memcheck} samo govori da će program uskoro pristupiti memoriji na nedozvoljenoj adresi i da pritom taj pristup ne može sprečiti. Dakle, kada program pristupi, što bi obično rezultiralo greškom (eng. \textit{Segmentation fault}), program će i dalje imati isto ponašanje - ali \textit{Memcheck}-a će izdati poruku neposredno pre toga. U ovom konkretnom primeru čitanje loših (nevalidnih) vrednosti sa steku nije fatalno, i program nastavlja sa radom \cite{ValgrindDOC}. 
+Treba imati na umu da \textit{Memcheck} samo govori da će program uskoro pristupiti memoriji na nedozvoljenoj adresi i da pritom taj pristup ne može sprečiti. Dakle, kada program pristupi, što bi obično rezultiralo greškom (eng. \textit{Segmentation fault}), program će i dalje imati isto ponašanje - ali \textit{Memcheck}-a će izdati poruku neposredno pre toga. U ovom konkretnom primeru čitanje loših (nevalidnih) vrednosti sa steku nije fatalno, i program nastavlja sa radom \cite{Memcheck}. 
 
 \subsection{Korišćenje neinicijalizovanih vrednosti}
 Greška pri korišćenju neinicijalizovane vrednosti se prijavljuje kada program koristi vrednost koja nije inicijalizovana - drugim rečima, nije definisana. Ovde se nedefinisana vrednost koristi negde unutar funkcije \texttt{printf} iz standardne C biblioteke. Ova greška je prijavljena prilikom pokretanja programa sa listinga \ref{lst:slika2.4}, dok je njen ispis dat na listingu \ref{lst:slika2.5}.
@@ -440,7 +440,7 @@ Izvori grešaka neinicijalizovanih vrednosti su sledeći:
 \item Sadržaj blokova hipa (dodeljen \textit{malloc}-om, \textit{new} ili sličnom funkcijom) pre nego što se nešto u tom bloku ispiše, odnosno pre inicijalizacije.
 \end{itemize}
 
-Za dobijanje informacija o izvorima neinicijalizovanih podataka u programu, neophodno je koristiti opciju \texttt{--track-origins=yes}. Ovo čini \textit{Memcheck} sporijim, ali može znatno olakšati pronalaženje osnovnih uzroka neinicijalizovanih grešaka \cite{Memcheck}. 
+Za dobijanje informacija o izvorima neinicijalizovanih podataka u programu, neophodno je koristiti opciju \texttt{--track-origins=yes}. Ovo čini \textit{Memcheck} sporijim, ali može znatno olakšati pronalaženje osnovnih uzroka neinicijalizovanih grešaka \cite{ValgrindDOC}. 
 
 \subsection{Korišćenje neinicializovane ili neadresirane vrednosti u sistemskom pozivu}
 
@@ -513,7 +513,7 @@ int main(){
 %  \label{fig:slika2.8}
 %\end{figure}
 
-Kao i kod grešaka nevalidnog čitanja/pisanja, \textit{Memcheck} pokušava da dokuči oslobođenu adresu. Ako je, kao ovde, slučaj da je adresa koja je prethodno oslobođena, to će biti prijavljeno i učiniće duplikate oslobađanja istog bloka lako uočljivim. Ova poruka će biti emitovana i ako program pokuša da oslobodi pokazivač koji ne pokazuje na početak hip bloka. Listing \ref{lst:slika2.9} ilustruje izlaz dobijen puštanjem programa sa listinga \ref{lst:slika2.8} na analizu alatom \textit{Memcheck} \cite{Memcheck}. 
+Kao i kod grešaka nevalidnog čitanja/pisanja, \textit{Memcheck} pokušava da dokuči oslobođenu adresu. Ako je, kao ovde, slučaj da je adresa koja je prethodno oslobođena, to će biti prijavljeno i učiniće duplikate oslobađanja istog bloka lako uočljivim. Ova poruka će biti emitovana i ako program pokuša da oslobodi pokazivač koji ne pokazuje na početak hip bloka. Listing \ref{lst:slika2.9} ilustruje izlaz dobijen puštanjem programa sa listinga \ref{lst:slika2.8} na analizu alatom \textit{Memcheck} \cite{ValgrindDOC}. 
 
 %\begin{figure}[!ht]
 %  \centering
@@ -592,7 +592,7 @@ Na kraju izvršavanja programa \textit{Memcheck} ima informaciju o svim blokovim
 
 Memorijskim blokovima se može pristupiti pomoću pokazivača. Postoje dve vrste pokazivača koje u tu svrhu koristimo:
 \begin{itemize}
-\item Pokazivač na početak memorijskog bloka (eng. \textit{start-pointer});
+\item Pokazivač na početak memorijskog bloka (eng. \textit{start-pointer}).
 \item Pokazivač na sadržaj unutar memorijskog bloka (eng. \textit{interior-pointer}).
 \end{itemize}
 
@@ -772,14 +772,16 @@ Da bi se kreirala datoteka osnovnog vektorskog bloka, neophodno je u komandnoj l
 % ------------------------------------------------------------------------------
 \chapter{Regularni izrazi}
 
-U današnje vreme, programski jezici imaju veoma dobru podršku za rad sa regularnim izrazima i imaju širok dijapazon upotrebe. Jezici, a samim tim i regularni izrazi koji predstavljaju jednu klasu jezika, vrlo su važni za proces kompilacije. Kompilacija se sastoji iz nekoliko etapa, koje se kasnije dele u nekoliko faza. Jezici imaju važnu ulogu u etapi analize izvornog koda. Preduslov za ispitivanje izvornog koda jeste precizna definicija jezika \cite{Vitas}.
+Jezici, a samim tim i regularni izrazi koji predstavljaju jednu klasu jezika, vrlo su važni za proces kompilacije. Kompilacija se sastoji iz nekoliko etapa, koje se kasnije dele u nekoliko faza. Jezici imaju važnu ulogu u etapi analize izvornog koda. Preduslov za ispitivanje izvornog koda jeste precizna definicija jezika \cite{Vitas}.
+
+U današnje vreme, programski jezici imaju veoma dobru podršku za rad sa regularnim izrazima i koji imaju širok dijapazon upotrebe. Da bi u potpunosti iskoristili podršku za rad sa regularnim izrazima koju nam programski jezici pružaju, neophodno je pre svega razumeti šta su regularni izrazi i koje operacije je moguće vršiti nad njima. U tu svrhu biće definisani jezik, regularni izraz kao posebna klasa jezika, kao i operacije nad regularnim izrazima. 
 
 \section{Kratak pregled teorije jezika i regularnih izraza} 
 
-Definicija izvornog jezika mora sadržati konačan skup simbola koje možemo koristiti u jeziku, tj.~azbuku jezika. Takođe, mora sadržati sintaksička i semantička pravila jezika, tj.~opis svih reči koje pripadaju datom jeziku kao i njihovo značenje \cite{Vitas}.
+Definicija izvornog jezika sadrži konačan skup simbola koje možemo koristiti u jeziku, tj.~azbuku jezika. Takođe, sadrži i sintaksička i semantička pravila jezika, tj.~opis svih reči koje pripadaju datom jeziku kao i njihovo značenje \cite{Vitas}.
 
-Neka je $\Sigma$ konačan skup. Reč (eng. \textit{word}) nad $\Sigma$ je svaki konačan niz $$x = (a_1, a_2, …, a_n),$$ gde je $n \geq 0$, a $a_i \in \Sigma$ za svako $\textit{i} \in [1,n]$. Broj $n$ se naziva dužina reči i obeležava se sa $|x|$. Prazna reč  obeležava se simbolom $\varepsilon$, odnosno važi $| \varepsilon |=0$. Ako je $$y = (b_1, b_2, …, b_m)$$ neka druga reč nad $\Sigma$, tada je proizvod dopisivanja, tj.~konkatenacije reči $x$ i $y$ reč $$xy =(a_1, a_2, …, a_n, b_1, b_2, …, b_m).$$
-Elemente skupa $\Sigma$ nazivamo slova ili simboli, dok sam skup nazivamo alfabet ili azbuka \cite{Vitas}.
+Neka je $\Sigma$ konačan skup. Elemente skupa $\Sigma$ nazivamo slova ili simboli, dok sam skup nazivamo alfabet ili azbuka \cite{Vitas}. Reč (eng. \textit{word}) nad $\Sigma$ je svaki konačan niz $$x = (a_1, a_2, …, a_n),$$ gde je $n \geq 0$, a $a_i \in \Sigma$ za svako $\textit{i} \in [1,n]$. Broj $n$ se naziva dužina reči i obeležava se sa $|x|$. Prazna reč  obeležava se simbolom $\varepsilon$, odnosno važi $| \varepsilon |=0$. Ako je $$y = (b_1, b_2, …, b_m)$$ neka druga reč nad $\Sigma$, tada je proizvod dopisivanja, tj.~konkatenacije reči $x$ i $y$ reč $$xy =(a_1, a_2, …, a_n, b_1, b_2, …, b_m).$$
+
 
 Klinijevo zatvorenje azbuke $\Sigma$, u oznaci $\Sigma^*$, je skup svih niski nad azbukom $\Sigma$. Na primer, ukoliko je $\Sigma = \{a,b\}$, onda je $$\Sigma^* = { \varepsilon, a, b, aa, ab, ba, bb, …}.$$
 Neutral u odnosu na dopisivanje je prazna reč, tj.~za $\forall x\in \Sigma, x\varepsilon = \varepsilon x = x$. Skup svih reči bez prazne reči označava se kao $\Sigma^+$, tj.~$\Sigma^+ = \Sigma^* - { \varepsilon }$ \cite{Vitas}. 
@@ -795,32 +797,44 @@ Neka je data azbuka $\Sigma = \{ a, b, c\}$. Neki od jezika nad ovom azbukom pre
 \item[] $L_3 = \{ca^ncccb^m | m, n > 0\}$ – jezik koji se sastoji od niski u kojima se nakon simbola $c$ proizvoljan broj puta pojavljuje simbol $a$, iza čega sledi tri pojavljivanja simbola $c$ i pojavljivanje simbola $b$ proizvoljan broj puta.
 \end{itemize}
 
-%Nad jezicima se mogu izvršiti skupovne operacije kao što su unija, presek i razlika, kao i operacija proizvoda, kako su i sami jezici skupovi \cite{Vitas}. Pored pomenutih, nad jezicima definišemo još i operaciju proizvoda, $n$-tog stepena i zatvorenja jezika $L$.
-%\begin{defn}
-%Proizvod jezika $L_1$ i $L_2$ nad azbukom $\Sigma$ u oznaci $L_1L_2$ je jezik $$L_1L_2 = \{xy | x \in L_1, y \in L_2\}.$$
-%Proizvod jezika je asocijativna operacija, a {$\varepsilon$} je njen neutralni element.
-%\end{defn}
+Neka su $L$ i $M$ dva proizvoljna jezika. Kako su i sami jezici skupovi, nad jezicima je moguće izvršiti sledeće operacije:
+\begin{itemize}
+\item Unija dva jezika: $L \cup M = \{w| w \in L \vee w\in M \}$.
+\item Presek dva jezika: $L \cap M = \{w| w \in L \wedge w\in M \}$.
+\item Razlika dva jezika: $L \backslash M = \{w| w \in L \wedge w\notin M \}$.
+\end{itemize}
+ Pored pomenutih, nad jezicima definišemo još i operaciju proizvoda, $n$-tog stepena i zatvorenja jezika $L$.
+\begin{defn}
+Proizvod jezika $L_1$ i $L_2$ nad azbukom $\Sigma$ u oznaci $L_1L_2$ je jezik $$L_1L_2 = \{xy | x \in L_1, y \in L_2\}.$$
+Proizvod jezika je asocijativna operacija, a {$\varepsilon$} je njen neutralni element.
+\end{defn}
 
-%\begin{defn}
-%Za jezik $L$, $n$-ti stepen jezika $L$ je jezik: 
-%$$L_0 = \{ \varepsilon\} $$ 
-%$$L_1 = L$$
-%$$L_n = LL_(n-1), za n>1.$$
-%\end{defn}
+\begin{defn}
+Za jezik $L$, $n$-ti stepen jezika $L$ je jezik: 
+$$L_0 = \{ \varepsilon\},\quad L_1 = L,\quad L_n = LL_(n-1), za\  n>1.$$ 
+\end{defn}
 
-%\begin{defn}
-%Iteracija ili (Klinijevo) zatvorenje jezika $L$, u oznaci $L^*$, je jezik:
-%$$ L^* = \bigcup_{n\geq0}L^n.$$
-%Pozitivno zatvorenje jezika $L$, u oznaci $L^+$, je jezik:
-%$$ L^+ = \bigcup_{n\geq1}L^n = L^* - \{\varepsilon\}.$$
-%\end{defn}
+\begin{defn}
+Iteracija ili (Klinijevo) zatvorenje jezika $L$, u oznaci $L^*$, je jezik:
+$$ L^* = \bigcup_{n\geq0}L^n.$$
+Pozitivno zatvorenje jezika $L$, u oznaci $L^+$, je jezik:
+$$ L^+ = \bigcup_{n\geq1}L^n = L^* - \{\varepsilon\}.$$
+\end{defn}
+
+Za opisivanje jezika koristimo regularne izraze. Međutim, ne mogu se svi jezici opisati regularnim izrazima. 
+
+\begin{defn}
+Ukoliko se jezik može predstaviti regularnim izrazom, takav jezik se smatra regularnim.
+\end{defn}
+
+Važnost ove notacije ogleda se u tome što se na isti način zapisuju simbol azbuke, reč koja se sastoji od tog simbola, regularni izraz koji predstavlja taj simbol, i na kraju jezik predstavljen tim regularnim izrazom \cite{Vitas}. Kažemo da je za neki regularni izraz $p$, jezik $L(p)$ jezik opisan regularnim izrazom $p$.
 
 \begin{defn}
 Regularni izrazi nad azbukom $\Sigma$ opisuju se rekurzivno na sledeći način:
 \begin{enumerate}
-\item Prazan skup je regularni izraz koji se prikazuje simpolom $\emptyset$;
-\item Regularni izraz $\varepsilon$ predstavlja jezik $\{\varepsilon\}$;
-\item Ako je $a \in \Sigma$, onda regularni izraz $a$ predstavlja jezik $\{a\}$;
+\item Prazan skup je regularni izraz koji se prikazuje simpolom $\emptyset$.
+\item Regularni izraz $\varepsilon$ predstavlja jezik $\{\varepsilon\}$.
+\item Ako je $a \in \Sigma$, onda regularni izraz $a$ predstavlja jezik $\{a\}$.
 \item Ako su $p$ i $q$ regularni izrazi jezika $L(p)$ i $L(q)$, onda je:
 \begin{itemize}
 \item $(p+q)$ regularni izraz koji predstavlja jezik $L(p) \cup L(q)$.
@@ -833,51 +847,46 @@ Regularni izrazi nad azbukom $\Sigma$ opisuju se rekurzivno na sledeći način:
 
 Opisani jezik se neće promeniti ako se zagrade izostave iz regularnog izraza \cite{Vitas}. Kada prioritet operacija nije eksplicitno naveden, primenjuju se podrazumevani prioriteti nad operatorima regularnih izraza, tj.~jezika, u sledećem redosledu:
 \begin{enumerate}
-	\item operator $*$
-	\item konkatenacija
-	\item operator $+$
+	\item Operator $*$
+	\item Konkatenacija
+	\item Operator $+$
 \end{enumerate}
-
-\begin{defn}
-Ukoliko se jezik može predstaviti regularnim izrazom, takav jezik se smatra regularnim.
-\end{defn}
-
-Važnost ove notacije ogleda se u tome što se na isti način zapisuju simbol azbuke, reč koja se sastoji od tog simbola, regularni izraz koji predstavlja taj simbol, i na kraju jezik predstavljen tim regularnim izrazom \cite{Vitas}. Kažemo da je za neki regularni izraz $p$, jezik $L(p)$ jezik opisan regularnim izrazom $p$.
 
 Zapisivanje regularnih izraza može se znatno pojednostaviti uvođenjem sledećih konvencija:
 \begin{itemize}
-\item Neka je $r$ regularni izraz koji opisuje jezik $L(r)$. Jezik $(L(r))(L(r))^*$ se opisuje regularnim izrazom $(r)^+$ , dok se jezik $L(r) \cup \{\varepsilon\}$ opisuje regularnim izrazom $(r)?$;
-\item Ako su $c_1, c_2, …, c_n$ karakteri, tada se regularni izraz $c_1 + c_2 + … + c_n$ može obeležiti sa $[c_1, c_2, …, c_n]$. Izraz $[c_1-c_2]$ označava sekvencu svih karaktera $c$ tdj. $c_1 \leq c \leq c_2$.
+\item Neka je $r$ regularni izraz koji opisuje jezik $L(r)$. Jezik $(L(r))(L(r))^*$ se opisuje regularnim izrazom $(r)^+$ , dok se jezik $L(r) \cup \{\varepsilon\}$ opisuje regularnim izrazom $(r)?$.
+\item Ako su $c_1, c_2, …, c_n$ karakteri, tada se regularni izraz $c_1 + c_2 + … + c_n$ može obeležiti sa $[c_1, c_2, …, c_n]$. Izraz $[c_1-c_2]$ označava sekvencu svih karaktera $c$ tako da važi $c_1 \leq c \leq c_2$.
 \end{itemize}
 
 Tako na primer slova engleske abecede označavamo sa $[A-Za-z]$, dok cifre označavamo sa $[0-9]$.
  
 \section{Modul re}
 
-Alat koji ovaj rad prati razvijen je u programskom jeziku Python, a \textit{re} je modul koji pruža podršku za rad sa regularnim izrazima u Python programima. Ovaj modul pruža operacije podudaranja regularnih izraza. Važno je napomenuti da je većina operacija sa regularnim izrazima dostupna u vidu funkcija i metoda na nivou modula sa kompajliranim regularnim izrazima. Funkcije su prečice koje ne zahtevaju da prvo kompajlirate objekat regularnog izraza, ali je mana što im nedostaju neki parametri za fino podešavanje. 
+Alat koji ovaj rad prati razvijen je u programskom jeziku Python, a \textit{re} je modul koji pruža podršku za rad sa regularnim izrazima u Python programima. Ovaj modul pruža operacije podudaranja regularnih izraza. Većina operacija sa regularnim izrazima je dostupna u vidu funkcija i metoda na nivou modula sa kompajliranim regularnim izrazima. Razlika između funkcija i metoda je ta da funkcije ne zahtevaju da prvo kompajlirate objekat regularnog izraza, ali je mana što im nedostaju neki parametri za fino podešavanje. 
 
-Regularni izraz navodi niz karaktera koji mu odgovara, dok vam funkcije u ovom modulu omogućavaju da proverite da li se određeni niz karaktera poklapa sa datim regularnim izrazom (ili da li se regularni izraz podudara sa određenim nizom karaktera, što se svodi na istu stvar).
+Regularni izraz predstavljen je odgovarajućom niskom, dok funkcije u ovom modulu omogućavaju da proverite da li se određeni niz karaktera poklapa sa datim regularnim izrazom (ili da li se regularni izraz podudara sa određenim nizom karaktera).
 Neke od funkcija koje ovaj modul pruža, a koje su iskorišćene u alatu koji ovaj rad prati su sledeće:
 
-\begin{itemize}
-\item[$\textendash$]  \textit{re.search(pattern, string, flags=0)} - Skenira kroz \textit{string} tražeći prvu lokaciju na kojoj obrazac regularnog izraza daje podudaranje i vraća odgovarajući objekt podudaranja. Vratiće \textit{None} ako nijedna pozicija u nizu karaktera ne odgovara obrascu.
-\item[$\textendash$]  \textit{re.match(pattern, string, flags=0)} - Ako se nula ili više znakova na početku niza karaktera \textit{string}  podudaraju sa regularnim izrazom, vratiće odgovarajući objekt podudaranja. Vratiće \textit{None} ako se niz ne podudara sa obrascem.
-\item[$\textendash$]  \textit{re.split(pattern, string, maxsplit=0, flags=0)} - Podeliće nisku \textit{string} pojavljivanjima koja se poklapalu sa \textit{pattern}. 
-\item[$\textendash$]  \textit{re.findall(pattern, string, flags=0)} - Vraća sva podudaranja \textit{pattern}-a u \textit{string}-u kao listu stringova, tj.~niski. Niska u kojoj se traže preklapanja - \textit{string}, skenira se s leva na desno, a poklapanja se vraćaju u redosledu u kom se i javljaju. 
-\item[$\textendash$]  \textit{re.sub(pattern, repl, string, count=0, flags=0)} - Vraća string dobijen zamenom krajnjeg levog poklapanja sa \textit{pattern}-om u \textit{string}-u sa \textit{repl}. Ako poklapanje nije pronađeno, \textit{string} se vraća nepromenjen. Argument \textit{repl} može biti niz ili funkcija.
-\end{itemize}
+\begin{description}
+\item  \textit{re.search(\texttt{string} pattern, \texttt{string} string, \texttt{int} flags=0)} --- Skenira kroz \textit{string} tražeći prvu lokaciju na kojoj obrazac regularnog izraza daje podudaranje i vraća odgovarajući objekt podudaranja. Vratiće \textit{None}\footnote{U \textit{Python}-u ključna reč \textit{None} je objekat klase \textit{NoneType}. Može se dodeliti bilo kojoj promenljivoj, ali ne može se kreirati novi \textit{NoneType} objekat.}, ako nijedna pozicija u nizu karaktera ne odgovara obrascu. U ovoj, kao i u ostalim funkcijama, \textit{pattern} predstavlja regularni izraz zadat odgovarajućim nizom karaktera, dok se osobine regularnog izraza mogu izmeniti navođenjem vrednosti argumenta \textit{flag}, npr.~\texttt{flags=re.IGNORECASE}.
+\item  \textit{re.match(\texttt{string} pattern, \texttt{string} string, \texttt{int} flags=0)} --- Ako se nula ili više znakova na početku niza karaktera \textit{string}  podudaraju sa regularnim izrazom, vratiće odgovarajući objekt podudaranja. Vratiće \textit{None} ako se niz ne podudara sa obrascem.
+\item  \textit{re.split(\texttt{string} pattern, \texttt{string} string, \texttt{int} maxsplit=0, \texttt{int} flags=0)} --- Podeliće nisku \textit{string} koristeći kao separator za deljenje sva poklapanja sa regularnim izrazom \textit{pattern}. Ako argument \textit{maxsplit} nije 0, u rezultatu će se javiti maksimum \textit{maxsplit} podeljenih niski.  
+\item  \textit{re.findall(\texttt{string} pattern, \texttt{string} string, \texttt{int} flags=0)} - Vraća sva podudaranja \textit{pattern}-a u \textit{string}-u kao listu stringova, tj.~niski. Niska u kojoj se traže preklapanja - \textit{string}, skenira se s leva na desno, a poklapanja se vraćaju u redosledu u kom se i javljaju. 
+\item  \textit{re.sub(\texttt{string} pattern, \texttt{string|function} repl, \texttt{string} string, \texttt{int} count=0, \texttt{int} flags=0)} --- Vraća string dobijen zamenom krajnjeg levog poklapanja sa \textit{pattern}-om u \textit{string}-u sa \textit{repl}. Ako poklapanje nije pronađeno, \textit{string} se vraća nepromenjen. Argument \textit{repl} može biti niz ili funkcija.
+\end{description}
 
 Kompajlirani objekti regularnog izraza podržavaju slične metode i atribute, s tim da je pozivanje istih u formi
 \begin{center}
 \texttt{pattern.funkcija(argumenti).}
 \end{center}
 
-Objekti podudaranja uvek imaju logičku vrednost \textit{True}. Budući da \textit{match()} i \textit{search()} vraćaju \textit{None} kada nema podudaranja, možete testirati da li je postojalo podudaranje jednostavnim \textit{if} izrazom. 
+Objekti podudaranja sadrže ono što se poklopilo sa navedenim regularnim izrazom, što će u okviru \textit{if} izraza kao takvo biti tretirano kao logička vrednost \textit{True}. Ukoliko nije bilo podudaranja, funkcije \textit{match()} i \textit{search()} vraćaju \textit{None}. 
+Tako proveru da li je postojalo podudaranje možemo ostvariti jednostavnim \textit{if} izrazom --- \texttt{if(matchObject)}, koji će vratiti \textit{True} ukoliko je bilo poklapanja, dok će u suprotnom vratiti \textit{False}.
 
-Objekti podudaranja podržavaju mnoge metode i atribute, a najiskorišćenija u alatu koji je razvijen, a u cilju izvlačenja potrebnih informacija iz poklapanja sa regularnim izrazom je:
-\begin{itemize}
-\item[$\textendash$]  \textit{Match.group([group1, ...])} - Vraća jednu ili više podgrupa podudaranja. Ako postoji jedan argument, rezultat je jedan string, dok ako postoji više argumenata, rezultat je t-orka sa jednom stavkom po argumentu. Bez argumenata, \textit{group1} je  podrazumevano nula, tj.~vraća se ceo \textit{Match} objekat. Ako je indeks \textit{group} u opsegu [1,99], to je string koji odgovara odgovarajućoj grupi u zagradama na toj poziciji. Ako je broj grupe negativan ili veći od broja grupa definisanih u obrascu, biće izbačen izuzetak \textit{IndexError}. Ako je grupa sadržana u delu uzorka koji se ne podudara, odgovarajući rezultat je \textit{None}. Ako je grupa sadržana u delu uzorka koji se podudarao više puta, vraća se poslednje podudaranje \cite{reModule}.
-\end{itemize}
+Objekti podudaranja podržavaju mnoge metode i atribute. Najiskorišćenija u alatu koji je razvijen, a u cilju izvlačenja potrebnih informacija iz poklapanja sa regularnim izrazom je:
+\begin{description}
+\item \textit{Match.group(groupNum [, groupNum2, ...])} --- Vraća jednu ili više podgrupa podudaranja. Grupa je definisana delom regularnog izraza u okviru zagrada (). Indeksiranje grupa vrši se s leva na desno, počevši od 1. Ako postoji jedan argument, rezultat je jedan string, koji odgovara grupi čiji je indeks dati argument, dok ako postoji više argumenata, rezultat je t-orka sa jednom stavkom po argumentu. Bez argumenata, \textit{groupNum} je  podrazumevano nula, tj.~vraća se ceo \textit{Match} objekat. Ako je indeks \textit{groupNum} u opsegu [1,99], to je string koji odgovara odgovarajućoj grupi u zagradama na toj poziciji. Ako je broj grupe negativan ili veći od broja grupa definisanih u obrascu, biće izbačen izuzetak \textit{IndexError}. Ako je grupa sadržana u delu uzorka koji se ne podudara, odgovarajući rezultat je \textit{None}. Ako je grupa sadržana u delu uzorka koji se podudarao više puta, vraća se poslednje podudaranje \cite{reModule}.
+\end{description}
 
 Primer korišćenja funkcije \textit{group} dat je na listingu \ref{lst:slika3.1}.
 %\begin{figure}[!ht]
@@ -1035,8 +1044,8 @@ Analizom linija koda datog bloka poklapanjem sa regularnim izrazom
 $$ ([\quad\textbackslash t]*)([a-zA-Z_-]+)[\quad]+([a-zA-Z0-9_-]+).*; $$
 dobijamo liniju koda gde imamo neinicijalizovanu definisanu promenljivu. Ona može biti i višedimenziona, pa pre inicijalizacije vršimo i tu proveru da bi je, ukoliko je to slučaj, adekvatno inicijalizovali. Iz rezultata dobijenih poklapanjem sa regularnim izrazima izvlačimo podatke poput tipa promenljive, imena, a u slučaju višedimenzionog niza još i dimenzije. Na primer, primenom navedenog regularnog izraza koristeći funkciju \textit{search} modula \textit{re} nad odgovarajućom linijom koda dobijamo objekat poklapanja. Iz datog objekta, primenom funkcije \textit{group} dobijamo segmente koje odgovaraju uparenim zagradama, i to:
 \begin{itemize}
-\item tip promenljive na osnovu \textit{matchObject.group(2)}
-\item ime promenljive na osnovu \textit{matchObject.group(3)}
+\item Tip promenljive na osnovu \textit{matchObject.group(2)}.
+\item Ime promenljive na osnovu \textit{matchObject.group(3)}.
 \end{itemize} 
 Za inicijalizaciju promenljivih koristimo funkciju prikazanu na listingu \ref{lst:slika4.6}, dok u slučaju nizova, odnosno višedimenzionih nizova, koristimo pomoćnu funkciju koja koristi petlje za inicijalizaciju, a koja se suštinski oslanja na funkciju sa listinga \ref{lst:slika4.6}.
 
@@ -1171,9 +1180,9 @@ U slučaju prekoračenja s leve strane, pristupamo memoriji kojoj nam nije dozvo
 \section{Primeri rada alata}
 U ovoj sekciji biće predstavljeni primeri rada alata za svaku od grešaka koje alat ispravlja. Prvi primer će dati kompletan pregled onoga što alat \textit{Koronka} radi sa programom koji analizira i šta ostavlja nakon svog rada. Ostali primeri biće izneti u formi listinga sa sledećom sadržinom:
 \begin{itemize}
-\item[$\textendash$] program koji sadrži greške;
-\item[$\textendash$] ispravljeni program alatom \textit{Koronka};
-\item[$\textendash$] izveštaj koji je formirao alat \textit{Koronka}.
+\item[$\textendash$] Program koji sadrži greške;
+\item[$\textendash$] Ispravljeni program alatom \textit{Koronka};
+\item[$\textendash$] Izveštaj koji je formirao alat \textit{Koronka}.
 \end{itemize} 
 
 Primeri koji su prikazani u ovoj sekciji deo su skupa test primera koji se nalaze u direktorijumu \textit{Examples} u okviru glavnog direktorijuma alata. Podeljeni su po direktorijumima tako da svaki direktorijum sadrži program koji sadrži određene vrste grešaka. Takođe, mogu se naći i pokretanja i ispravke koje je \textit{Koronka} implementirala nad tim test primerima. Ti fajlovi smešteni su u odgovarajući direktorijum formata \textit{datum pokretanja-vreme pokretanja}, koje je alat \textit{Koronka} kreirala prilikom izvršavanja. Skup test primera dostupan je na linku \url{https://github.com/LMladenovic/Error_fixing_tool/tree/master/Examples}.  
@@ -1633,11 +1642,11 @@ Alatima \textit{Valgrind} distribucije mogu se otkriti greške i kritične tačk
 
 Nakon što analizom programa nekim od alata distibucije \textit{Valgrind} detektujemo greške, ukoliko postoje, neophodno je da razumemo izlaz koji nam je alat dao, i da na osnovu njega pokušamo da popravimo greške. Alat koji je razvijen u ovom radu pokušava da taj proces automatizuje, odnosno da razume izlaz koji je alat \textit{Memcheck} dao, i da na osnovu njega korišćenjem adekvatnih šablona ispravi otkrivene greške. Alat pokriva širok dijapazon grešaka, što ne isključuje da postoje greške koje mogu biti otkrivene daljim razvojem, a koje alat \textit{Koronka} u ovom trenutku ne pokriva. Greške koje alat \textit{Koronka} uspešno otklanja su :
 \begin{itemize}
-\item korišćenje neinicijalizovanih vrednosti kako primitivnog tipa, tako i korisnički definisanih struktura, bilo da su one statički definisane, ili dinamički alocirane;
-\item nedozvoljeno čitanje i pisanje u memoriju, kako s leve, tako i s desne strane, a koja je dinamički alocirana;
-\item sumnjive vrednosti argumenata;
-\item nevalidna oslobađanja memorije;
-\item nevalidni arugmenti sistemskih poziva.
+\item Korišćenje neinicijalizovanih vrednosti kako primitivnog tipa, tako i korisnički definisanih struktura, bilo da su one statički definisane, ili dinamički alocirane;
+\item Nedozvoljeno čitanje i pisanje u memoriju, kako s leve, tako i s desne strane, a koja je dinamički alocirana;
+\item Sumnjive vrednosti argumenata;
+\item Nevalidna oslobađanja memorije;
+\item Nevalidni arugmenti sistemskih poziva.
 \end{itemize}
 Greške koje alat \textit{Koronka} nije u stanju da ispravi, a koje \textit{Memcheck} detektuje su specijalni slučajevi grešaka koje alat ispravlja, a koje šabloni ne pokrivaju, ili greške za koje šablon još uvek nije implementiran.
 To su na primer greške nedozvoljenog čitanja i pisanja iz statičke memorije i greške prilikom korišćenja funkcija poput \textit{mmap} i \textit{memcpy}.
