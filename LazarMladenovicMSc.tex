@@ -201,11 +201,11 @@ Kao što je već rečeno, svaki \textit{Valgrind}-ov alat sastoji se od koda jez
 \item \texttt{--leack-check} koja svako curenje memorije prikazuje detaljnjno,
 \item \texttt{--show-leack-kinds} koja prikazuje sve vrste curenja koje su definitivne, indirektne, moguće i dostupne u celom izveštaju.
 \end{itemize} 
-Poslednje tri odnose se na alat \textit{Memcheck}, i biće detaljnije objašnjene u sekcijama koje slede. Naredni primer ilustruje pokretanje \textit{Valgrind}-a sa dodatnim argumentima.
+Poslednje tri opcije odnose se na alat \textit{Memcheck}, i biće detaljnije objašnjene u sekcijama koje slede. Naredni primer ilustruje pokretanje \textit{Valgrind}-a sa dodatnim argumentima.
 \begin{center}
 \texttt{valgrind --track-origins=yes --leack-check=full --show-leak-kinds=all --log-file=LOG.txt ./a.out}.
 \end{center}
-Kao što je već napomenuto, podrazumevani alat je \textit{Memchek}, tako da se u prethodnom primeru poziva alat \textit{Memchek} nad izvršnim programom \textit{a.out}.
+Podrazumevani alat je \textit{Memchek}, tako da se u prethodnom primeru poziva alat \textit{Memchek} nad izvršnim programom \textit{a.out}.
 
 Bez obzira koji se alat koristi, \textit{Valgrind} preuzima kontrolu nad  programom pre nego što započne da se izvršava. Na taj način \textit{Valgrind} je u stanju da generiše poruke o greškama i druge izlaze u smislu lokacija izvornog koda, kada je to potrebno. Program se pokreće na sintetičkom procesoru koji obezbeđuje jezgro \textit{Valgrind}-a. Kako se k\^od izvršava prvi put, jezgro predaje k\^od odabranom alatu. Alat na to dodaje svoj vlastiti k\^od instrumentacije i vraća rezultat natrag u jezgro, koje koordinira dalje izvršavanje ovog instrumentiranog koda. Količina dodatog koda instrumentacije je različita za sve alate pojedinačno, i zavisi isključivo od izabranog alata. Na primer, alat \textit{Memcheck} dodaje k\^od za proveru svakog pristupa memoriji i svake izračunate vrednosti, čineći ga znatno sporijim od izvornog. \textit{Valgrind} simulira svaku instrukciju koju izvršava program pojedinačno. Zbog toga aktivni alat proverava ili profajlira ne samo k\^od programa, već i sve prateće dinamički povezane biblioteke, kao npr.~C biblioteku i grafičke biblioteke \cite{ValgrindCore}.
 
@@ -218,7 +218,7 @@ Alati \textit{Valgrind}-a pišu komentare koji sadrže detaljne izveštaje o gre
 \end{center}
 12345 je ID procesa. Ova šema olakšava razlikovanje izlaznih rezultata programa od komentara \textit{Valgrind}-a, a takođe i razlikovanje komentara od različitih procesa koji su se spojili iz bilo kog razloga.
 
-\textit{Valgrind}-ovi alati podrazumevano pišu u komentar samo ključne poruke, kako bi izbegli da vas preplave informacijama od sekundarne važnosti. Ako želite više informacija o tome šta se događa, pokrenite \textit{Valgrind} uz opciju \texttt{–v}.
+\textit{Valgrind}-ovi alati podrazumevano pišu u komentar samo ključne poruke, kako bi izbegli da vas preplave informacijama od sekundarne važnosti. Ukoliko je potrebno dobiti detaljnije informacije o tome šta se događa, treba pokrenuti \textit{Valgrind} uz opciju \texttt{–v}.
 
 Kada alat za proveru greške otkrije da se nešto loše događa u programu, u komentar se upisuje poruka o grešci. Na listingu \ref{lst:slika2.1} prikazan je izlaz iz alata \textit{Memcheck}.
 %\begin{figure}[!ht]
@@ -228,7 +228,7 @@ Kada alat za proveru greške otkrije da se nešto loše događa u programu, u ko
 %  \label{fig:slika2.1}
 %\end{figure}
 
-\begin{lstlisting}[style=terminal,caption={Primer izlaza alta \textit{Memcheck}, izvor: \cite{ValgrindCore}}, label={lst:slika2.1},language={bash}]   
+\begin{lstlisting}[style=terminal,caption={Primer izlaza alta \textit{Memcheck} \cite{ValgrindCore}}, label={lst:slika2.1},language={bash}]   
 ==25832==  Invalid read of size 4
 ==25832==      at 0x8048724: BandMatrix::ReSize(int, int, int) (bogon.cpp:45)
 ==25832==      by 0x80487AF: main (bogon.cpp:66)
@@ -239,9 +239,9 @@ Ova poruka kaže da je program izvršio ilegalno 4-bajtno čitanje adrese 0xBFFF
 
 \textit{Valgrind} pamti sve izveštaje o greškama. Kada se otkrije greška, ona se upoređuje sa starim izveštajima da bi se videlo da li je duplikat. Ako je tako, greška je zabeležena, ali dalji komentari se ne emituju. Na ovaj način, alat izbegava zatrpavanje velikim brojem duplikata izveštaja o greškama.  
 
-Zanimljivo je da se greške prijavljuju pre nego što se pridružena operacija zaista dogodi. Na primer, ako koristite \textit{Memcheck} i vaš program pokušava da čita sa adrese nula, \textit{Memcheck} će poslati poruku u tom smislu, a vaš program će onda verovatno zaustaviti rad sa greškom \textit{Segmentation fault}. Generalno, dobra je praksa ispravljati greške redosledom u kojem su prijavljene. Ukoliko se ne primeni pomenuta praksa, to može da zbuni. Na primer, program koji kopira neinicijalizovane vrednosti na nekoliko memorijskih lokacija i kasnije ih koristi, generisaće nekoliko poruka o grešci kada se pokrene na \textit{Memcheck}-u. Prva takva poruka o grešci može sasvim direktno dati osnovni uzrok problema. 
+Zanimljivo je da se greške prijavljuju pre nego što se pridružena operacija zaista dogodi. Na primer, ako se koristi \textit{Memcheck} i program pokušava da čita sa adrese nula, \textit{Memcheck} će poslati poruku u tom smislu, a program će onda verovatno zaustaviti rad sa greškom \textit{Segmentation fault}. Generalno, dobra je praksa ispravljati greške redosledom u kojem su prijavljene. Ukoliko se ne primeni pomenuta praksa, to može da zbuni. Na primer, program koji kopira neinicijalizovane vrednosti na nekoliko memorijskih lokacija i kasnije ih koristi, generisaće nekoliko poruka o grešci kada se pokrene na \textit{Memcheck}-u. Prva takva poruka o grešci može sasvim direktno dati osnovni uzrok problema. 
 
-Proces otkrivanja duplikata grešaka prilično je skup i može prouzrokovati značajno usporenje ako program generiše ogromne količine grešaka. Da bi izbegao ozbiljnije probleme, \textit{Valgrind} će jednostavno zaustaviti prikupljanje grešaka nakon što uoči 1.000 različitih grešaka ili ukupno 10.000.000 grešaka. U ovoj situaciji možete zaustaviti program i popraviti ga, jer \textit{Valgrind} neće prijaviti ništa drugo nakon ovoga. Imajte na umu da se ograničenja od 1.000 / 10.000.000 primenjuju nakon uklanjanja potisnutih grešaka, odnosno onih grešaka za koje \textit{Memcheck} utvrdi da su duplikati. Ova ograničenja su definisana u \textit{m\_errormgr.c} i mogu se povećati ako je potrebno \cite{ValgrindCore}. 
+Proces otkrivanja duplikata grešaka prilično je skup i može prouzrokovati značajno usporenje ako program generiše ogromne količine grešaka. Da bi izbegao ozbiljnije probleme, \textit{Valgrind} će jednostavno zaustaviti prikupljanje grešaka nakon što uoči 1.000 različitih grešaka ili ukupno 10.000.000 grešaka. U ovoj situaciji potrebno je zaustaviti program i popraviti ga, jer \textit{Valgrind} neće prijaviti ništa drugo nakon ovoga. Ograničenja od 1.000 / 10.000.000 primenjuju se nakon uklanjanja potisnutih grešaka, odnosno onih grešaka za koje \textit{Memcheck} utvrdi da su duplikati. Ova ograničenja su definisana u \textit{m\_errormgr.c} i mogu se povećati ako je potrebno \cite{ValgrindCore}. 
 
 \section{Memcheck}
 \textit{Memcheck} je alat koji vrši detekciju grešaka u radu sa memorijom \cite{Memcheck}. Može da otkrije sledeće probleme koji su česti u programima C i C ++:
@@ -256,11 +256,11 @@ Proces otkrivanja duplikata grešaka prilično je skup i može prouzrokovati zna
 
 Problemi poput ovih teško se mogu pronaći drugim sredstvima, često ostajući neotkriveni tokom dužih perioda, a zatim uzrokujući povremene padove, čiji je pravi razlog obično teško uočljiv. Upravo iz tih razloga memorijske greške spadaju u grupu najteže detektujućih grešaka pa je samim tim i njihovo otklanjanje težak zadatak.
 
-Kao što je rečeno u prethodnoj sekciji, da bi uspešno analizirali program koristeći \textit{Memcheck}, program kompajliramo sa uključenom opcijom \texttt{-g}. Što se optimizacije tiče, prilikom korišćenja alata \textit{Memcheck}, u retkim prilikama, primećeno je da su optimizacije kompajlera (optimizacija \texttt{-O2} i više optimizacije, a ponekad čak i optimizacija \texttt{-O1}) generisale k\^od koji zavara \textit{Memcheck} da pogrešno prijavljuje greške vezane za neinicijalizovane vrednosti \cite{ValgrindCore}. Razvojni tim \textit{Valgrind}-a je detaljno razmotrio kako to popraviti i nažalost došli su do rezultata da bi popravljanje te greške dovelo do značajnog usporavanja alata. Dakle, najbolje rešenje je potpuno isključiti optimizaciju. Budući da ovo često stvari čini nekontrolisano sporima, razuman kompromis je korišćenje opcije \texttt{-O0}. Ovo donosi većinu prednosti viših nivoa optimizacije, dok istovremeno ima relativno male šanse za lažno pozitivne ili lažno negativne podatke od \textit{Memcheck}-a. Takođe, poželjno je kompajlirati k\^od sa \texttt{-Wall} jer on može identifikovati neke ili sve probleme koje \textit{Valgrind} može propustiti na višim nivoima optimizacije. Nivo optimizacije ne utiče na sve ostale alate, a za alate za profajliranje kao što je \textit{Cachegrind} bolje je da program kompajlirate na normalnom nivou optimizacije \cite{ValgrindCore}. 
+Kao što je rečeno u prethodnoj sekciji, da bi se dobile detaljne, a pritom i neophodne informacije o programu, koristeći \textit{Memcheck}, program treba kompajlirati sa uključenom opcijom \texttt{-g}. Što se optimizacije tiče, prilikom korišćenja alata \textit{Memcheck}, u retkim prilikama, primećeno je da su optimizacije kompajlera (optimizacija \texttt{-O2} i više optimizacije, a ponekad čak i optimizacija \texttt{-O1}) generisale k\^od koji zavara \textit{Memcheck} da pogrešno prijavljuje greške vezane za neinicijalizovane vrednosti \cite{ValgrindCore}. Razvojni tim \textit{Valgrind}-a je detaljno razmotrio kako to popraviti i nažalost došli su do rezultata da bi popravljanje te greške dovelo do značajnog usporavanja alata. Dakle, najbolje rešenje je potpuno isključiti optimizaciju. Budući da ovo često stvari čini nekontrolisano sporima, razuman kompromis je korišćenje opcije \texttt{-O0}. Ovo donosi većinu prednosti viših nivoa optimizacije, dok istovremeno ima relativno male šanse za lažno pozitivne ili lažno negativne podatke od \textit{Memcheck}-a. Takođe, poželjno je kompajlirati k\^od sa \texttt{-Wall} jer on može identifikovati neke ili sve probleme koje \textit{Valgrind} može propustiti na višim nivoima optimizacije. Nivo optimizacije ne utiče na sve ostale alate, a za alate za profajliranje kao što je \textit{Cachegrind} bolje je da program kompajlirate na normalnom nivou optimizacije \cite{ValgrindCore}. 
 
 % (Korišćenje \texttt{-Wall} je takođe dobra ideja u celini.)
 
-Da biste koristili ovaj alat, možete da navedete opciju \texttt{--tool = memcheck} u komandnoj liniji prilikom pokretanja \textit{Valgrind}-a, ali niste u obavezi s obzirom da je \textit{Memcheck} podrazumevani alat..
+Da biste koristili ovaj alat, možete da navedete opciju \texttt{--tool = memcheck} u komandnoj liniji prilikom pokretanja \textit{Valgrind}-a, ali niste u obavezi s obzirom da je \textit{Memcheck} podrazumevani alat.
  \begin{center}
 \texttt{valgrind –tool=memcheck [argumenti memchecka] program [argumenti programa]}
 \end{center}
@@ -272,17 +272,22 @@ Program koji radi pod kontrolom \textit{Memcheck}-a obično je deset do pedeset 
 U ovoj sekciji biće opisani mehanizmi koje \textit{Memcheck} koristi u detektovanju grešaka, nakon čega će biti obrađene greške koje može detektovati.
 
 \subsubsection{Bitovi valjane vrednosti (V bitovi)}
-Najjednostavnije je razmišljati o \textit{Memcheck}-u kao alatu koji implementira sintetički CPU koji je identičan stvarnom CPU, osim jednog ključnog detalja. Svaki bit (doslovno) podataka koje obrađuje, čuva i njima rukuje stvarni CPU, dok u sintetičkom CPU ima pridruženi bit ,,valjane vrednosti'' (eng. \textit{valid-value bit}), koji govori da li prateći bit ima legitimnu vrednost ili ne. U daljem tekstu ovaj bit se naziva \texttt{V} bitom (važeće vrednosti).
+Najjednostavnije je razmišljati o \textit{Memcheck}-u kao alatu koji implementira sintetički CPU koji je identičan stvarnom CPU, osim jednog ključnog detalja. Svaki bit (doslovno) podataka koje obrađuje, čuva i njima rukuje stvarni CPU, dok u sintetičkom CPU ima pridruženi bit ,,valjane vrednosti'' (eng. \textit{valid-value bit}), koji govori da li prateći bit ima legitimnu vrednost ili ne. U daljem tekstu ovaj bit se naziva \texttt{V} bitom (valjane vrednosti).
 
-Svaki bajt u sistemu iz tog razloga ima i 8\texttt{V} bitova koji ga prate gde god bio. Na primer, kada CPU učita reč veličine 4 bajta iz memorije, takođe učitava odgovarajućih 32\texttt{V} bita iz bitmape koja čuva \texttt{V} bitove za čitav adresni prostor procesa. Ako bi CPU kasnije trebalo da upiše celu ili neki deo te vrednosti u memoriju na drugoj adresi, relevantni V bitovi će se sačuvati nazad u \texttt{V}-bitnoj bitmapi.
+Svaki bajt u sistemu iz tog razloga ima i 8\texttt{V} bitova koji ga prate. Na primer, kada CPU učita reč veličine 4 bajta iz memorije, takođe učitava odgovarajućih 32\texttt{V} bita iz bitmape koja čuva \texttt{V} bitove za čitav adresni prostor procesa. Ako bi CPU kasnije trebalo da upiše celu ili neki deo te vrednosti u memoriju na drugoj adresi, relevantni V bitovi će se sačuvati nazad u \texttt{V}-bitnoj bitmapi.
 
-Ukratko, svaki bit u sistemu ima (konceptualno) pridruženi \texttt{V} bit, koji ga prati svuda, čak i unutar CPU-a. Svi registri CPU-a (celi brojevi, registri sa pokretnom tačkom, vektori i uslovi) imaju svoje \texttt{V} bitne vektore. Da bi ovo uspelo, \textit{Memcheck} koristi veliku količinu kompresije da bi kompaktno prikazao \texttt{V} bitove.
+Ukratko, svaki bit u sistemu ima (konceptualno) pridruženi \texttt{V} bit, koji ga prati svuda, čak i unutar CPU-a. Svi registri CPU-a (celi brojevi, registri za brojeve u pokretnom zarezu, vektori i uslovi) imaju svoje \texttt{V} bitne vektore. Da bi ovo moglo da funkcioniše dovoljno efikasno, \textit{Memcheck} koristi veliku količinu kompresije da bi kompaktno prikazao \texttt{V} bitove.
 
-Kopiranje vrednosti okolo ne dovodi do toga da \textit{Memcheck} proverava greške ili izveštava o njima. Međutim, kada se vrednost koristi na način koji bi mogao da utiče na spoljno-vidljivo ponašanje vašeg programa, pridruženi \texttt{V} bitovi se odmah proveravaju. Ako bilo koji od njih ukazuje da je vrednost nedefinisana (odnosno promenljiva definisana ali neinicijalizovana), čak i delimično, prijaviće se greška.
+Kopiranje vrednosti ne dovodi do toga da \textit{Memcheck} proverava greške ili izveštava o njima. Međutim, kada se vrednost koristi na način koji bi mogao da utiče na spoljno-vidljivo ponašanje programa, pridruženi \texttt{V} bitovi se tada proveravaju. Ako bilo koji od njih ukazuje da je vrednost nedefinisana (odnosno promenljiva definisana ali neinicijalizovana), čak i delimično, prijaviće se greška.
 
-Većina operacija na niskom nivou, kao što je sabiranje, uzrokuje da \textit{Memcheck} koristi \texttt{V} bitove za operande za izračunavanje \texttt{V} bitova za rezultat. Čak i ako je rezultat delimično ili u potpunosti nedefinisan, on se ne žali. Provere definisanosti dešavaju se samo na tri mesta ---  kada se vrednost koristi za generisanje memorijske adrese, kada treba doneti odluku o kontroli toka izvršavanja programa i kada se detektuje sistemski poziv, \textit{Memcheck} proverava definisanost parametara prema potrebi.
+Većina operacija na niskom nivou, kao što je sabiranje, uzrokuje da \textit{Memcheck} koristi \texttt{V} bitove za operande za izračunavanje \texttt{V} bitova za rezultat. Čak i ako je rezultat delimično ili u potpunosti nedefinisan, alat ne prijavljuje grešku. Provere definisanosti dešavaju se samo na tri mesta:
+\begin{itemize}
+\item  kada se vrednost koristi za generisanje memorijske adrese;
+\item  kada treba doneti odluku o kontroli toka izvršavanja programa; 
+\item  kada se detektuje sistemski poziv, u kom slučaju će \textit{Memcheck} proveravati definisanost parametara prema potrebi.
+\end{itemize}
 
-Kada provera detektuje nedefinisanost, izdaje se poruka o grešci. Dobijena vrednost se na dalje smatra dobro definisanom, kako bi se izbegli dugi lanci poruka o greškama. Drugim rečima, kada \textit{Memcheck} prijavi grešku nedefinisane vrednosti, pokušava da izbegne prijavljivanje daljih grešaka izvedenih iz te iste nedefinisane vrednosti. Ideja o proveravanju svih čitanja iz memorije i žalbi ukoliko je nedefinisana vrednost učitana u registar procesora ne funkcioniše dobro, jer savršeno legitimni C programi rutinski kopiraju neinicijalizovane vrednosti u memoriji, što bi u slučaju primene pomenute ideje dovelo do enormno velikog broja žalbi. Primer sa listinga \ref{lst:slika2.2} ilustruje tu problematiku.
+Kada provera detektuje nedefinisanost, izdaje se poruka o grešci. Dobijena vrednost se na dalje smatra dobro definisanom, kako bi se izbegli dugi lanci poruka o greškama. Drugim rečima, kada \textit{Memcheck} prijavi grešku nedefinisane vrednosti, pokušava da izbegne prijavljivanje daljih grešaka izvedenih iz te iste nedefinisane vrednosti. Ideja o proveravanju svih čitanja iz memorije i žalbi ukoliko je nedefinisana vrednost učitana u registar procesora ne funkcioniše dobro, jer savršeno legitimni C programi rutinski kopiraju neinicijalizovane vrednosti u memoriji, što bi u slučaju primene pomenute ideje dovelo do enormno velikog broja prijavljenih grešaka. Primer sa listinga \ref{lst:slika2.2} ilustruje tu problematiku.
 
 \begin{lstlisting}[style=mystyle,caption={Primer kratkog segmenta koda}, label={lst:slika2.2},language={C}] 
 struct S{
@@ -303,39 +308,38 @@ s2=s1;
 %  \label{fig:slika2.2}
 %\end{figure}
 
-Nakon analize koda sa listinga \ref{lst:slika2.2}, jedno razmišljanje je da struktura \texttt{S}, kako Int zauzima 4 bajta, a char jedan bajt, zauzima 5 bajtova što je pogrešno. Svi kompajleri u normalnom režimu rada zaokružiće veličinu strukture \texttt{S} na ceo broj reči, u ovom slučaju 8 bajtova. Ukoliko to nije slučaj, kompajleri  se prisiljavaju da generišu zaista kompleksan k\^od za pristup nizovima struktura \texttt{S} na nekim arhitekturama. Dakle, \texttt{s1} zauzima 8 bajtova, ali će samo njih 5 biti inicijalizovano. Za zadatak \texttt{s2=21}, GCC generiše k\^od za kopiranje svih 8 bajtova u \texttt{s2} bez obzira na njihovo značenje. Ako bi \textit{Memcheck} jednostavno proveravao vrednosti redom kako su izašle iz memorije, oglasio bi svaki put kad bi se desilo ovakvo dodeljivanje strukture. Dakle, neophodno je komplikovanije ponašanje opisano gore. Ovo omogućava GCC-u da kopira \texttt{s1} u \texttt{s2} na bilo koji način, a upozorenje će se emitovati samo ako se kasnije koriste neinicijalizovane vrednosti \cite{Memcheck}. 
+Nakon analize koda sa listinga \ref{lst:slika2.2}, može da deluje da struktura \texttt{S}, kako tip podataka \texttt{int} zauzima 4 bajta, a tip podataka \texttt{char} jedan bajt, zauzima 5 bajtova. Međutim, svi kompajleri, u normalnom režimu rada, zaokružiće veličinu strukture \texttt{S} na ceo broj reči, tj.~na 8 bajtova. Dakle, \texttt{s1} zauzima 8 bajtova, ali će samo njih 5 biti inicijalizovano. Za zadatak \texttt{s2=21}, GCC generiše k\^od za kopiranje svih 8 bajtova u \texttt{s2} bez obzira na njihovo značenje. Ako bi \textit{Memcheck} jednostavno proveravao vrednosti redom kako su izašle iz memorije, oglasio bi svaki put kad bi se desilo ovakvo dodeljivanje strukture. Dakle, neophodno je komplikovanije ponašanje opisano gore. Ovo omogućava GCC-u da kopira \texttt{s1} u \texttt{s2} na bilo koji način, a upozorenje će se emitovati samo ako se kasnije koriste neinicijalizovane vrednosti \cite{Memcheck}. 
 
 \subsubsection{Bitovi važeće adrese (A bitovi)}
 Prethodna sekcija opisuje kako se uspostavlja i održava valjanost vrednosti bez potrebe da se kaže da li program ima ili nema pravo na pristup bilo kojoj određenoj memorijskoj lokaciji. U ovoj sekciji ćemo razmotriti to pitanje.
 
-Svaki bit u memoriji ili u procesoru ima pridruženi bit valjane vrednosti (\texttt{V}). Pored toga, svi bajtovi u memoriji, ali ne i u procesoru, imaju pridruženi bit valjane adrese (\texttt{A}, eng. \textit{valid-address bit}). Ovo ukazuje na to da li program može legitimno čitati ili pisati u tu lokaciju. To ne daje nikakve naznake valjanosti podataka na toj lokaciji, kako je to zadatak V bitova već samo da li se toj lokaciji može pristupiti ili ne. Svaki put kada vaš program čita ili upisuje u memoriju, \textit{Memcheck} proverava \texttt{A} bitove povezane sa adresom. Ako bilo koji od njih označi neispravnu adresu, prijavljuje se greška. Bitno je reći da sama čitanja i pisanja ne menjaju \texttt{A} bitove, već ih samo konsultuju.
+Svaki bit u memoriji ili u procesoru ima pridruženi bit valjane vrednosti (\texttt{V}). Pored toga, svi bajtovi u memoriji, ali ne i u procesoru, imaju pridruženi bit valjane adrese (\texttt{A}, eng. \textit{valid-address bit}). Ovo ukazuje na to da li program može legitimno čitati ili pisati u tu lokaciju. To ne daje nikakve naznake valjanosti podataka na toj lokaciji, kako je to zadatak V bitova već samo da li se toj lokaciji može pristupiti ili ne. Svaki put kada program čita ili upisuje u memoriju, \textit{Memcheck} proverava \texttt{A} bitove povezane sa adresom. Ako bilo koji od njih označi neispravnu adresu, prijavljuje se greška. Sama čitanja i pisanja ne menjaju \texttt{A} bitove, već ih samo konsultuju. Ovaj naizgled čudan izbor smanjuje količinu zbunjujućih informacija koje se predstavljaju korisniku. Izbegava neprijatnu pojavu u kojoj se memorija čita sa mesta koje je i nedostupno i sadrži nevažeće vrednosti, a kao rezultat toga dobila bi se ne samo greška sa nevažećom adresom (čitanje / pisanje), već i potencijalno veliki skup greškaka neinicijalizovanih vrednosti --- jedna za svaki put kada se vrednost koristi.
 
 Princip postavljanja, odnosno čišćenja \texttt{A} bitova je sledeći:
 \begin{itemize}
 \item Kada se program pokrene, sva globalna područja podataka su označena kao pristupačna.
-\item Kada program izvrši \textit{malloc/new}, A bitovi za tačno dodeljeno područje, ni bajt više, označeni su kao dostupni. Po oslobađanju područja A bitovi se menjaju kako bi ukazali na nepristupačnost.
-\item Kada se registar pokazivača steka (SP) pomeri gore ili dole, postavljaju se \texttt{A} bitovi. Pravilo je da je područje SP od vrha do podnožja steka označeni kao dostupno, a ispod SP nedostupno. 
+\item Kada program izvrši \textit{malloc/new}, A bitovi za tačno dodeljeno područje označeni su kao pristupačni. Po oslobađanju područja A bitovi se menjaju kako bi ukazali na nepristupačnost.
+\item Kada se registar pokazivača steka (SP) pomeri gore ili dole, postavljaju se \texttt{A} bitovi. Pravilo je da je područje SP od vrha do podnožja steka označeno kao pristupačno, a ispod SP nepristupačno. 
 %(Ako to zvuči nelogično, imajte na umu da stek raste prema dole, a ne prema gore, na gotovo svim Unix sistemima, uključujući GNU / Linux.) 
 \item Pri obavljanju sistemskih poziva, \texttt{A} bitovi se odgovarajuće menjaju. Na primer, \textit{mmap} čini da se datoteke pojavljuju u adresnom prostoru procesa, pa se \texttt{A} bitovi moraju ažurirati ako \textit{mmap} uspe \cite{Memcheck}. 
 \end{itemize}
 
 Nakon svega navedenog dolazimo do rezimea \textit{Memcheck}-ovog principa funkcionisanja.
 \begin{itemize}
-\item[$\textendash$] Svaki bajt u memoriji ima 8 pridruženih \texttt{V} bitova (važeće vrednosti), govoreći da li bajt ima definisanu vrednost i jedan bit \texttt{A} (valjane adrese), odnosno govoreći da li program trenutno ima pravo da čita/piše na tu adresu. Kao što je gore pomenuto, velika upotreba kompresije znači da troškovi obično iznose oko 25\%.
+\item[$\textendash$] Svaki bajt u memoriji ima 8 pridruženih \texttt{V} bitova (važeće vrednosti), govoreći da li bajt ima definisanu vrednost i jedan bit \texttt{A} (valjane adrese), odnosno govoreći da li program trenutno ima pravo da čita/piše na tu adresu. Kao što je gore pomenuto, velika upotreba kompresije omogućava da troškovi obično iznose oko 25\% vremena i prostora.
 \item[$\textendash$] Kada se memorija čita ili se u nju piše, pregledaju se odgovarajući \texttt{A} bitovi. Ako označe nevažeću adresu, \textit{Memcheck} emituje grešku \textit{neispravno čitanje} (eng. \textit{invalid read}) ili \textit{neispravno pisanje} (eng. \textit{invalid write}).
 \item[$\textendash$] Kada se memorija čita u registre CPU-a, relevantni \texttt{V} bitovi se preuzimaju iz memorije i čuvaju u simuliranom CPU-u. Oni se ne konsultuju.
 \item[$\textendash$] Kada se registar ispiše u memoriju, V bitovi za taj registar se takođe zapisuju nazad u memoriju.
 \item[$\textendash$] Kada se vrednosti u registrima CPU koriste za generisanje memorijske adrese ili za određivanje ishoda uslovne grane, \texttt{V} bitovi za te vrednosti se proveravaju i emituje se greška ako je bilo koja od njih nedefinisana. Kada se vrednosti u registrima procesora koriste u bilo koju drugu svrhu, \textit{Memcheck} izračunava \texttt{V} bitove za rezultat, ali ih ne proverava.
 \item[$\textendash$] Jednom kada se provere \texttt{V} bitovi za vrednost u CPU, oni se postavljaju da ukazuju na validnost. Ovo izbegava dugačke lance grešaka.
-\item[$\textendash$] Kada se vrednosti učitaju iz memorije, \textit{Memcheck} proverava \texttt{A} bitove za tu lokaciju i izdaje upozorenje o nevalidnoj adresi ako je potrebno. U tom slučaju su učitani \texttt{V} bitovi primorani da označe validno stanje, uprkos tome što je lokacija nevalidna. Ovaj naizgled čudan izbor smanjuje količinu zbunjujućih informacija koje se predstavljaju korisniku. Izbegava neprijatnu pojavu u kojoj se memorija čita sa mesta koje je i nedostupno i sadrži nevažeće vrednosti, a kao rezultat toga dobila bi se ne samo greška sa nevažećom adresom (čitanje / pisanje), već i potencijalno veliki skup greškaka neinicijalizovanih vrednosti --- jedna za svaki put kada se vrednost koristi.
-\end{itemize}
-
-\textit{Memcheck} presreće pozive funkcija \textit{malloc, calloc, realloc, valloc, memalign, free, new, new[], delete i delete[]}. Ponašanje koje  se dobija usled toga je sledeće:
-\begin{itemize}
-\item \textit{malloc/new/new[]}: vraćena memorija je označena kao adresabilna, ali nema važeće vrednosti. To znači da u nju morate pisati pre nego što je pročitate.
-\item \textit{calloc}: vraćena memorija označena je i adresabilnom i važećom, jer \textit{calloc} postavlja područje na nulu.
-\item \textit{realloc}: ako je nova veličina veća od stare, novi odeljak je adresiran, ali nevažeći, kao kod \textit{malloc}-a. Ako je nova veličina manja, odloženi odeljak je označen kao nedostupan. \textit{Realloc}-u može da se prosledi bilo šta, ali ispravno je samo ako se prosledi pokazivač koji je prethodno izdao \textit{malloc/calloc/realloc}.
-\item \textit{free/delete/delete[]}: ovim funkcijama može se proslediti samo pokazivač koji je prethodno izdala odgovarajuća funkcija dodeljivanja. Inače, \textit{Memcheck} prijavljuje nepravilnost. Ako je pokazivač zaista važeći, \textit{Memcheck} označava celo područje na koje pokazuje kao da ga nije moguće adresirati i postavlja blok u red oslobođenih blokova. Cilj je odložiti što je duže moguće realokaciju ovog bloka. Dok se to ne dogodi, svi pokušaji da mu se pristupi izazvaće grešku nevažeće adrese \cite{Memcheck}. 
+\item[$\textendash$] Kada se vrednosti učitaju iz memorije, \textit{Memcheck} proverava \texttt{A} bitove za tu lokaciju i izdaje upozorenje o nevalidnoj adresi ako je potrebno. U tom slučaju su učitani \texttt{V} bitovi primorani da označe validno stanje, uprkos tome što je lokacija nevalidna. 
+\item[$\textendash$] \textit{Memcheck} presreće pozive funkcija \textit{malloc, calloc, realloc, valloc, memalign, free, new, new[], delete i delete[]}. Ponašanje koje  se dobija usled toga je sledeće:
+	\begin{itemize}
+	\item[$\textbullet$] \textit{malloc/new/new[]}: vraćena memorija je označena kao adresabilna, ali nema važeće vrednosti. To znači da u nju morate pisati pre nego što je pročitate.
+	\item[$\textbullet$] \textit{calloc}: vraćena memorija označena je i adresabilnom i važećom, jer \textit{calloc} postavlja područje na nulu.
+	\item[$\textbullet$] \textit{realloc}: ako je nova veličina veća od stare, novi odeljak je adresiran, ali nevažeći, kao kod \textit{malloc}-a. Ako je nova veličina manja, odloženi odeljak je označen kao nedostupan. \textit{Realloc}-u može da se prosledi bilo šta, ali ispravno je samo ako se prosledi pokazivač koji je prethodno izdao \textit{malloc/calloc/realloc}.
+	\item[$\textbullet$] \textit{free/delete/delete[]}: ovim funkcijama može se proslediti samo pokazivač koji je prethodno izdala odgovarajuća funkcija dodeljivanja. Inače, \textit{Memcheck} prijavljuje nepravilnost. Ako je pokazivač zaista važeći, \textit{Memcheck} označava celo područje na koje pokazuje kao da ga nije moguće adresirati i postavlja blok u red oslobođenih blokova. Cilj je odložiti što je duže moguće realokaciju ovog bloka. Dok se to ne dogodi, svi pokušaji da mu se pristupi izazvaće grešku nevažeće adrese \cite{Memcheck}. 
+	\end{itemize}
 \end{itemize}
 
 \subsection{Greške nevalidnog čitanja/pisanja (eng. \textit{invalid read/write errors})}
@@ -346,7 +350,7 @@ Nakon svega navedenog dolazimo do rezimea \textit{Memcheck}-ovog principa funkci
 %  \label{fig:slika2.3}
 %\end{figure}
 
-\begin{lstlisting}[style=terminal,caption={Primer ispisa greške nevalidnog čitanja, izvor: \cite{Memcheck}}, label={lst:slika2.3},language={bash}]   
+\begin{lstlisting}[style=terminal,caption={Primer ispisa greške nevalidnog čitanja \cite{Memcheck}}, label={lst:slika2.3},language={bash}]   
 Invalid read of size 4
     at 0x40F6BBCC: (within /usr/lib/libpng.so.2.1.0.9)
     by 0x40F6B804: (within /usr/lib/libpng.so.2.1.0.9)
@@ -355,16 +359,16 @@ Invalid read of size 4
 Address 0xBFFFF0E0 is not stack'd, malloc'd or free'd
 \end{lstlisting}
 
-Ove greške se javljaju kada vaš program čita ili piše u memoriju na mestu za koje \textit{Memcheck} smatra da ne bi trebalo. U ovom primeru, program je izvršio četvorobajtno čitanje na adresi 0xBFFFF0E0, negde unutar sistemske biblioteke \textit{libpng.so.2.1.0.9}, koja je pozvana negde drugde u istoj biblioteci, pozvana iz linije 326 \textit{qpngio.cpp} , i tako dalje.
+Ove greške se javljaju kada program čita ili piše u memoriju na mestu za koje \textit{Memcheck} smatra da ne bi trebalo. U ovom primeru, program je izvršio četvorobajtno čitanje na adresi 0xBFFFF0E0, negde unutar sistemske biblioteke \textit{libpng.so.2.1.0.9}, koja je pozvana negde drugde u istoj biblioteci, a koje je izvšeno iz linije 326 u okviru fajla \textit{qpngio.cpp} , i tako dalje.
 
-\textit{Memcheck} će svakako pokušati da odredi na šta se ilegalna adresa može odnositi, jer je to često korisno. Dakle, ako pokazuje na blok memorije koji je već oslobođen, bićete obavešteni o tome, kao i o tome gde je blok oslobođen. Isto tako, ako se ispostavi da se nalazi na kraju hip bloka, što je greška, tj.~greška prekoračenja niza, bićete obavešteni o ovoj činjenici, kao i o tome gde je blok dodeljen. Ako koristite opciju \texttt{--read-var-info}, \textit{Memcheck} će raditi sporije, ali može dati detaljniji opis bilo koje nelegalne adrese.
+\textit{Memcheck} će svakako pokušati da odredi na šta se ilegalna adresa može odnositi, jer je to često korisno. Dakle, ako pokazuje na blok memorije koji je već oslobođen, alat će emitovati tu informaciju, kao i podatak o tome gde je blok oslobođen. Isto tako, ako se ispostavi da se nalazi na kraju hip bloka, što je greška, tj.~greška prekoračenja niza, alat će i to registrovati i prijaviiti, kao i podatak o tome gde je blok dodeljen. Ako koristite opciju \texttt{--read-var-info}, \textit{Memcheck} će raditi sporije, ali može dati detaljniji opis bilo koje nelegalne adrese.
 
-U ovom primeru \textit{Memcheck} ne može da identifikuje adresu. Zapravo se adresa nalazi na steku, ali iz nekog razloga ovo nije važeća adresa steka - nalazi se ispod pokazivača steka i to nije dozvoljeno. U ovom konkretnom slučaju verovatno je uzrokovano GCC-om koji generiše nevažeći k\^od, što je poznata greška u nekim drevnim verzijama GCC-a.
+U ovom primeru \textit{Memcheck} ne može da identifikuje adresu. Zapravo se adresa nalazi na steku, ali iz nekog razloga ovo nije važeća adresa steka - nalazi se ispod pokazivača steka i to nije dozvoljeno. U ovom konkretnom slučaju greška je verovatno uzrokovana GCC-om koji generiše nevažeći k\^od, što je poznata greška u nekim drevnim verzijama GCC-a.
 
-Treba imati na umu da \textit{Memcheck} samo govori da će program uskoro pristupiti memoriji na nedozvoljenoj adresi i da pritom taj pristup ne može sprečiti. Dakle, ako program pristupi, što bi obično rezultiralo greškom (segmentation fault), program će i dalje imati isto ponašanje - ali od \textit{Memcheck}-a ćete dobiti poruku neposredno pre toga. U ovom konkretnom primeru čitanje loših (nevalidnih) vrednosti sa steku nije fatalno, a program nastavlja sa radom \cite{Memcheck}. 
+Treba imati na umu da \textit{Memcheck} samo govori da će program uskoro pristupiti memoriji na nedozvoljenoj adresi i da pritom taj pristup ne može sprečiti. Dakle, kada program pristupi, što bi obično rezultiralo greškom (eng. \textit{Segmentation fault}), program će i dalje imati isto ponašanje - ali \textit{Memcheck}-a će izdati poruku neposredno pre toga. U ovom konkretnom primeru čitanje loših (nevalidnih) vrednosti sa steku nije fatalno, i program nastavlja sa radom \cite{Memcheck}. 
 
 \subsection{Korišćenje neinicijalizovanih vrednosti}
-Greška pri korišćenju neinicijalizovane vrednosti se prijavljuje kada vaš program koristi vrednost koja nije inicijalizovana - drugim rečima, nije definisana. Ovde se nedefinisana vrednost koristi negde unutar printf mašine C biblioteke. Ova greška je prijavljena prilikom pokretanja programa sa listinga \ref{lst:slika2.4}, dok je njen ispis dat na listingu \ref{lst:slika2.5}.
+Greška pri korišćenju neinicijalizovane vrednosti se prijavljuje kada program koristi vrednost koja nije inicijalizovana - drugim rečima, nije definisana. Ovde se nedefinisana vrednost koristi negde unutar funkcije \texttt{printf} iz standardne C biblioteke. Ova greška je prijavljena prilikom pokretanja programa sa listinga \ref{lst:slika2.4}, dok je njen ispis dat na listingu \ref{lst:slika2.5}.
 
 \begin{lstlisting}[style=mystyle,caption={Program koji izaziva grešku korišćenja neinicijalizovanih vrednosti}, label={lst:slika2.4},language={C}] 
 #include <stdio.h>
@@ -427,21 +431,22 @@ int main(){
 0
 \end{lstlisting}
 
-Važno je shvatiti da program može kopirati neželjene (neinicijalizovane) podatke koliko god želi. \textit{Memcheck} to posmatra i evidentira podatke, ali se ne žali. Žalba se izdaje samo kada vaš program pokušava da koristi neinicijalizovane podatke na način koji može uticati na spolja vidljivo ponašanje vašeg programa. U ovom primeru, \textit{x} je neinicijalizovano. \textit{Memcheck} primećuje vrednost koja se prosleđuje \textit{\_IO\_printf} i odatle \textit{\_IO\_vfprintf}, ali ne daje komentar. Međutim, \textit{\_IO\_vfprintf} mora ispitati vrednost  kako bi je mogao pretvoriti u odgovarajući ASCI niz i \textit{Memcheck} se u ovom trenutku žali.
+%Važno je shvatiti da program može kopirati neželjene (neinicijalizovane) podatke koliko god želi. \textit{Memcheck} to posmatra i evidentira podatke, ali se ne žali.
+Poruka o grešci se izdaje samo kada program pokušava da koristi neinicijalizovane podatke na način koji može uticati na spolja vidljivo ponašanje programa, iako \textit{Memcheck} prati i evidentira svako korišćenje neinicijalizovanih podataka. U ovom primeru, \textit{x} je neinicijalizovano. \textit{Memcheck} primećuje vrednost koja se prosleđuje \textit{\_IO\_printf} i odatle \textit{\_IO\_vfprintf}, ali ne daje komentar. Međutim, \textit{\_IO\_vfprintf} mora ispitati vrednost  kako bi je mogao pretvoriti u odgovarajući ASCI niz i \textit{Memcheck} u ovom trenutku prijavljuje grešku.
 
 Izvori grešaka neinicijalizovanih vrednosti su sledeći:
 \begin{itemize}
-\item Lokalne promenljive u procedurama koje nisu inicijalizovane, kao u primeru iznad.
+\item Lokalne promenljive u procedurama koje nisu inicijalizovane, kao u primeru sa listinga \ref{lst:slika2.4}.
 \item Sadržaj blokova hipa (dodeljen \textit{malloc}-om, \textit{new} ili sličnom funkcijom) pre nego što se nešto u tom bloku ispiše, odnosno pre inicijalizacije.
 \end{itemize}
 
-Za dobijanje informacija o izvorima neinicijalizovanih podataka u programu, neophodno je koristiti opciju \texttt{--track-origins=yes}. Kao što je već rečeno, ovo čini \textit{Memcheck} sporijim, ali može znatno olakšati pronalaženje osnovnih uzroka neinicijalizovanih grešaka \cite{Memcheck}. 
+Za dobijanje informacija o izvorima neinicijalizovanih podataka u programu, neophodno je koristiti opciju \texttt{--track-origins=yes}. Ovo čini \textit{Memcheck} sporijim, ali može znatno olakšati pronalaženje osnovnih uzroka neinicijalizovanih grešaka \cite{Memcheck}. 
 
 \subsection{Korišćenje neinicializovane ili neadresirane vrednosti u sistemskom pozivu}
 
 \textit{Memcheck} prati i proverava sve parametre sistemskih poziva. Svaki parametar se proverava pojedinačno, bio on inicijalizovan ili ne. Ukoliko sistemski poziv treba da čita iz bafera  koji je obezbeđen programu, \textit{Memcheck} proverava da li je ceo bafer adresiran i da li je njegov sadržaj inicijalizovan. Takođe, ako sistemski poziv treba da piše u bafer, \textit{Memcheck} proverava da li je bafer moguće adresirati. Nakon sistemskog poziva, \textit{Memcheck} ažurira sve parametre koje je pratio kako bi tačno odražavale sve promene u stanju memorije izazvane sistemskim pozivom.
 
-\begin{lstlisting}[style=mystyle,caption={Program koji izaziva grešku korišćenja neinicializovane ili neadresirane vrednosti u sistemskom pozivu, izvor: \cite{Memcheck}}, label={lst:slika2.6},language={C}] 
+\begin{lstlisting}[style=mystyle,caption={Program koji izaziva grešku korišćenja neinicializovane ili neadresirane vrednosti u sistemskom pozivu \cite{Memcheck}}, label={lst:slika2.6},language={C}] 
 #include <unistd.h>
 #include <stdlib.h>
 
@@ -481,7 +486,7 @@ Syscall param exit(error_code) contains uninitialised byte(s)
    by 0x8048426: main (a.c:8)
 \end{lstlisting}
 
-Na listinzima \ref{lst:slika2.6} i \ref{lst:slika2.7} dat je primer programa koji ilustruje sistemski poziv sa neispravnim parametrima, kao i izveštaj koji dobijamo nakon analize pomenutog programa. Sa listinga \ref{lst:slika2.7} vidimo da je \textit{Memcheck} prikazao dve greške sa informacijama o korišćenju neinicijalizovanih vrednosti u sistemskim pozivima, kao i linije izvornog koda gde se ove vrednosti koriste. Prva greška posledica je korišćenja neinicijalizovane vrednosti \textit{arr} kao paramatra sistemskog poziva \textit{write()}, dok je druga greška posledica prosledjenog nedefinisanog argumenta sistemskom pozivu \textit{exit} \cite{Memcheck}. 
+Na listinzima \ref{lst:slika2.6} i \ref{lst:slika2.7} dat je primer programa koji ilustruje sistemski poziv sa neispravnim parametrima, kao i izveštaj koji dobijamo nakon analize pomenutog programa. Sa listinga \ref{lst:slika2.7} vidimo da je \textit{Memcheck} prikazao dve greške sa informacijama o korišćenju neinicijalizovanih vrednosti u sistemskim pozivima, kao i linije izvornog koda gde se ove vrednosti koriste. Prva greška posledica je korišćenja neinicijalizovane vrednosti \textit{arr} kao paramatra sistemskog poziva \textit{write()}, dok je druga greška posledica prosleđenog nedefinisanog argumenta sistemskom pozivu \textit{exit} \cite{Memcheck}. 
 
 \subsection{Nedopušteno oslobađanje memorije}
 \textit{Memcheck} prati sve blokove memorije koje je program alocirao pomoću \textit{malloc/new}, tako da može tačno znati da li je argument prosleđen \textit{free/ delete} legitiman ili ne. Listing \ref{lst:slika2.8} ilustruje program koji je oslobodio isti blok dva puta. 
@@ -508,7 +513,7 @@ int main(){
 %  \label{fig:slika2.8}
 %\end{figure}
 
-Kao i kod grešaka nevalidnog čitanja/pisanja, \textit{Memcheck} pokušava da dokuči oslobođenu adresu. Ako je, kao ovde, slučaj da je adresa koja je prethodno oslobođena, to će biti prijavljeno i učiniće duplikate oslobađanja istog bloka lako uočljivim. Ovu poruku ćete dobiti i ako pokušate da oslobodite pokazivač koji ne pokazuje početak hip bloka. Listing \ref{lst:slika2.9} ilustruje izlaz dobijen puštanjem programa sa listinga \ref{lst:slika2.8} na analizu alatom \textit{Memcheck} \cite{Memcheck}. 
+Kao i kod grešaka nevalidnog čitanja/pisanja, \textit{Memcheck} pokušava da dokuči oslobođenu adresu. Ako je, kao ovde, slučaj da je adresa koja je prethodno oslobođena, to će biti prijavljeno i učiniće duplikate oslobađanja istog bloka lako uočljivim. Ova poruka će biti emitovana i ako program pokuša da oslobodi pokazivač koji ne pokazuje na početak hip bloka. Listing \ref{lst:slika2.9} ilustruje izlaz dobijen puštanjem programa sa listinga \ref{lst:slika2.8} na analizu alatom \textit{Memcheck} \cite{Memcheck}. 
 
 %\begin{figure}[!ht]
 %  \centering
@@ -548,7 +553,7 @@ Kao i kod grešaka nevalidnog čitanja/pisanja, \textit{Memcheck} pokušava da d
 \end{lstlisting}
 
 \subsection{Preklapanje izvornog i odredišnog bloka}
-Sledeće C bibliotečke funkcije kopiraju neke podatke iz jednog memorijskog bloka u drugi - \textit{memcpy, strcpy, strncpy, strcat, strncat}.  Blokovi na koje ukazuju njihovi pokazivači \textit{src} i \textit{dst} ne smeju se preklapati. \textit{POSIX} standardi imaju sledeću formulaciju: ,,Ako se kopiranje vrši između objekata koji se preklapaju, ponašanje je nedefinisano''.  Stoga \textit{Memcheck} ovo proverava. Ukoliko dođe do preklapanja, prijaviće grešku.
+Sledeće bibliotečke funkcije kopiraju neke podatke iz jednog memorijskog bloka u drugi - \textit{memcpy, strcpy, strncpy, strcat, strncat}.  Blokovi na koje ukazuju njihovi pokazivači \textit{src} i \textit{dst} ne smeju se preklapati. \textit{POSIX} standardi imaju sledeću formulaciju: ,,Ako se kopiranje vrši između objekata koji se preklapaju, ponašanje je nedefinisano''.  Stoga \textit{Memcheck} ovo proverava. Ukoliko dođe do preklapanja, prijaviće grešku.
 %\begin{figure}[!ht]
  % \centering
 %  \includegraphics[width=0.7\textwidth]{overlapError.png}
@@ -556,18 +561,18 @@ Sledeće C bibliotečke funkcije kopiraju neke podatke iz jednog memorijskog bl
 %  \label{fig:slika2.10}
 %\end{figure}
 
-\begin{lstlisting}[style=terminal,caption={Primer ispisa greške preklapanja izvornog i odredišnog bloka, izvor: \cite{Memcheck}}, label={lst:slika2.10},language={bash}] 
+\begin{lstlisting}[style=terminal,caption={Primer ispisa greške preklapanja izvornog i odredišnog bloka \cite{Memcheck}}, label={lst:slika2.10},language={bash}] 
 ==27492==  Source and destination overlap in memcpy(0xbffff294, 0xbffff280, 21)
 ==27492==      at 0x40026CDC: memcpy (mc_replace_strmem.c:71)
 ==27492==      by 0x804865A: main (overlap.c:40)
 \end{lstlisting}
 
-Ne želite da se dva bloka preklapaju, jer bi jedan od njih mogao delimično da se prepiše kopiranjem. Može delovati da \textit{Memcheck} previše pedantno prijavljuje ovo u slučaju kada je \textit{dst} manji od \textit{src}. Na primer, očigledan način implementacije \textit{memcpy}  je kopiranje iz prvog bajta u poslednji. Međutim, vodiči za optimizaciju nekih arhitektura preporučuju kopiranje od poslednjeg bajta do prvog. Pouka priče je da ako zaista želite da napišete prenosivi k\^od, ne pravite nikakve pretpostavke o implentaciji jezika \cite{Memcheck}. 
+%Ne želite da se dva bloka preklapaju, jer bi jedan od njih mogao delimično da se prepiše kopiranjem. Može delovati da \textit{Memcheck} previše pedantno prijavljuje ovo u slučaju kada je \textit{dst} manji od \textit{src}. Na primer, očigledan način implementacije \textit{memcpy}  je kopiranje iz prvog bajta u poslednji. Međutim, vodiči za optimizaciju nekih arhitektura preporučuju kopiranje od poslednjeg bajta do prvog. Pouka priče je da ako zaista želite da napišete prenosivi k\^od, ne pravite nikakve pretpostavke o implentaciji jezika \cite{Memcheck}. 
 
 \subsection{Sumnjive vrednosti argumenata}
-Sve funkcije za alokaciju memorije uzimaju argument koji određuje veličinu memorijskog bloka koji treba dodeliti. Jasno je da tražena veličina treba da bude pozitivna vrednost koja obično nije preterano velika. Na primer, krajnje je neverovatno da veličina zahteva za dodelu premašuje ${2}^{63}$ bajta na 64-bitnoj mašini. Mnogo je verovatnije da je takva vrednost rezultat pogrešnog izračunavanja veličine i da je u stvari negativna vrednost (koja se čini preterano velikom jer se obrazac bita tumači kao nepotpisani celi broj). Takva vrednost se naziva ,,sumnjivom vrednošću''. Argument veličine sledećih funkcija dodeljivanja biće proveren da li je sumnjiv: \textit{malloc, calloc, realloc, memalign, new, new[ ]. \_builtin\_new, \_builtin\_vec\_new}. Za \textit{calloc} se proveravaju oba argumenta.
+Sve funkcije za alokaciju memorije uzimaju argument koji određuje veličinu memorijskog bloka koji treba dodeliti. Jasno je da tražena veličina treba da bude pozitivna vrednost koja obično nije preterano velika. Na primer, krajnje je neverovatno da veličina zahteva za dodelu premašuje ${2}^{63}$ bajta na 64-bitnoj mašini. Mnogo je verovatnije da je takva vrednost rezultat pogrešnog izračunavanja veličine i da je u stvari negativna vrednost (koja se čini preterano velikom jer se obrazac bita tumači kao neoznačeni celi broj). Takva vrednost se naziva ,,sumnjivom vrednošću''. Argument veličine sledećih funkcija dodeljivanja biće proveren da li je sumnjiv: \textit{malloc, calloc, realloc, memalign, new, new[ ], \_builtin\_new, \_builtin\_vec\_new}. Za \textit{calloc} se proveravaju oba argumenta.
 
-Ukoliko dođe do ovakve sitruacije, prijaviće se greška sa listinga \ref{lst:slika2.11} \cite{Memcheck}. 
+Ukoliko dođe do ovakve situacije, prijaviće se greška sa listinga \ref{lst:slika2.11}. 
 %\begin{figure}[!ht]
 %  \centering
 %  \includegraphics[width=0.7\textwidth]{fishyArgument.png}
@@ -575,7 +580,7 @@ Ukoliko dođe do ovakve sitruacije, prijaviće se greška sa listinga \ref{lst:s
  % \label{fig:slika2.11}
 %\end{figure}
 
-\begin{lstlisting}[style=terminal,caption={Primer ispisa greške sumnjive vrednosti argumenata, izvor: \cite{Memcheck}}, label={lst:slika2.11},language={bash}] 
+\begin{lstlisting}[style=terminal,caption={Primer ispisa greške sumnjive vrednosti argumenata \cite{Memcheck}}, label={lst:slika2.11},language={bash}] 
 ==32233==  Argument 'size' of function malloc has a fishy (possibly negative) value: -3
 ==32233==      at 0x4C2CFA7: malloc (vg_replace_malloc.c:298)
 ==32233==      by 0x400555: foo (fishy.c:15)
@@ -583,15 +588,15 @@ Ukoliko dođe do ovakve sitruacije, prijaviće se greška sa listinga \ref{lst:s
 \end{lstlisting}
 
 \subsection{Detekcija curenja memorije}
-Na kraju izvršavanja programa \textit{Memcheck} ima informaciju o svim blokovima hip memorije koji nisu oslobođeni, kako tokom izvršavanja programa, \textit{Memcheck} vodi računa o svim blokovima hipa koji su alocirani. \textit{Memcheck} takođe može odrediti da li se svakom od tih blokova moće pristupiti preko pokazivača, ukoliko se na odgovarajući način podesi opcija \texttt{--leak-check} \cite{Memcheck}.
+Na kraju izvršavanja programa \textit{Memcheck} ima informaciju o svim blokovima hip memorije koji nisu oslobođeni, jer tokom izvršavanja programa \textit{Memcheck} vodi računa o svim blokovima hipa koji su alocirani. \textit{Memcheck} takođe može odrediti da li se svakom od tih blokova može pristupiti preko dostupnog pokazivača, ukoliko se na odgovarajući način podesi opcija \texttt{--leak-check} \cite{Memcheck}.
 
 Memorijskim blokovima se može pristupiti pomoću pokazivača. Postoje dve vrste pokazivača koje u tu svrhu koristimo:
 \begin{itemize}
-\item pokazivač na početak memorijskog bloka (eng. \textit{start-pointer})
-\item pokazivač na sadržaj unutar memorijskog bloka (eng. \textit{interior-pointer})
+\item Pokazivač na početak memorijskog bloka (eng. \textit{start-pointer});
+\item Pokazivač na sadržaj unutar memorijskog bloka (eng. \textit{interior-pointer}).
 \end{itemize}
 
-Ukoliko imamo pokazivač koji je pokazivao na početak bloka, koji je u međuvremeno pomeren da pokazuje na unutrašnjost bloka, ili postoji neželjena, tj. slučajna i nepovezana vrednost u memoriji, automatski znamo da imamo pokazivač na unutrašnjost memorijskog bloka. 
+Ukoliko imamo pokazivač koji je pokazivao na početak bloka, koji je u međuvremenu pomeren da pokazuje na unutrašnjost bloka, ili postoji slučajna i nepovezana vrednost u memoriji koja pokazuje na unutrašnjost nekog memorijskog bloka, automatski znamo da imamo pokazivač na unutrašnjost memorijskog bloka. 
 
 Imajući to na umu, na slici \ref{fig:slika2.12} navedeno je devet mogućih slučajeva kada pokazivači pokazuju na neke memorijske blokove.
 \begin{figure}[!ht]
@@ -606,11 +611,11 @@ Svaki mogući slučaj može se svesti na jedan od gore navedenih devet. \textit
 \begin{itemize}
 \item[$\textendash$] \textbf{Još uvek dostupan (eng. \textit{still reachable})} – Ova klasa pokriva slučajeve 1 i 2 navedene na slici \ref{fig:slika2.12}. Pronađen je pokazivač na početak bloka ili više takvih pokazivača. Kako ovi pokazivači pokazuju tačno na neoslobođeni segment memorije, isti se može osloboditi pre završetka rada programa. Blokovi iz ove kategorije su vrlo česti i verovatno nisu problem. Dakle, \textit{Memcheck} podrazumevano neće pojedinačno prijavljivati takve blokove \cite{Memcheck}.
 \item[$\textendash$] \textbf{Definitivno izgubljen (eng. \textit{definitely lost})} – Ova klasa pokriva slučaj 3 naveden na slici \ref{fig:slika2.12}. To znači da se ne može naći pokazivač na blok. Blok je klasifikovan kao ,,izgubljen'', jer oslobađanje istog nije moguće na izlazu iz programa, kako na njega ne postoji pokazivač. Ovo je verovatno simptom gubitka pokazivača u nekom ranijem trenutku programa. Takve slučajeve treba da popravi programer \cite{Memcheck}.
-\item[$\textendash$] \textbf{Indirektno izgubljen (eng. \textit{indirectly lost})} – Ova klasa pokriva slučajeve 4 i 9 navedene na slici \ref{fig:slika2.12}. To znači da je blok izgubljen, ne zato što na njega nema pokazivača, već zato što su svi blokovi koji na njega upućuju sami izgubljeni. Ukoliko imamo jednostruko povezanu listu, a u nekom trenutku, iz nekog razloga, pokazivač koji je pokazivao na početak liste prestane da pokazuje na početak, već pokazuje na neki element unutar liste, svi elementi od početka liste do elementa na koji pokazivač trenutno pokazuje nisu više dostupni, odnosno indirektno su izgubljeni. Ovo će \textit{Memcheck} prijaviti kao definitivno izgubljene blokove, sem ako se ne podesi opcija \textit{–show-reachable=yes} \cite{Memcheck}.
-\item[$\textendash$] \textbf{Moguće izgubljen (eng. \textit{possibly lost})} – Ova klasa obuhvata slučajeve 5-8 navedene na slici \ref{fig:slika2.12}. To znači da je pronađen jedan ili više pokazivača na memorijski blok, ali bar jedan od pokazivača je pokazuje na unutrašnjost memorijskog bloka. To bi mogla biti  slučajna vrednost u memoriji koja pokazuje na unutrašnjost bloka, što ne treba smatrati validnim sve dok se ne razreši slučaj pokazivača koji pokazuje na unutrašnjost bloka \cite{Memcheck}.
+\item[$\textendash$] \textbf{Indirektno izgubljen (eng. \textit{indirectly lost})} – Ova klasa pokriva slučajeve 4 i 9 navedene na slici \ref{fig:slika2.12}. To znači da je blok izgubljen, ne zato što na njega ne pokazuje ni jedan pokazivač, već zato što su svi blokovi koji na njega upućuju sami izgubljeni. Ukoliko imamo jednostruko povezanu listu, a u nekom trenutku, iz nekog razloga, pokazivač koji je pokazivao na početak liste prestane da pokazuje na početak, već pokazuje na neki element unutar liste, svi elementi od početka liste do elementa na koji pokazivač trenutno pokazuje nisu više dostupni, odnosno indirektno su izgubljeni. Ovo će \textit{Memcheck} prijaviti kao definitivno izgubljene blokove, sem ako se ne podesi opcija \textit{–show-reachable=yes} \cite{Memcheck}.
+\item[$\textendash$] \textbf{Moguće izgubljen (eng. \textit{possibly lost})} – Ova klasa obuhvata slučajeve 5-8 navedene na slici \ref{fig:slika2.12}. To znači da je pronađen jedan ili više pokazivača na memorijski blok, ali bar jedan od pokazivača pokazuje na unutrašnjost memorijskog bloka. To bi mogla biti  slučajna vrednost u memoriji koja pokazuje na unutrašnjost bloka, što ne treba smatrati validnim sve dok se ne razreši slučaj pokazivača koji pokazuje na unutrašnjost bloka \cite{Memcheck}.
 \end{itemize}
 
-Treba napomenuti da ovo mapiranje devet mogućih slučajeva na četiri vrste curenja nije nužno najbolji način za prijavljivanje curenja. Naročito se prema unutrašnjim pokazivačima postupa nedosledno. Moguće je da će se kategorizacija u budućnosti poboljšati. Na listingu  \ref{lst:slika2.13} dat je rezime curenja memorije koji ispisuje \textit{Memcheck}.
+Treba napomenuti da ovo mapiranje devet mogućih slučajeva na četiri vrste curenja nije nužno najbolji način za prijavljivanje curenja memorije. Naročito se prema unutrašnjim pokazivačima postupa nedosledno. Moguće je da će se kategorizacija u budućnosti poboljšati. Na listingu  \ref{lst:slika2.13} dat je rezime curenja memorije koji ispisuje \textit{Memcheck}.
 
 %\begin{figure}[!ht]
 %  \centering
@@ -628,7 +633,7 @@ LEAK SUMMARY:
      suppressed: 0 bytes in 0 blocks
 \end{lstlisting}
 
-Ako je uključena opcija \texttt{--leak-check = full}, \textit{Memcheck} će dati detaljan izveštaj za svaki definitivno izgubljeni ili moguće izgubljeni blok, uključujući i mesto gde je alociran. Međutim, \textit{Memcheck} vam ne može reći kada, kako ili zašto se izgubio pokazivač na iscureli blok, to morate sami da rešite. Generalno, treba težiti tome da vaši programi nemaju definitivno izgubljene ili moguće izgubljene blokove na izlazu.
+Ako je uključena opcija \texttt{--leak-check = full}, \textit{Memcheck} će dati detaljan izveštaj za svaki definitivno izgubljeni ili moguće izgubljeni blok, uključujući i mesto gde je alociran. Međutim, \textit{Memcheck} ne može reći kada, kako ili zašto se izgubio pokazivač na iscureli blok. Generalno, treba težiti tome da programi nemaju definitivno izgubljene ili moguće izgubljene blokove na izlazu.
 
 Opcija \texttt{--show-leak-kind = <set>} kontroliše skup vrsta curenja koje će se prikazati kada je uključena opcija \texttt{--leak-check = full}. Inače, podrazumevana vrednost opcije \texttt{–leak-check} je \texttt{summary}.
 
@@ -640,7 +645,7 @@ Opcija \texttt{--show-leak-kind = <set>} kontroliše skup vrsta curenja koje ć
 \end{enumerate}
 Podrazumevana vrednost za vrste curenja koje se prikazuju je \texttt{--show-leak-kinds = definite, possible}.
 
-Na listingu \ref{lst:slika2.14} prikazan je izveštaj koji nam daje \textit{Memcheck} o definitivnom gubitku bloka veličine 12 bajta, još uvek dostupnom bloku veličine 12 bajta, moguće izgubljenom bloku veličine 5 bajta, kao i liniju u programu gde su oni alocirani. 
+Na listingu \ref{lst:slika2.14} prikazan je izveštaj koji daje \textit{Memcheck} o definitivnom gubitku bloka veličine 12 bajta, još uvek dostupnom bloku veličine 12 bajta, moguće izgubljenom bloku veličine 5 bajta, kao i liniju u programu gde su oni alocirani. 
 %\begin{figure}[!ht]
 %  \centering
 %  \includegraphics[width=0.7\textwidth]{heapResume.png}
@@ -669,7 +674,7 @@ HEAP SUMMARY:
 \textit{Memcheck} koristi odgovarajući kriterijum za prijavljivanje i tretman grešaka vezanih za curenje memorije, budući da postoje različite vrste curenja memorije različitih težina. Ukoliko je uključena opcija \texttt{--leak-check=full}, \textit{Memcheck} će smatrati da je curenje memorije greška, odnosno, ukoliko podaci o curenju memorije nisu prikazani, iako oni postoje, \textit{Memcheck} smatra da to curenje nije greška. Takođe, definitivno i moguće izgubljene blokove \textit{Memcheck} smatra greškom, dok indirektno izgubljene i još uvek dostupne blokove ne smatra greškom \cite{Memcheck}.
 
 \begin{itemize}
-\item[$\textendash$]. Drugim rečima, ako podaci o curenju memorije nisu prikazani, smatra se da to curenje nije ,,greška''.
+\item[$\textendash$] Ako podaci o curenju memorije nisu prikazani, smatra se da to curenje nije ,,greška''.
 \item[$\textendash$] Definitivno i moguće izgubljeni blokovi se smatraju za pravu ,,grešku'', dok indirektno izgubljeni i još uvek dospuni blokovi se ne smatraju kao greška \cite{Memcheck}. 
 \end{itemize}
 
@@ -680,81 +685,81 @@ U ovoj sekciji biće obrađeni ostali važni alati \textit{Valgrind} distribucij
 Da bi uspešno izvršili analizu alatima \textit{Cashegrind}, \textit{Callgrind} i \textit{DHAT} neophodno je kompajlirati program sa opcijom za debug mod (opcija \texttt{-g}) i uključenom optimizacijom, jer nema smisla profajlirati k\^od koji je drugačiji od onoga koji će se normalno izvršavati. Za analizu programa alatom \textit{Massif} neophodno je kompaljirati program sa opcijom \texttt{-g}, dok nivo optimizacije nije od presudnog značaja. Što se alata \textit{Helgrind} i \textit{DRD} tiče, oni nisu zavisni od uslova kompilacije, tj.~opcije \texttt{-g} i uključene optimizacije.
 
 \subsection{Cachegrind}
-\textit{Cachegrind} je alat koji simulira i prati kako program pristupa keš memoriji \cite{Cachegrind}. Takođe, može se koristiti i za profajliranje izvršavanja grana. Simulira mašinu sa nezavisnim kešovima instrukcija prvog nivoa i kešima podataka (I1 i D1), potpomognutim objedinjenom keš memorijom drugog nivoa (L2). Simulira memoriju mašine koja ima nezavistan deo za intstrukcije i podatke u okviru prvog nivoa keša (\textit{I1} i \textit{L2}), potpomognut objedinjenim delom keša drugog nivoa (\textit{L2}).
+\textit{Cachegrind} je alat koji simulira i prati kako program pristupa keš memoriji \cite{Cachegrind}. Takođe, može se koristiti i za profajliranje izvršavanja grana. Simulira mašinu sa nezavisnim kešom instrukcija prvog nivoa i kešom podataka (I1 i D1), potpomognutim objedinjenom keš memorijom drugog nivoa (L2). 
 
 Što se modernih mašina tiče, tj. onih mašina sa tri ili četiri nivoa keš memorije, u slučajevima kada \textit{Cachegrind} može automatski otkriti konfiguraciju keš memorije, \textit{Cachegrind} simulira pristup kešu prvog i poslednjeg nivoa, tj.~\textit{Cachegrind} simulira \textit{I1, D1 i LL}. Ovakav pristup posledica je toga što keš memorija poslednjeg nivoa (\textit{LL}) ima najveći uticaj na vreme izvršavanja, jer maskira pristupe glavnoj memoriji. Dalje, \textit{L1} keš memorije često imaju malu asocijativnost, pa se njihovom simulacijom mogu otkriti slučajevi kada k\^od loše interaguje sa ovom keš memorijom \cite{Cachegrind}.
 
-Da biste koristili alat \textit{Cachegrind} neophodno je podesiti opciju \texttt{–tool=cachegrind}. Izvršavanje programa trajaće veoma sporo, a po završetku štampaće se sažeti statistički podaci. Pored štampanja sažetka na standardni izlaz, \textit{Cachegrind} u odgovarajuću datoteku upisuje i detaljnije informacije o profajliranju. Za dobijanje detaljnijih informacija, odnosno rezima funkciju po funkciju, koristimo pomenutu datoteku ako ulaz za texttt{cg\_annotate}, koji je deo paketa \textit{Valgrind}. Alternativno, možete koristiti \texttt{cg\_diff} za razlikovanje više izlaza iz alata \textit{Cachegrind}, koje kasnije koristimo kao ulaz za \texttt{cg\_annotate} \cite{Cachegrind}.
+Da bi se koristio alat \textit{Cachegrind} neophodno je podesiti opciju \texttt{–tool=cachegrind}. Izvršavanje programa će trajati dugo, a po završetku štampaće se sažeti statistički podaci. Pored štampanja sažetka na standardni izlaz, \textit{Cachegrind} u odgovarajuću datoteku upisuje i detaljnije informacije o profajliranju. Za dobijanje detaljnijih informacija koristimo pomenutu datoteku kao ulaz za \texttt{cg\_annotate}, koji je deo paketa \textit{Valgrind}. Alternativno, možete koristiti \texttt{cg\_diff} za razlikovanje više izlaza iz alata \textit{Cachegrind}, koje kasnije koristimo kao ulaz za \texttt{cg\_annotate} \cite{Cachegrind}.
 
 \subsection{Callgrind}
 
-\textit{Callgrind} je alat za profajliranje koji generiše istoriju poziva funkcija korisničkog programa u vidu grafa. Prikupljeni podaci podrazumevano se sastoje od broja izvršenih instrukcija, njihovog odnosa sa linijama izvršnog koda, odnosa pozivaoc/pozvan između funkcija, kao i broja takvih poziva. Opciono, simulacija keš memorije i/ili profajliranje grana (slično \textit{Cachegrind}-u) mogu dati dodatne informacije o ponašanju aplikacije u toku izvršavanja \cite{Callgrind}. Ima nekih preklapanja sa \textit{Cachegrind} - om, ali takođe pruža neke informacije koje \textit{Cachegrind} ne.
+\textit{Callgrind} je alat za profajliranje koji generiše istoriju poziva funkcija korisničkog programa u vidu grafa. Prikupljeni podaci podrazumevano se sastoje od broja izvršenih instrukcija, njihovog odnosa sa linijama izvršnog koda, odnosa pozivaoc/pozvan između funkcija, kao i broja takvih poziva. Opciono, simulacija keš memorije i/ili profajliranje grana (slično \textit{Cachegrind}-u) mogu dati dodatne informacije o ponašanju aplikacije u toku izvršavanja \cite{Callgrind}. Alat sadrži neka preklapanja sa \textit{Cachegrind} - om, ali takođe pruža neke informacije koje \textit{Cachegrind} ne pruža.
 
-Da biste koristili ovaj alat, morate navesti \texttt{--tool = callgrind} u komandnoj liniji \textit{Valgrind}-a. Nakon završetka programa i rada alata, generiše se odgovarajuća datoteka sa podacima o izvršenom profajliranju. Za prezentaciju podataka i interaktivnu kontrolu profajliranja na osnovu date datoteke, obezbeđena su dva alata komandne linije. Jedan je \texttt{callgrind\_annotate}, koji čita generisani fajl i ispisuje sortirane liste funkcija, opciono sa anotacijom izvora. Drugi je \texttt{callgrind\_control} koji omogućava interaktivno posmatranje i kontrolisanje statusa programa koji se trenutno izvršava pod kontrolom \textit{Callgrind}-a, bez zaustavljanja programa. Možete dobiti statističke podatke kao npr.~stanje steka, a u svakom trenutku se takođe može generisati i profil \cite{Callgrind}. 
+Da bi se koristio \textit{Callgrind}, potrebno je navesti opciju komandne linije \texttt{--tool = callgrind} u komandnoj liniji \textit{Valgrind}-a. Nakon završetka programa i rada alata, generiše se odgovarajuća datoteka sa podacima o izvršenom profajliranju. Za prezentaciju podataka i interaktivnu kontrolu profajliranja na osnovu date datoteke, obezbeđena su dva alata komandne linije. Jedan je \texttt{callgrind\_annotate}, koji čita generisani fajl i ispisuje sortirane liste funkcija, opciono sa anotacijom izvora. Drugi je \texttt{callgrind\_control} koji omogućava interaktivno posmatranje i kontrolisanje statusa programa koji se trenutno izvršava pod kontrolom \textit{Callgrind}-a, bez zaustavljanja programa. Mogu se dobiti statistički podaci kao npr.~stanje steka, a u svakom trenutku se takođe može generisati i profil \cite{Callgrind}. 
 
 \subsection{Helgrind}
 
-\textit{Helgrind} je \textit{Valgrind}-ov alat za otkrivanje grešaka sinhronizacije u programima C, C++ i Fortran prilikom upotreba modela niti \textit{POSIX} \cite{Helgrind}. Model niti \textit{POSIX} prate određene apstrakcije. To su skup niti koji dele zajednički adresni prostor, formiranje niti, spajanje niti, izlaz iz funkcije niti, muteksi (katanci), uslovne promenljive (obaveštenja o događajima među nitima), čitaj-piši zaključavanje, spinlokovi, semafori i barijere. 
+\textit{Helgrind} je \textit{Valgrind}-ov alat za otkrivanje grešaka sinhronizacije u programima C, C++ i Fortran prilikom upotreba modela niti \textit{POSIX} \cite{Helgrind}. Model niti \textit{POSIX} prate određene apstrakcije --- skup niti koji dele zajednički adresni prostor, formiranje niti, spajanje niti, izlaz iz funkcije niti, muteksi (katanci), uslovne promenljive (obaveštenja o događajima među nitima), čitaj-piši zaključavanje, spinlokovi, semafori i barijere \cite{Helgrind}. 
+
+Da bi se koristio ovaj alat, potrebno je navesti opciju komandne linije \texttt{--tool = helgrind} u komandnoj liniji \textit{Valgrind}-a.
 
 \textit{Helgrind} može otkriti sledeća tri tipa grešaka:
 \begin{enumerate}
-\item Pogrešna upotreba interfejsa za programiranje \textit{POSIX} niti (\textit{POSIX} API) 
-\item Potencijalno blokiranje prouzrokovano redosledom zaključavanja
-\item Trka sa podacima (eng. \textit{data race})  - pristup memoriji bez odgovarajućeg zaključavanja ili sinhronizacije
+\item Pogrešna upotreba interfejsa za programiranje \textit{POSIX} niti.
+\item Potencijalno blokiranje prouzrokovano redosledom zaključavanja.
+\item Trka sa podacima (eng. \textit{data race})  - pristup memoriji bez odgovarajućeg zaključavanja ili sinhronizacije.
 \end{enumerate}
 
 Problemi poput ovih često rezultiraju ponovljivim padovima, vremenski zavisnim padovima, mrtvim tačkama i drugim nepravilnim ponašanjem, a koji se teško mogu pronaći drugim sredstvima.
 
-Što se pogrešne upotrebe \textit{POSIX} API-ja tiče, \textit{Helgrind} presreće pozive ka funkcijama biblioteke \textit{pthread}, i zbog toga je u mogućnosti da otkrije veliki broj grešaka. Neke od njih su: 
+Što se pogrešne upotrebe interfejsa za programiranje \textit{POSIX} niti tiče, \textit{Helgrind} presreće pozive ka funkcijama biblioteke \textit{pthread}, i zbog toga je u mogućnosti da otkrije veliki broj grešaka. Neke od njih su: 
 \begin{itemize}
 \item Greške u otključavanju muteksa – slučaj nevažećeg muteksa, nezaključanog muteksa, ili muteksa zaključanog od strane druge niti.
 \item Greške u radu sa zaključanim muteksom – uništavanje nevažećeg ili zaključanog muteksa, rekurzivno zaključavanje nerekurzivnog muteksa, oslobađanje memorije koja sadrži zaključan muteks \cite{Helgrind}.
 \end{itemize}
 
-Što se potencijalnog blokiranja prouzrokovanog redosledom zaključavanja tiče, \textit{Helgrind} nadgleda redosled kojim niti zaključavaju promenljive. To mu omogućava detektovanje potencijalnih zastoja koji bi mogli nastati formiranjem ciklusa zaključavanja. Na ovaj način je moguće detektovati greške koje se nisu javile tokom samog procesa testiranja programa, već se javljaju kasnije tokom korišćenja istog \cite{Helgrind}.
+Što se potencijalnog blokiranja prouzrokovanog redosledom zaključavanja tiče, \textit{Helgrind} nadgleda redosled kojim niti zaključavaju promenljive. To mu omogućava detektovanje potencijalnih zastoja koji bi mogli nastati formiranjem ciklusa zaključavanja. Na ovaj način je moguće detektovati greške koje se nisu javile tokom samog procesa testiranja programa, već se mogu javiti prilikom nekog drugog pokretanja programa \cite{Helgrind}.
 
 Što se trke sa podacima tiče, \textit{Helgrind}-ov algoritam je (konceptualno) vrlo jednostavan - nadgleda sve pristupe memorijskim lokacijama. Ako lokaciji pristupaju dve različite niti, \textit{Helgrind} proverava da li su dva pristupa uređena relacijom ,,dogodilo se pre'' (eng. \textit{happens-before relation}). Ako je tako, to je u redu, ali ukoliko nije, \textit{Helgrind} prijavljuje trku sa podacima.
 
-Da biste koristili ovaj alat, morate navesti \texttt{--tool = helgrind} u komandnoj liniji \textit{Valgrind}-a.
-
 \subsection{DRD}
-\textit{DRD} je \textit{Valgrind}-ov alat za otkrivanje grešaka u višenitnim programima C i C++ \cite{Drd}. Alat radi za bilo koji program koji koristi niti bazirane na modelu \textit{POSIX}\cite{Drd}. Sličan je \textit{Helgrind}-u, ali koristi različite tehnike analize i tako može naći različite probleme.
+\textit{DRD} je \textit{Valgrind}-ov alat za otkrivanje grešaka u višenitnim programima napisanim u programskim jezicima C i C++ \cite{Drd}. Alat radi za bilo koji program koji koristi niti bazirane na modelu \textit{POSIX} \cite{Drd}. Sličan je \textit{Helgrind}-u, ali koristi različite tehnike analize i tako može naći različite probleme.
 
-U zavisnosti od toga koja se višenitna paradigma koristi u programu, može se pojaviti jedna ili više sledećih grešaka:
+Da bi se koristio ovaj alat, potrebno je navesti opciju komandne linije \texttt{--tool = drd} u komandnoj liniji \textit{Valgrind}-a.
+
+U zavisnosti od toga koja se višenitna paradigma koristi u programu, može se pojaviti jedna ili više grešaka:
 \begin{itemize}
-\item Trka sa podacima;
-\item Zadržavanje katanaca - jedna nit blokira napredovanje jedne ili više drugih niti držeći predugo katanac zaključanim;
-\item Pogrešna upotreba \textit{POSIX} API-ja;
-\item Potencijalno blokiranje prouzrokovano redosledom zaključavanja;
+\item Trka sa podacima.
+\item Zadržavanje katanaca - jedna nit blokira napredovanje jedne ili više drugih niti držeći predugo katanac zaključanim.
+\item Pogrešna upotreba interfejsa za programiranje \textit{POSIX} niti.
+\item Potencijalno blokiranje prouzrokovano redosledom zaključavanja.
 \item Lažno deljenje - ako niti koje rade na različitim procesorskim jezgrima često pristupaju različitim promenljivim smeštenim u istoj liniji keš memorije, to će usporiti uključene niti zbog česte razmene linija keš memorije.
 \end{itemize} 
 
-Što se tiče grešaka vezanih za pogrešnu upotrebu \textit{POSIX} API-ja, kao i trke sa podacima, greške koje \textit{DRD} otkriva su identične onim koje otkriva \textit{Helgrind}, a koje su opisane u sekciji o \textit{Helgrind}-u, uz određene minimalne razlike. Kada je u pitanju greška vezana za trku sa podacima, \textit{DRD} ispisuje poruku svaki put kada otkrije da je došlo do trke podataka \cite{Drd}. Alat \textit{DRD} svakoj niti dodeljije jedinstveni ID broj. Brojevi koji se dodeljuju nitima u svojstvu identifikatora počinju od jedinice i dodeljuju se jednokratno, odnosno jednom iskorišćeni broj ne može se više koristiti. Segment uvek započinje i završava se operacijom sinhronizacije, a sam termin se odnosi na uzastopni niz operacija učitavanja, skladištenja i sinhronizacije - sve izvršene u istoj niti. Da bi detektovao grešku trke sa podacima, \textit{DRD} analizu vrši između segmenata, što kao rezultat daje bolje performanse \cite{Drd}.
+Što se tiče grešaka vezanih za pogrešnu upotrebu interfejsa za programiranje \textit{POSIX} niti, kao i trke sa podacima, greške koje \textit{DRD} otkriva su veoma slične onim koje otkriva \textit{Helgrind}, a koje su opisane u sekciji o \textit{Helgrind}-u, uz određene minimalne razlike. Kada je u pitanju greška vezana za trku sa podacima, \textit{DRD} ispisuje poruku svaki put kada otkrije da je došlo do trke podataka \cite{Drd}. Alat \textit{DRD} svakoj niti dodeljije jedinstveni ID broj. Brojevi koji se dodeljuju nitima u svojstvu identifikatora počinju od jedinice i dodeljuju se jednokratno, odnosno jednom iskorišćeni broj ne može se više koristiti. Segment uvek započinje i završava se operacijom sinhronizacije, a sam termin se odnosi na uzastopni niz operacija učitavanja, skladištenja i sinhronizacije - sve izvršene u istoj niti. Da bi detektovao grešku trke sa podacima, \textit{DRD} analizu vrši između segmenata, što kao rezultat daje bolje performanse \cite{Drd}.
 
-Niti moraju biti u stanju da napreduju, a da ih druge niti predugo ne blokiraju. Ponekad nit mora da sačeka dok muteks ili objekat sinhronizacije reader-writer ne otključa druga nit. Pojava u kojoj jedna nit ne može da nastavi sa radom zbog blokiranja drugih niti naziva se zadržavanje katanaca (eng. \textit{lock contention})  \cite{Drd}. Ovakva pojava je nepoželjna u višenitnim sistemima, a u njenom otklanjanju pomaže alat \textit{DRD} koji otkriva ovaj tip problema. 
-
-Da biste koristili ovaj alat, morate navesti \texttt{--tool = drd} u komandnoj liniji \textit{Valgrind}-a.
+Niti moraju biti u stanju da napreduju, a da ih druge niti predugo ne blokiraju. Ponekad nit mora da sačeka dok muteks ili objekat sinhronizacije ne otključa druga nit. Pojava u kojoj jedna nit ne može da nastavi sa radom zbog blokiranja drugih niti naziva se zadržavanje katanaca (eng. \textit{lock contention})  \cite{Drd}. Ovakva pojava je nepoželjna u višenitnim sistemima, a u njenom otklanjanju pomaže alat \textit{DRD} koji otkriva ovaj tip problema. 
 
 \subsection{Massif}
 
-\textit{Massif} je alat za profajliranje hipa. Meri koliko memorije hipa program koristi, i na koji način. To uključuje memoriju kojoj korisnik može pristupiti, kao i memoriju koja se koristi za dodatne koncepte i prostora za poravnanje \cite{Massif}. Takođe može izmeriti veličinu steka  programa, s tim da to ne radi podrazumevano. Profajliranje hipa vam može pomoći da smanjite količinu memorije koju vaš program koristi. Na modernim mašinama ovo pruža prednosti u vidu ubrzanja programa i smanjenja šansi za izgladnjivanje.
+\textit{Massif} je alat za profajliranje hipa. Meri koliko memorije hipa program koristi, i na koji način. To uključuje memoriju kojoj korisnik može pristupiti, kao i memoriju koja se koristi za dodatne koncepte, poput \textit{book-keeping} bajtova i prostora za poravnanje \cite{Massif}. Takođe može izmeriti veličinu steka  programa, s tim da to ne radi podrazumevano. Profajliranje hipa može pomoći u smanjivanju količine memorije koju program koristi. Na modernim mašinama ovo pruža prednosti u vidu ubrzanja programa i smanjenja šansi za izgladnjivanje prostora za razmenu mašine (eng. \textit{swap space}) \cite{Massif}.
 
 Može se desiti da postoji pokazivač na memoriju, ali da se ta memorija ne koristi, što je jedan vid curenja memorije. Programi koji imaju ovakvo curenje mogu s vremenom nepotrebno povećati količinu memorije koju koriste. \textit{Massif} može pomoći u identifikovanju ovakvog tipa curenja memorije \cite{Massif}.
 
-Da biste koristili ovaj alat, morate navesti \texttt{--tool = massif} u komandnoj liniji \textit{Valgrind}-a. Nakon završetka procesa profajliranja, podaci se smeštaju u odgovarajuću datoteku. Nakon toga treba pokrenuti \texttt{ms\_print} da bi podatke iz datoteke predstavili na čitljiv način. 
+Da bi se koristio ovaj alat, potrebno je navesti opciju komandne linije \texttt{--tool = massif} u komandnoj liniji \textit{Valgrind}-a. Nakon završetka procesa profajliranja, podaci se smeštaju u odgovarajuću datoteku. Nakon toga treba pokrenuti \texttt{ms\_print} da bi podatke iz datoteke predstavili na čitljiv način. 
 
 \subsection{DHAT}
 
 \textit{DHAT} je alat za ispitivanje kako programi koriste alociranu memoriju na hipu. Prati dodeljene blokove i pregleda svaki pristup memoriji da bi pronašao kom bloku, ako takav blok postoji, se pristupa. Na osnovu tačke dodeljivanja predstavlja informacije o tim blokovima, kao što su veličina, životni vek, broj čitanja i pisanja i obrasce čitanja i pisanja \cite{DHAT}. Korišćenjem ovih informacija moguće je identifikovati mesta alokacije sa sledećim karakteristikama:
 \begin{itemize}
-\item potencijalna curenja tokom životnog veka procesa: blokovi koji se dodeljuju se samo akumuliraju i oslobađaju se tek na kraju izvršavanja.
-\item prekomerni promet: tačke koje zauzmu veliki deo hipa, čak i ako ga ne zadržavaju jako dugo.
-\item prekomerno prolazne: tačke koje dodeljuju vrlo kratkotrajne blokove.
-\item beskorisne ili nedovoljno iskorišćene alokacije: blokovi koji su dodeljeni, ali nisu u potpunosti popunjeni, ili su popunjeni, ali se iz njih naknadno nije čitalo.
-\item blokovi sa neefikasnim rasporedom - segmenti kojima se nikada nije pristupilo ili sa poljima raštrkanim po bloku.
+\item Potencijalna curenja tokom životnog veka procesa: blokovi koji se dodeljuju se samo akumuliraju i oslobađaju se tek na kraju izvršavanja.
+\item Prekomerni promet: tačke koje zauzmu veliki deo hipa, čak i ako ga ne zadržavaju jako dugo.
+\item Prekomerno prolazne: tačke koje dodeljuju vrlo kratkotrajne blokove.
+\item Beskorisne ili nedovoljno iskorišćene alokacije: blokovi koji su dodeljeni, ali nisu u potpunosti popunjeni, ili su popunjeni, ali se iz njih naknadno nije čitalo.
+\item Blokovi sa neefikasnim rasporedom --- segmenti kojima se nikada nije pristupilo ili sa poljima raštrkanim po bloku.
 \end{itemize}
 
-Da bismo pokrenuli alat \textit{ DHAT} neophodno je navesti \texttt{–tool=dhat} u komandnoj liniji \textit{Valgrind}-a. Analiza programa alatom \textit{DHAT} će se izvršavati prilično sporo, a po završetku, štampaće se sažeti statistički podaci. Korisnije informacije mogu se videti sa \textit{DHAT}-ovim prikazivačem. To omogućava činjenica da pored štampanja rezimea, \textit{DHAT} u datoteku upisuje i detaljnije informacije o profajliranju. Ova datoteka je u JSON formatu i namenjena je pregledu \textit{DHAT}-ovog pregledača \cite{DHAT}. 
+Da bi se koristio alat \textit{ DHAT} potrebno je navesti opciju komandne linije \texttt{–tool=dhat} u komandnoj liniji \textit{Valgrind}-a. Analiza programa alatom \textit{DHAT} će se izvršavati prilično sporo, a po završetku, štampaće se sažeti statistički podaci. Korisnije informacije mogu se videti sa \textit{DHAT}-ovim prikazivačem. To omogućava činjenica da pored štampanja rezimea, \textit{DHAT} u datoteku upisuje i detaljnije informacije o profajliranju. Ova datoteka je u JSON formatu i namenjena je pregledu \textit{DHAT}-ovog pregledača \cite{DHAT}. 
 
 \subsection{BBV}
 
@@ -762,7 +767,7 @@ Osnovni blok je linearni presek koda sa jednom ulaznom tačkom i jednom izlaznom
 
 \textit{BBV} je alat koji generiše osnovne blok vektore za upotrebu sa alatkom za analizu \textit{SimPoint}. \textit{SimPoint} metodologija omogućava ubrzavanje arhitektonskih simulacija pokretanjem samo malog dela programa i ekstrapolacijom ukupnog ponašanja iz ovog malog dela. Većina programa pokazuje ponašanje zasnovano na fazama, što znači da će u različito vreme tokom izvršavanja program naići na vremenske intervale u kojima se k\^od ponaša slično prethodnom intervalu. Na kraju, to znači da ako možemo da detektujemo ove intervale i grupišemo ih, približna vrednost ukupnog ponašanja programa može se dobiti samo simulacijom najmanjeg broja intervala, a zatim skaliranjem rezultata \cite{BBV}.
 
-Da bismo kreirali datoteku osnovnog vektorskog bloka, neophodno je u komandnoj liniji \textit{Valgrind}-a navesti opciju \texttt{–tool=exp-bbv}. Nakon izvršene analize biće kreirana odgovarajuća datoteka koja sadrži vektor osnovnog bloka. Za kreiranje stvarnih \textit{SimPoint} rezultate, potreban je uslužni program \textit{SimPoint}, dostupan na \textit{SimPoint} veb stranici. Uslužni program \textit{SimPoint} vrši slučajnu linearnu projekciju pomoću 15 dimenzija, a zatim k-dimenziono grupisanje kako bi izračunao koji intervali su od interesa \cite{BBV}.  
+Da bi se kreirala datoteka osnovnog vektorskog bloka, neophodno je u komandnoj liniji \textit{Valgrind}-a navesti opciju \texttt{–tool=exp-bbv}. Nakon izvršene analize biće kreirana odgovarajuća datoteka koja sadrži vektor osnovnog bloka. Za kreiranje stvarnih \textit{SimPoint} rezultata na osnovu pređašnje generisane datoteke, potreban je uslužni program \textit{SimPoint}, dostupan na \href{http://cseweb.ucsd.edu/~calder/simpoint/}{\textit{SimPoint} veb stranici}. Uslužni program \textit{SimPoint} vrši slučajnu linearnu projekciju pomoću 15 dimenzija, a zatim k-dimenziono grupisanje kako bi izračunao koji intervali su od interesa \cite{BBV}.  
 
 % ------------------------------------------------------------------------------
 \chapter{Regularni izrazi}
