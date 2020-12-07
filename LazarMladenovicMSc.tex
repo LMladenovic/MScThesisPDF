@@ -767,7 +767,7 @@ Osnovni blok je sekvencijalni niz instrukcija, pri čemu postoji jedna ulazna ta
 
 \textit{BBV} je alat koji generiše osnovne blok vektore za upotrebu sa alatkom za analizu \textit{SimPoint}. \textit{SimPoint} metodologija omogućava brže dobijanje rezultata vezanih za arhitekturu koja se simulira. To ostvaruje tako što eksploatiše ukupno ponašanje programa samo na osnovu pokretanja malog dela programa. Većina programa pokazuje ponašanje zasnovano na fazama, što znači da će u različito vreme tokom izvršavanja program naići na vremenske intervale u kojima se k\^od ponaša slično prethodnom intervalu. Na kraju, to znači da ako možemo da detektujemo ove intervale i grupišemo ih, približna vrednost ukupnog ponašanja programa može se dobiti samo simulacijom najmanjeg broja intervala, a zatim skaliranjem rezultata \cite{BBV}.
 
-U istraživanju računarske arhitekture, pokretanje referentne vrednosti na simulatoru sa tačnošću ciklusa može prouzrokovati usporavanje do 1000 puta. To znači da su potrebni dani, nedelje ili čak i duži vremenski period da se pokrenu kompletni testovi. Korišćenjem \textit{SimPoint}-a ovo se može značajno smanjiti, obično za 90-95\% \cite{BBV}.
+U istraživanju računarske arhitekture, pokretanje testova na simulatoru sa tačnošću ciklusa može prouzrokovati usporavanje do 1000 puta. To znači da su potrebni dani, nedelje ili čak i duži vremenski period da se pokrenu kompletni testovi. Korišćenjem \textit{SimPoint}-a ovo se može značajno smanjiti, obično za 90-95\% \cite{BBV}.
 
 Da bi se kreirala datoteka koja sadrži vektor osnovnog bloka, neophodno je izvršiti analizu alatom \textit{BBV}, tj.~ u komandnoj liniji \textit{Valgrind}-a navesti opciju \texttt{–tool=exp-bbv}. Za kreiranje stvarnih \textit{SimPoint} rezultata na osnovu pređašnje generisane datoteke, potreban je uslužni program \textit{SimPoint}, dostupan na \href{http://cseweb.ucsd.edu/~calder/simpoint/}{\textit{SimPoint} veb stranici} \cite{BBV}.  
 
@@ -870,14 +870,14 @@ Regularni izraz predstavljen je odgovarajućom niskom, dok funkcije u ovom modul
 %OPIS REGULARNIH IZRAZA
 Postoji niz specijalnih karaktera prilikom pisanja regularnih izraza. Neki od njih su:
 \begin{description}
-	\item \texttt{[]} --- označava set karaktera. Primer reg. izraza bi bio \texttt{[A-Z]}, dok bi primer podudaranja bio \texttt{L}.
-	\item \texttt{\textbackslash} --- oznaka za izbegavanje specijalnog karaktera ili specijalna sekvenca. Tako na primer reg. izraz \texttt{\textbackslash[} bi imao podudaranje \texttt{[}. S druge strane reg. izraz \texttt{\textbackslash d}  predstavlja broj,.
-	\item $\^$ --- oznaka da početak. Primer reg. izraza bi bio\quad \texttt{$\^$Hello}, dok bi podudaranje sa niskom \texttt{Hello world} bilo \texttt{Hello}.
-	\item \$ --- oznaka za kraj. Primer reg. izraza bi bio \texttt{world\$}, dok bi podudaranje sa niskom \texttt{Hello world} bilo \texttt{world}.
-	\item * --- označava pojavljivanje nula ili više puta. Primer reg. izraza bi bio \texttt{[A-Za-z]*}, dok bi primer podudaranja bio kako \texttt{Koronka}, tako i prazna reč.
-	\item + --- označava pojavljivanje bar jednom. Primer reg. izraza bi bio \texttt{[A-Za-z]+}, dok bi primer podudaranja bio \texttt{Koronka}, tako i samo jedno slovo.
-	\item \{\} --- služi za definisanje određenog broja pojavljivanja. Primer reg. izraza bi bio \texttt{Mo\{2\}n}, dok bi primer podudaranja u nisci \texttt{Moon is shining!} bio \texttt{Moon}.
-	\item | --- operator izbora.  Primer reg. izraza bi bio \texttt{a|b}, dok bi primer podudaranja bio kako slovo \texttt{a}, tako i slovo \texttt{b}.
+	\item \texttt{[]} --- označava skup karaktera. Na primer, podudaranje sa regularnim izrazom \texttt{[A-Z]} je karakter \texttt{L}.
+	\item \texttt{\textbackslash} --- oznaka za izbegavanje specijalnog karaktera ili specijalna sekvenca. Na primer, regularni izraz \texttt{\textbackslash[} ima podudaranje \texttt{[}. S druge strane regularni izraz \texttt{\textbackslash d}  predstavlja broj.
+	\item $\^$ --- oznaka da početak. Za regularni izraz\quad \texttt{$\^$Hello}, podudaranje sa niskom \texttt{Hello world} je niska \texttt{Hello}.
+	\item \$ --- oznaka za kraj. Za regularni izraz \texttt{world\$}, podudaranje sa niskom \texttt{Hello world} je niska \texttt{world}.
+	\item * --- označava pojavljivanje nula ili više puta. Primer regularnog izraza je \texttt{[A-Za-z]*}, dok je primer podudaranja sa navedenim regularnim izrazom, kako niska \texttt{Koronka}, tako i prazna reč.
+	\item + --- označava pojavljivanje bar jednom. Primer regularnog izraza je \texttt{[A-Za-z]+}, dok je primer podudaranja sa navedenim regularnim izrazom, kako niska \texttt{Koronka}, tako i samo jedno slovo.
+	\item \{\} --- služi za definisanje određenog broja pojavljivanja. Primer regularnog izraza je \texttt{Mo\{2\}n}, dok je podudaranje datog regularnog izraza sa niskom \texttt{Moon is shining!} niska \texttt{Moon}.
+	\item | --- operator izbora. Na primer, podudaranje sa regularnim izrazom \texttt{a|b} je kako karakter \texttt{a}, tako i karakter \texttt{b}.
 	\item () --- služi da definiše grupu unutar regularnog izraza.
 \end{description}
 
