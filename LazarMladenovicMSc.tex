@@ -144,15 +144,15 @@ Verifikacija softvera zauzima bitno mesto u procesu razvoja softvera. Dinamička
 % ------------------------------------------------------------------------------
 \chapter{Uvod}
 % ------------------------------------------------------------------------------
-Razvoj softvera predstavlja složen proces koji obuhvata razne aktivnosti. Nepisano je pravilo da se prilikom pisanja programa može desiti da se provuče neka greška kao npr. neinicijalizacija promenljive, ili neoslobađanje alocirane memorije, koja u tom trenutku možda biva bezazlena. Međutim, kako razvoj programa odmiče, dodatne greške koje ta početna, naizgled bezazlena greška izaziva, bivaju krucijalne i od vitalnog značaja. Na neke od gore pomenutih grešaka, nažalost kompliator ne može da nam ukaže. Ovo nije veliki problem ukoliko su naši programi mali, ali u  kompleksnijim programima, onim koji se sastoje od više hiljada ili desetina hiljada linija koda, greške je teško naći. Pronalaženje i ispravljanje grešaka u kodu zauzimaju bitno mesto u procesu razvoja softvera.
+Razvoj softvera predstavlja složen proces koji obuhvata razne aktivnosti. Nepisano je pravilo da se prilikom pisanja programa može desiti da se provuče neka greška kao npr. neinicijalizacija promenljive, ili neoslobađanje alocirane memorije. U tom trenutku ta greška najverovatnije neće biti fatalna. Međutim, kako razvoj programa odmiče, dodatne greške koje ta početna, naizgled bezazlena greška izaziva, bivaju krucijalne i od vitalnog značaja. Na neke od gore pomenutih grešaka, nažalost kompilator ne može da nam ukaže. Ovo nije veliki problem ukoliko su naši programi mali, ali u  kompleksnijim programima, onim koji se sastoje od više hiljada ili desetina hiljada linija koda, greške je teško naći. Pronalaženje i ispravljanje grešaka u kodu su bitne komponente u procesu razvoja softvera.
 
 Verifikacija softvera je provera ispravnosti softvera. Statička verifikacija softvera analizira ispravnost programa bez njegovog izvršavanja, tj.~vrši analizu izvornog koda, dok dinamička verifikacija softvera predstavlja tehniku ispitivanja ispravnosti koda u toku njegovog izvršavanja \cite{02Motivacija}. Binarna analiza obuhvata analizu na nivou mašinskog koda, snimljenog kao objektni k\^od (nepovezan) ili kao izvršni k\^od (povezan) \cite{03DinamickaAnaliza}. Primer platforme koji vrši dinamičku binarnu analizu koda jeste \textit{Valgrind}.  
 
-\textit{Valgrind} je platforma koja pruža brojne alate za debagovanje i profajliranje koji pomažu da se brže i pravilnije otklone greške u programima. Najpopularniji od ovih alata zove se \textit{Memcheck}. Ovaj alat može otkriti mnoge greške u vezi sa memorijom koje su česte u programima C i C++, a koje mogu dovesti do pada ili nepredvidivog ponašanja programa. 
+\textit{Valgrind} je platforma koja pruža brojne alate za debagovanje i profajliranje koji pomažu da se brže i pravilnije otklone greške u programima. Najpopularniji od ovih alata zove se \textit{Memcheck}. Ovaj alat može otkriti mnoge greške u vezi sa memorijom koje su česte u C ili C++ programima, a koje mogu dovesti do pada ili nepredvidivog ponašanja programa. 
 
-Platforma \textit{Valgrind} sa svim svojim alatima samo ukazuje na greške, kao i na to šta ih je izazvalo. Ispravljanje istih ostaje programeru. Cilj ovog rada jeste da automatizuje ispravljanje grešaka na koje ukazuje alat \textit{Valgrind}, tako što će koristiti precizno definisane šablone za ispravljanje grešaka. U realizaciji te ideje će se primenjivati regularni izrazi kojima će biti opisani izrazi koji mogu da prouzrokuju greške na koje nam ukazuje \textit{Memcheck}.
+Platforma \textit{Valgrind} sa svim svojim alatima samo ukazuje na greške, kao i na to šta ih je izazvalo. Ispravljanje istih ostaje programeru. Cilj ovog rada jeste da automatizuje ispravljanje grešaka na koje ukazuje alat \textit{Valgrind}, tako što koristiti precizno definisane šablone za ispravljanje grešaka. U realizaciji te ideje primenjiuju se regularni izrazi kojima su opisani izrazi koji mogu da prouzrokuju greške na koje nam ukazuje \textit{Memcheck}.
 
-U glavi 2 platforma \textit{Valgrind} će biti detaljno opisana. Biće pobrojani i obrađeni svi alati \textit{Valgrind}-a. Najveći akcenat će biti na alatu \textit{Memcheck}, dok će o ostalima biti date osnovne relevantne informacije. U glavi 3 biće iznet kratak pregled teorije jezika i regularnih izraza. Biće obrađen modul \textit{re}, koji pruža podršku za rad sa regularnim izrazima u Python programima. U glavi 4 biće predstavljen alat \textit{Koronka}, koji je osnovni doprinos ovog rada: biće opisana arhitektura, algoritam izvršavanja i njegove funkcionalnosti. Takođe, čitaoci će biti bliže upoznati sa načinom upotrebe i rada alata. Na kraju, biće iznet osvrt na ceo rad. Kako tema to afirmiše, a i sam alat je napravljen tako da može da se stalno unapređuje, u smislu uopštavanja postojećih šablona, primene drugih vrsta analiza i alata \textit{Valgrind}-a i sl., biće iznete i ideje i mogućnosti za dalji razvoj ovog projekta.
+U glavi 2 detaljno je opisana platforma \textit{Valgrind}. Pobrojani su i obrađeni svi alati \textit{Valgrind}-a. Najveći akcenat je na alatu \textit{Memcheck}, dok su o ostalim alatima distribucije \textit{Valgrind} date osnovne relevantne informacije. U glavi 3 iznet je kratak pregled teorije jezika i regularnih izraza. Obrađen je modul \textit{re}, koji pruža podršku za rad sa regularnim izrazima u Python programima. U glavi 4 predstavljen je alat \textit{Koronka}, koji je osnovni doprinos ovog rada: opisana je arhitektura, algoritam izvršavanja i njegove funkcionalnosti. Takođe, detaljno se prikazuje način upotrebe i rada alata. Na kraju, iznet je osvrt na ceo rad. Kako tema to afirmiše, a i sam alat je napravljen tako da može da se stalno unapređuje, u smislu uopštavanja postojećih šablona, primene drugih vrsta analiza i alata \textit{Valgrind}-a i sl., iznete su ideje i mogućnosti za dalji razvoj ovog projekta.
 
 
 \chapter{Alat Valgrind}
@@ -269,7 +269,7 @@ Program koji radi pod kontrolom \textit{Memcheck}-a obično je deset do pedeset 
 
 \subsection{Princip funkcionisanja alata Memcheck}
 
-U ovoj sekciji biće opisani mehanizmi koje \textit{Memcheck} koristi u detektovanju grešaka, nakon čega će biti obrađene greške koje može detektovati.
+U ovoj sekciji opisani su mehanizmi koje \textit{Memcheck} koristi u detektovanju grešaka. Takođe, obrađene su greške koje može detektovati.
 
 \subsubsection{Bitovi valjane vrednosti (V bitovi)}
 Najjednostavnije je razmišljati o \textit{Memcheck}-u kao alatu koji implementira sintetički CPU koji je identičan stvarnom CPU, osim jednog ključnog detalja. Svaki bit (doslovno) podataka koje obrađuje, čuva i njima rukuje stvarni CPU, dok u sintetičkom CPU ima pridruženi bit ,,valjane vrednosti'' (eng. \textit{valid-value bit}), koji govori da li prateći bit ima legitimnu vrednost ili ne. U daljem tekstu ovaj bit se naziva \texttt{V} bitom (valjane vrednosti).
@@ -678,9 +678,9 @@ HEAP SUMMARY:
 \item[$\textendash$] Definitivno i moguće izgubljeni blokovi se smatraju za pravu ,,grešku'', dok indirektno izgubljeni i još uvek dospuni blokovi se ne smatraju kao greška \cite{ValgrindDOC}. 
 \end{itemize}
 
-\section{Ostali važni alati Valgrind distribucije}
+\section{Ostali važni alati distribucije Valgrind}
 
-U ovoj sekciji biće obrađeni ostali važni alati \textit{Valgrind} distribucije. Biće reči o njihovoj osnovnoj nameni i načinu korišćenja. 
+U ovoj sekciji obrađeni su ostali važni alati distribucije \textit{Valgrind}. Navedena je njihova osnovna namena i način korišćenja. 
 
 Da bi uspešno izvršili analizu alatima \textit{Cashegrind}, \textit{Callgrind} i \textit{DHAT} neophodno je kompajlirati program sa opcijom za debug mod (opcija \texttt{-g}) i uključenom optimizacijom, jer nema smisla profajlirati k\^od koji je drugačiji od onoga koji će se normalno izvršavati. Za analizu programa alatom \textit{Massif} neophodno je kompajlirati program sa opcijom \texttt{-g}, dok nivo optimizacije nije od presudnog značaja. Što se alata \textit{Helgrind} i \textit{DRD} tiče, oni nisu zavisni od uslova kompilacije, tj.~opcije \texttt{-g} i uključene optimizacije.
 
@@ -889,7 +889,7 @@ Direkan prevod ovog regularnog izraza jeste niska koja počinje brojem ili malim
 
 %OPIS PARAMETARA FUNKCIJE
 
-Potpisi nekih od funkcija koje ovaj modul pruža, a koje su iskorišćene u alatu koji ovaj rad prati, biće navedene u nastavku. U okviru tih potpisa, \textit{pattern} predstavlja regularni izraz zadat odgovarajućim nizom karaktera, dok se osobine regularnog izraza mogu izmeniti navođenjem vrednosti argumenta \textit{flags}. Na primer, navođenjem argumenta \texttt{flags=re.IGNORECASE} prilikom pretrage podudaranja neće biti razlike između velikih i malih slova. Podrazumevana vrednost argumenta \textit{flag} je 0, što označava da nijedan vid specijalnih osobina neće biti uključen prilikom pretrage podudaranja. Argument \textit{string} predstavlja nisku u okviru koje će se tražiti podudaranje za regularnim izrazom.
+Potpisi nekih od funkcija koje ovaj modul pruža, a koje su iskorišćene u alatu koji ovaj rad prati, navedene su u nastavku. U okviru tih potpisa, \textit{pattern} predstavlja regularni izraz zadat odgovarajućim nizom karaktera, dok se osobine regularnog izraza mogu izmeniti navođenjem vrednosti argumenta \textit{flags}. Na primer, navođenjem argumenta \texttt{flags=re.IGNORECASE} prilikom pretrage podudaranja neće biti razlike između velikih i malih slova. Podrazumevana vrednost argumenta \textit{flag} je 0, što označava da nijedan vid specijalnih osobina neće biti uključen prilikom pretrage podudaranja. Argument \textit{string} predstavlja nisku u okviru koje će se tražiti podudaranje za regularnim izrazom.
 
 %FUNKCIJE
 
@@ -940,7 +940,7 @@ Primer korišćenja funkcije \textit{group} dat je na listingu \ref{lst:slika3.1
 
 % ------------------------------------------------------------------------------
 \chapter{Alat Koronka}
-Alat \textit{Koronka} predstavlja alat koji automatski otkriva greške u kodu napisanom u programskom jeziku C koristeći alat \textit{Memcheck}, a zatim ih ispravlja ukoliko je to u njegovoj moći. Alat je razvijan pod \textit{Linux} okruženjem, a implementiran u programskom jeziku \textit{Python}. Alat je nazvan \textit{Koronka}, zbog situacije u kojoj se ceo svet našao početkom 2020. godine. Osnovna svrha alata je demonstracija rada alata \textit{Valgrind}, kao i tumačenje izveštaja o greškama koje \textit{Valgrind} daje i njihovo uspešno otklanjanje. Alat je slobodno dostupan i nalazi se na linku \url{https://github.com/LMladenovic/Error_fixing_tool}. Na pomenutom linku se nalaze neophodne datoteke alata, opis sistema, kao i skup test primera i njihova pokretanja.
+Alat \textit{Koronka} predstavlja alat koji automatski otkriva greške u kodu napisanom u programskom jeziku C koristeći alat \textit{Memcheck}, a zatim ih ispravlja ukoliko je to u njegovoj moći. Greške koje otkriva alat \textit{Memcheck} mogu se ispraviti na više načina. Alat \textit{Koronka} će ponuditi jedno rešenje. Ukoliko to rešenje ne zadovoljava norme softvera koji se razvija, svakako će pomoci u analiranju greške i pronalasku njenog rešenja na osnovu izveštaja i predloženog rešenja koje je alat dao. Alat je razvijan pod \textit{Linux} okruženjem, a implementiran u programskom jeziku \textit{Python}. Alat je nazvan \textit{Koronka}, zbog situacije u kojoj se ceo svet našao početkom 2020. godine. Osnovna svrha alata je demonstracija rada alata \textit{Valgrind}, kao i tumačenje izveštaja o greškama koje \textit{Valgrind} daje i njihovo uspešno otklanjanje. Alat je slobodno dostupan i nalazi se na linku \url{https://github.com/LMladenovic/Error_fixing_tool}. Na pomenutom linku se nalaze neophodne datoteke alata, opis sistema, kao i skup test primera i njihova pokretanja.
 
 \section{Korišćenje alata}
 Da biste pokrenuli alat \textit{Koronka} neophodno je da prethodno instalirate \textit{GCC} kompajler, sam alat \textit{Valgrind}, kao i \textit{Python}. U razvoju alata korišćen je \textit{Python2.7}. Alat se pokreće sledećom komandom:
@@ -956,7 +956,7 @@ Navedeni arumenti podrazumevaju sledeće:
 
 Takođe, alat \textit{Koronka} sadrži i opciju \texttt{--help } čijim će navođenjem biti ispisano uputstvo za upotrebu alata. 
 
-Sve argumente koji se navedu prilikom pokretanja alata \textit{Koronka} obradiće funkcija za obrađivanje argumenata komandne linije. Nakon pokretanja alata, u direktorijumu alata će se kreirati direktorijum u formatu \textit{datum pokretanja-vreme pokretanja}. U njega će se kopirati svi podaci navedeni kao arugment \textit{files}, kao i glavni program nad kojim se vrši analiza i nad njima će biti vršene odgovarajuće promene u skladu sa otkrivenim greškama. Originalni fajlovi ostaće nepromenjeni. Po završetku rada alata, u pomenutom direktorijumu će se naći još dva fajla. Prvi je \textit{ExecutionReport} koji sadrži detaljan izveštaj o radu alata, koje greške je našao, na koji način ih je rešio, koje fajlove, odnosno linije koda u njima je izmenio. Drugi, pod nazivom \textit{ValgrindLOG.txt}, predstavlja izlaz alata \textit{Valgrind}, koji će se u procesu rada alata koristiti za parsiranje grešaka koje nađe alat \textit{Memcheck}. Ukoliko se analizira ispravljeni program nakon završetka rada alata alatom \textit{Memcheck}, biće dobijen isti izlaz koji možete videti u datoteci \textit{ValgrindLOG.txt}. Način i logika rada alata biće opisani u sekcijama koje slede.
+Sve argumente koji se navedu prilikom pokretanja alata \textit{Koronka} obradiće funkcija za obrađivanje argumenata komandne linije. Nakon pokretanja alata, u direktorijumu alata će se kreirati direktorijum u formatu \textit{datum pokretanja-vreme pokretanja}. U njega će se kopirati svi podaci navedeni kao arugment \textit{files}, kao i glavni program nad kojim se vrši analiza i nad njima će biti vršene odgovarajuće promene u skladu sa otkrivenim greškama. Originalni fajlovi ostaće nepromenjeni. Po završetku rada alata, u pomenutom direktorijumu će se naći još dva fajla. Prvi je \textit{ExecutionReport} koji sadrži detaljan izveštaj o radu alata, koje greške je našao, na koji način ih je rešio, koje fajlove, odnosno linije koda u njima je izmenio. Drugi, pod nazivom \textit{ValgrindLOG.txt}, predstavlja izlaz alata \textit{Valgrind}, koji će se u procesu rada alata koristiti za parsiranje grešaka koje nađe alat \textit{Memcheck}. Ukoliko se analizira ispravljeni program nakon završetka rada alata alatom \textit{Memcheck}, biće dobijen isti izlaz koji možete videti u datoteci \textit{ValgrindLOG.txt}. Način i logika rada alata opisani su u sekcijama koje slede.
 
 \section{Algoritam izvršavanja}\label{algoritam}
 Pri pokretanju alata generiše se odgovarajući direktorijum, u njega se kopiraju svi navedeni (potrebni) fajlovi, formiraju se nizovi \textit{structures}, \textit{files} i \textit{history}. Nakon početnih podešavanja sledi iterativno kompilacija programa i analiza \textit{Valgrind}-ovim alatom \textit{Memcheck} čiji izlaz se smešta u datoteku \textit{ValgrindLOG.txt}. Ovaj fajl se parsira, i iz njega se čitaju informacije o greškama iterativno. Kad alat naiđe na grešku, parsira je, nakon čega proba da je ispravi ukoliko je u mogućnosti. Ukoliko nađe rešenje koje već nije primenjeno, biće implementirano nakon čega alat ide u novu iteraciju kompilacije i provere grešaka, uz prethodno ažuriranje istorije i izveštaja o ispravljenim greškama. Proces se ponavlja dokle god ima grešaka koje nisu ispravljene, a koje je \textit{Koronka} u mogućnosti da ispravi. Grafički prikaz algoritma dat je na slici \ref{fig:slika4.4}.
@@ -1023,7 +1023,7 @@ def isKnownReason(self, newReason):
 %  \label{fig:slika4.2}
 %\end{figure}
 
-Na slici \ref{fig:slika4.3} prikazan je segment izveštaja alata \textit{Valgrind} koji predstavlja jednu grešku koju treba ispraviti. Žutom bojom je obeležen deo koji predstavlja tip greške, zelenom bojom deo koji predstavlja razlog greške, dok su plavom bojom obeležene sumnjive (problematične) linije. Ti podaci će redom biti smešteni u \textit{errorType}, \textit{errorReason} i \textit{problemLines}. Sve potrebne informacije od značaja iz datog segmenta izveštaja dobićemo upotrebom regularnih izraza.
+Na slici \ref{fig:slika4.3} prikazan je segment izveštaja alata \textit{Valgrind} koji predstavlja jednu grešku koju treba ispraviti. Žutom bojom je obeležen deo koji predstavlja tip greške, zelenom bojom deo koji predstavlja razlog greške, dok su plavom bojom obeležene sumnjive (problematične) linije. Ti podaci će redom biti smešteni u \textit{errorType}, \textit{errorReason} i \textit{problemLines}. Sve potrebne informacije od značaja iz datog segmenta izveštaja dobijamo upotrebom regularnih izraza.
 
 \begin{figure}[!ht]
   \centering
@@ -1035,7 +1035,7 @@ Na slici \ref{fig:slika4.3} prikazan je segment izveštaja alata \textit{Valgrin
 Na osnovu \textit{errorType} i \textit{errorReason} biće određeno koji će šablon biti upotrebljen za ispravljanje greške. Na osnovu \textit{problemLines} biće pronađena tačna linija koda koja je izazvala grešku, a iz nje izvučeni podaci koji su neophodni za ispravljanje greške, kao i iz ostalih linija ukoliko sadrže informacije od značaja. Kada se neophodni podaci o grešci izvuku i nađe njeno rešenje, biće postavljene vrednosti \textit{changedFile}, \textit{changedLine}, \textit{bug}, \textit{bugFix}. Kada se obezbede svi podaci, dalje izvršavanje alata prepušta se sistemu za praćenje istorije promena.
 
 \section{Mehanizam praćenja istorije}\label{istorija}
-Sve promene koje je alat \textit{Коronka} izvršio nad fajlovima biće praćene pomoću mehanizma za praćenje istorije. Svaka promena biće sačuvana pojedinačno u nizu \textit{history} u vidu uređene trojke \textit{(izmena u kodu, promenjena linja koda, fajl nad kojim se vrši promena)}. Ovakav vid praćenja istorije je dobar iz više razloga. Na primer, može se desiti da imamo iste naredbe koje izazivaju grešku u dva različita fajla. Promena tih naredbi bez praćenja fajla nad kojim se vrši promena ne bi bila moguća u oba fajla, ukoliko je ispravka greške opet ista naredba sa određenim dodacima. Takođe, može se desiti na primer da u istom fajlu imamo dva bloka unutar kojih postoji linija koja izaziva problem. To su dakle dve greške, čije rešenje mogu biti dve potupuno iste naredbe, izmenjene u dve različite linije koda u istom fajlu. Ukoliko mehanizam praćenja istorije ne bi pamtio i liniju koda u kojoj su promene izvršene, onda praćenje ovakve situacije ne bi bilo moguće 
+Sve promene koje je alat \textit{Коronka} izvršio nad fajlovima praćene su pomoću mehanizma za praćenje istorije. Svaka promena biće sačuvana pojedinačno u nizu \textit{history} u vidu uređene trojke \textit{(izmena u kodu, promenjena linja koda, fajl nad kojim se vrši promena)}. Ovakav vid praćenja istorije je dobar iz više razloga. Na primer, može se desiti da imamo iste naredbe koje izazivaju grešku u dva različita fajla. Promena tih naredbi bez praćenja fajla nad kojim se vrši promena ne bi bila moguća u oba fajla, ukoliko je ispravka greške opet ista naredba sa određenim dodacima. Takođe, može se desiti na primer da u istom fajlu imamo dva bloka unutar kojih postoji linija koja izaziva problem. To su dakle dve greške, čije rešenje mogu biti dve potupuno iste naredbe, izmenjene u dve različite linije koda u istom fajlu. Ukoliko mehanizam praćenja istorije ne bi pamtio i liniju koda u kojoj su promene izvršene, onda praćenje ovakve situacije ne bi bilo moguće 
 
 Prilikom pokretanja alata niz \textit{history} sadrži samo jednu trojku, tj.~\textit{(' ', -1, ' ')}. Kako se greške iterativno ispravljaju, svaka iteracija predstavlja pokušaj alata da datu grešku ispravi, što je bliže opisano u sekciji \ref{algoritam}. Za mehanizam praćenja istorije je to važno jer će on validirati trenutni predlog za ispravku greške koje je alat našao. Prvi slučaj je da se predlog ispravke ne nalazi u istoriji, on će biti implementiran i dodat isoriji izmena u nadi da će se greška uspešno ispraviti. U drugom slučaju, predlog ispravke se već nalazi u istoriji izmena, što je signal alatu da je predlog rešenja već implementiran i da ta implementacija nije ispravila grešku, te da alat nastavi sa traženjem novog rešenja. Ukoliko alat iskoristi sve mehanizme za ispravljanje određene greške koje poseduje, tj.~implementira sve predloge rešenja koje je u mogućnosti da predloži, a greška ostane neispravljena, alat će nastaviti sa radom i pokušati da ispravi ostale greške, ukoliko postoje. Navedena greška će ostati neispravljena, a korisnik će biti obavešten da postoji greška koja nažalost nije ispravljena, samim tim što će se izveštaj o njoj nalaziti u datoteci \textit{ValgrindLOG.txt}. Prilikom nalaženja rešenja koje će zaista i biti implementirano, to rešenje biva dodato u istoriju, a alat nastavlja sa iteracijama ispravljanja ostalih grešaka.
 
@@ -1203,7 +1203,7 @@ U slučaju prekoračenja s leve strane, pristupamo memoriji kojoj nam nije dozvo
 \end{lstlisting}
 
 \section{Primeri rada alata}
-U ovoj sekciji biće predstavljeni primeri rada alata za svaku od grešaka koje alat ispravlja. Prvi primer će dati kompletan pregled onoga što alat \textit{Koronka} radi sa programom koji analizira i šta ostavlja nakon svog rada. Ostali primeri biće izneti u formi listinga sa sledećom sadržinom:
+U ovoj sekciji predstavljeni su primeri rada alata za svaku od grešaka koje alat ispravlja. Prvi primer daje kompletan pregled onoga što alat \textit{Koronka} radi sa programom koji analizira i šta ostavlja nakon svog rada. Ostali primeri izneti su u formi listinga sa sledećom sadržinom:
 \begin{itemize}
 \item[$\textendash$] Program koji sadrži greške;
 \item[$\textendash$] Ispravljeni program alatom \textit{Koronka};
@@ -1230,22 +1230,22 @@ Izgled komandne linije nakon pokretanja alata prikazan je na slici \ref{fig:slik
 \begin{figure}[!ht]
   \centering
   \includegraphics[width=0.6\textwidth]{TerminalOutput.png}
-  \caption{Izgled terminala nakon izvršavanja alata \textit{Koronka}}
+  \caption{Ispis prilikom izvršavanja alata \textit{Koronka}}
   \label{fig:slika4.11}
 \end{figure}
 
 Direktorijum koji je formiran i dodeljen ovom konkretnom pokretanju alata i njegovom izvršavanju prikazan je na slici \ref{fig:slika4.12}, dok su izmenjen program nakon izvršavanja alata \textit{Koronka}, kao i izveštaj, prikazani na slikama \ref{fig:slika4.13} i \ref{fig:slika4.14}.
 \begin{figure}[!ht]
   \centering
-  \includegraphics[width=0.6\textwidth]{DateTimeFolder.png}
-  \caption{Izgled foldera u formatu \textit{datum pokretanja - vreme pokretanja} koji formira alat \textit{Koronka}}
+  \includegraphics[width=0.5\textwidth]{DateTimeFolder.png}
+  \caption{Izgled direktorijuma u formatu \textit{datum pokretanja - vreme pokretanja} koji formira alat \textit{Koronka}}
   \label{fig:slika4.12}
 \end{figure}
 
 \begin{figure}[!ht]
   \centering
-  \includegraphics[width=0.6\textwidth]{FixedProgram.png}
-  \caption{Izgled ispravljenog programa alatom \textit{Koronka}}
+  \includegraphics[width=0.5\textwidth]{FixedProgram.png}
+  \caption{Predlog rešenja koji je dao alat \textit{Koronka}}
   \label{fig:slika4.13}
 \end{figure}
 
@@ -1271,7 +1271,7 @@ int main( void ){
 }
 \end{lstlisting}
 
-\begin{lstlisting}[style=mystyle,caption={Ispravljeni program sa listinga \ref{lst:program1} alatom \textit{Koronka}}, label={lst:program1Fix},language={Python}] 
+\begin{lstlisting}[style=mystyle,caption={Predlog rešenja alata \textit{Koronka} za greške otkrivene u programu sa listinga \ref{lst:program1}}, label={lst:program1Fix},language={Python}] 
 #include <stdlib.h>
 #include <unistd.h>
 
@@ -1344,7 +1344,7 @@ int main()
 }
 \end{lstlisting}
 
-\begin{lstlisting}[style=mystyle,caption={Ispravljeni program sa listinga \ref{lst:program2} alatom \textit{Koronka}}, label={lst:program2Fix},language={Python}] 
+\begin{lstlisting}[style=mystyle,caption={Predlog rešenja alata \textit{Koronka} za greške otkrivene u programu sa listinga \ref{lst:program2}}, label={lst:program2Fix},language={Python}] 
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -1413,7 +1413,7 @@ int main(){
 }
 \end{lstlisting}
 
-\begin{lstlisting}[style=mystyle,caption={Ispravljeni program sa listinga \ref{lst:program3} alatom \textit{Koronka}}, label={lst:program3Fix},language={Python}] 
+\begin{lstlisting}[style=mystyle,caption={Predlog rešenja alata \textit{Koronka} za greške otkrivene u programu sa listinga \ref{lst:program3}}, label={lst:program3Fix},language={Python}] 
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -1500,7 +1500,7 @@ int main(int argv, char** argc){
 }
 \end{lstlisting}
 
-\begin{lstlisting}[style=mystyle,caption={Ispravljeni program sa listinga \ref{lst:program4} alatom \textit{Koronka}}, label={lst:program4Fix},language={Python}] 
+\begin{lstlisting}[style=mystyle,caption={Predlog rešenja alata \textit{Koronka} za greške otkrivene u programu sa listinga \ref{lst:program4}}, label={lst:program4Fix},language={Python}] 
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -1571,7 +1571,7 @@ int main(){
 }
 \end{lstlisting}
 
-\begin{lstlisting}[style=mystyle,caption={Ispravljeni program sa listinga \ref{lst:program5} alatom \textit{Koronka}}, label={lst:program5Fix},language={Python}] 
+\begin{lstlisting}[style=mystyle,caption={Predlog rešenja alata \textit{Koronka} za greške otkrivene u programu sa listinga \ref{lst:program5}}, label={lst:program5Fix},language={Python}] 
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -1663,12 +1663,12 @@ Changed 19. line
 
 % ------------------------------------------------------------------------------
 \chapter{Zaključak}
-Alatima \textit{Valgrind} distribucije mogu se otkriti greške i kritične tačke programa čijim ispravljanjem direktno poboljšavamo konzistentnost, funkcionalnost i performanse programa koji se razvija. Ručno otkrivanje tih grešaka obično je mukotrpan i najčešće neefikasan postupak. Srećom, alat \textit{Valgrind} je tu da pomogne u prevazilaženju tog problema. Alat \textit{Memcheck}, koji je deo \textit{Valgrind} distribucije, otkriva greške u radu sa memorijom koje mogu da dovedu do pada programa, a koje kompilator nije u mogućnosti da otkrije. Ostali alati \textit{Valgrind} distribucije mogu da otkriju druge probleme, poput grešaka u radu sa nitima i, čijom se detekcijom i ispravljanjem može doprineti performansama i boljem radu softvera koji se razvija. 
+Alatima distribucije \textit{Valgrind} mogu se otkriti greške i kritične tačke programa čijim ispravljanjem direktno poboljšavamo konzistentnost, funkcionalnost i performanse programa koji se razvija. Ručno otkrivanje tih grešaka obično je mukotrpan i najčešće neefikasan postupak. Srećom, alat \textit{Valgrind} je tu da pomogne u prevazilaženju problema. Alat \textit{Memcheck}, koji je deo distribucije \textit{Valgrind}, otkriva greške u radu sa memorijom koje mogu da dovedu do pada programa, a koje kompilator nije u mogućnosti da otkrije. Ostali alati distribucije \textit{Valgrind} mogu da otkriju druge probleme, poput grešaka u radu sa nitima, čijom se detekcijom i ispravljanjem može doprineti performansama i boljem radu softvera koji se razvija. 
 
 Nakon što analizom programa nekim od alata distibucije \textit{Valgrind} detektujemo greške, ukoliko postoje, neophodno je da razumemo izlaz koji nam je alat dao, i da na osnovu njega pokušamo da popravimo greške. Alat koji je razvijen u ovom radu pokušava da taj proces automatizuje, odnosno da razume izlaz koji je alat \textit{Memcheck} dao, i da na osnovu njega korišćenjem adekvatnih šablona ispravi otkrivene greške. Alat pokriva širok dijapazon grešaka, što ne isključuje da postoje greške koje mogu biti otkrivene daljim razvojem, a koje alat \textit{Koronka} u ovom trenutku ne pokriva. Greške koje alat \textit{Koronka} uspešno otklanja su:
 \begin{itemize}
 \item Korišćenje neinicijalizovanih vrednosti kako primitivnog tipa, tako i korisnički definisanih struktura, bilo da su one statički definisane, ili dinamički alocirane;
-\item Nedozvoljeno čitanje i pisanje u memoriju koja je dinamički alocirana, kako s leve, tako i s desne strane;
+\item Nedozvoljeno čitanje i pisanje u memoriju koja je dinamički alocirana, kako u slučaju potkoračenja, tako i u slučaju prekoračenja;
 \item Sumnjive vrednosti argumenata;
 \item Nevalidna oslobađanja memorije;
 \item Nevalidni arugmenti sistemskih poziva.
@@ -1676,7 +1676,7 @@ Nakon što analizom programa nekim od alata distibucije \textit{Valgrind} detekt
 Greške koje alat \textit{Koronka} nije u stanju da ispravi, a koje \textit{Memcheck} detektuje su specijalni slučajevi grešaka koje alat ispravlja, a koje šabloni ne pokrivaju, ili greške za koje šablon još uvek nije implementiran.
 To su na primer greške nedozvoljenog čitanja i pisanja iz statičke memorije i greške prilikom korišćenja funkcija poput \textit{mmap} i \textit{memcpy}.
 
-Što se daljeg razvoja alata tiče, mogu se kreirati novi i dodatno specijalizovati i unaprediti postojeći mehanizmi i šabloni. Kako struktura alata liči na mikro servis, alat se može iskoristiti kao deo nekog novog alata, ili kao odvojeni deo skupa alata. Takođe, može biti proširen dijapazon grešaka koji alat ispravlja korišćenjem ostalih alata distribucije \textit{Valgrind}. Na primer, može se iskoristiti alat \textit{Helgrind} koji detektuje greške u radu sa nitima. Nakon ispravljanja grešaka koje detektuje \textit{Memcheck}, program bi se prepustio na dalju iterativnu analizu alatu \textit{Helgrind}, i šablonima za ispravljanje grešaka u radu sa nitima, što je slično principu koji je već iskorišćen. Nažalost, alate poput \textit{Cachegrind}-a i \textit{Callgrind}-a nije moguće iskoristiti u ovakvoj arhitekturi, kako nije moguće iskoristiti automatsku analizu njihovih izveštaja za isprvljanje propusta na koje oni ukazuju.
+Što se daljeg razvoja alata tiče, mogu se kreirati novi i dodatno specijalizovati i unaprediti postojeći mehanizmi i šabloni. Kako struktura alata liči na mikro servis, alat se može iskoristiti kao deo nekog novog alata, ili kao odvojeni deo skupa alata. Takođe, može biti proširen dijapazon grešaka koji alat ispravlja korišćenjem ostalih alata distribucije \textit{Valgrind}. Na primer, može se iskoristiti alat \textit{Helgrind} koji detektuje greške u radu sa nitima. Nakon ispravljanja grešaka koje detektuje \textit{Memcheck}, program bi se prepustio na dalju iterativnu analizu alatu \textit{Helgrind}, i šablonima za ispravljanje grešaka u radu sa nitima, što je slično principu koji je već iskorišćen. Nažalost, alate poput \textit{Cachegrind}-a i \textit{Callgrind}-a nije moguće iskoristiti u ovakvoj arhitekturi, jer nije moguće iskoristiti automatsku analizu njihovih izveštaja za ispravljanje propusta na koje oni ukazuju.
 
 % ------------------------------------------------------------------------------
 
