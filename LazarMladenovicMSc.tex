@@ -148,16 +148,17 @@ Razvoj softvera predstavlja složen proces koji obuhvata razne aktivnosti. Čest
 
 Verifikacija softvera je provera ispravnosti softvera. Statička verifikacija softvera analizira ispravnost programa bez njegovog izvršavanja, tj.~vrši analizu izvornog koda, dok dinamička verifikacija softvera predstavlja tehniku ispitivanja ispravnosti koda u toku njegovog izvršavanja \cite{02Motivacija}. Binarna analiza obuhvata analizu na nivou mašinskog koda, snimljenog kao objektni k\^od (nepovezan) ili kao izvršni k\^od (povezan) \cite{03DinamickaAnaliza}. Primer platforme koji vrši dinamičku binarnu analizu koda jeste \textit{Valgrind}.  
 
-\textit{Valgrind} je platforma koja pruža brojne alate za debagovanje i profajliranje koji pomažu da se brže i pravilnije otklone greške u programima. Najpopularniji od ovih alata zove se \textit{Memcheck}. Ovaj alat može otkriti mnoge greške u vezi sa memorijom koje su česte u C i C++ programima, a koje mogu dovesti do pada ili nepredvidivog ponašanja programa. Rešenje za ove greške nije jedinstveno. Izgled rešenja i njegova ispravnost zavisi isključivo od implemetacije programa.
+\textit{Valgrind} je platforma koja pruža brojne alate za debagovanje i profajliranje koji pomažu da se brže otklone greške u programima. Najpopularniji od ovih alata zove se \textit{Memcheck}. Ovaj alat može otkriti mnoge greške u vezi sa memorijom koje su česte u C i C++ programima, a koje mogu dovesti do pada ili nepredvidivog ponašanja programa.
+% Rešenje za ove greške nije jedinstveno. Izgled rešenja i njegova ispravnost zavisi isključivo od implemetacije programa.
 
 Platforma \textit{Valgrind} sa svim svojim alatima samo ukazuje na greške, kao i na to šta ih je izazvalo. Ispravljanje istih ostaje programeru. Cilj ovog rada jeste da automatizuje ispravljanje grešaka na koje ukazuje alat \textit{Valgrind}, tako što koristiti precizno definisane šablone za ispravljanje grešaka. U realizaciji te ideje primenjuju se regularni izrazi kojima su opisani izrazi koji mogu da prouzrokuju greške na koje nam ukazuje \textit{Memcheck}.
 
 U glavi 2 detaljno je opisana platforma \textit{Valgrind}. Pobrojani su i obrađeni svi alati \textit{Valgrind}-a. Najveći akcenat je na alatu \textit{Memcheck}, dok su o ostalim alatima distribucije \textit{Valgrind} date osnovne relevantne informacije. U glavi 3 iznet je kratak pregled teorije jezika i regularnih izraza. Obrađen je modul \textit{re}, koji pruža podršku za rad sa regularnim izrazima u Python programima. U glavi 4 predstavljen je alat \textit{Koronka}\footnote{Alatu je dato ime \textit{Koronka}, kako je alat razvijan u doba pandemije Korona virusa, a sa idejom da bar nešto dobro nastane sa pomenutim imenom.}, koji je osnovni doprinos ovog rada: opisana je arhitektura, algoritam izvršavanja i njegove funkcionalnosti. Takođe, detaljno se prikazuje način upotrebe i rada alata. Na kraju, iznet je osvrt na ceo rad. Kako tema to afirmiše, a i sam alat je napravljen tako da može da se stalno unapređuje, u smislu uopštavanja postojećih šablona, primene drugih vrsta analiza i alata \textit{Valgrind}-a i sl., iznete su ideje i mogućnosti za dalji razvoj ovog projekta.
 
 
-\chapter{Alat Valgrind}
+\chapter{Platforma Valgrind}
 \textit{Valgrind}\footnote{ Ime \textit{Valgrind} potiče iz nordijske mitologije.} je platforma za pravljenje alata za dinamičku analizu \cite{Valgrind}. Dolazi sa skupom alata, od kojih svaki obavlja neku vrstu debagovanja, profajliranja ili slične zadatke koji pomažu programeru da poboljša program koji razvija. \textit{Valgrind} se može koristiti i kao alat za pravljenje novih alata. 
-\textit{Valgrind} distribucija trenutno sadrži sledeće alate:
+Platforma \textit{Valgrind} trenutno sadrži sledeće alate:
 \begin{enumerate}
   \item \textit{Memcheck} \cite{ValgrindDOC} --- alat za detekciju memorijskih grešaka.
   \item \textit{Cachegrind}  \cite{Cachegrind} --- profajler keš memorije i skokova. 
@@ -207,7 +208,7 @@ Naredni primer ilustruje pokretanje \textit{Valgrind}-a sa dodatnim argumentima.
 \end{center}
 Podrazumevani alat je \textit{Memchek}, tako da se u prethodnom primeru poziva alat \textit{Memchek} nad izvršnim programom \textit{a.out}.
 
-Bez obzira koji se alat koristi, \textit{Valgrind} preuzima kontrolu nad  programom pre nego što program započne da se izvršava. Na taj način \textit{Valgrind} je u stanju da generiše poruke o greškama i druge izlaze u smislu lokacija izvornog koda, kada je to potrebno. Program se pokreće na sintetičkom procesoru koji obezbeđuje jezgro \textit{Valgrind}-a. Sintetički procesor, za razliku od običnog procesora, sadrži i obrađuje dodatne informacije koje su značajne za profajliranje ili debaovanje alatima distribucije \textit{Valgrind}. Kako se k\^od izvršava prvi put, jezgro predaje k\^od odabranom alatu. Alat na to dodaje svoj vlastiti k\^od instrumentacije. Prilikom instrumentacije alat u originalni  k\^od dodaje dodatne instrukcije kojima proverava ispravnost rada programa. Rezultat instrumentacije vraća se natrag u jezgro, koje koordinira dalje izvršavanje ovog instrumentiranog koda. Količina dodatog koda instrumentacije je različita za sve alate pojedinačno, i zavisi isključivo od izabranog alata. Na primer, alat \textit{Memcheck} dodaje k\^od za proveru svakog pristupa memoriji i svake izračunate vrednosti, čineći ga znatno sporijim od izvornog. \textit{Valgrind} simulira svaku instrukciju koju izvršava program pojedinačno. Zbog toga aktivni alat proverava ili profajlira ne samo k\^od programa, već i sve prateće dinamički povezane biblioteke, kao npr.~C biblioteku i grafičke biblioteke \cite{ValgrindCore}.
+Bez obzira koji se alat koristi, \textit{Valgrind} preuzima kontrolu nad programom pre nego što program započne da se izvršava. Na taj način \textit{Valgrind} je u stanju da generiše poruke o greškama i druge izlaze u smislu lokacija izvornog koda, kada je to potrebno. Program se pokreće na sintetičkom procesoru koji obezbeđuje jezgro \textit{Valgrind}-a. Sintetički procesor, za razliku od običnog procesora, sadrži i obrađuje dodatne informacije koje su značajne za profajliranje ili debaovanje alatima distribucije \textit{Valgrind}. Kako se k\^od izvršava prvi put, jezgro predaje k\^od odabranom alatu. Alat na to dodaje svoj vlastiti k\^od instrumentacije. Prilikom instrumentacije alat u originalni  k\^od dodaje dodatne instrukcije kojima proverava ispravnost rada programa. Rezultat instrumentacije vraća se natrag u jezgro, koje koordinira dalje izvršavanje ovog instrumentiranog koda. Količina dodatog koda instrumentacije je različita za sve alate pojedinačno, i zavisi isključivo od izabranog alata. Na primer, alat \textit{Memcheck} dodaje k\^od za proveru svakog pristupa memoriji i svake izračunate vrednosti, čineći ga znatno sporijim od izvornog. \textit{Valgrind} simulira svaku instrukciju koju izvršava program pojedinačno. Zbog toga aktivni alat proverava ili profajlira ne samo k\^od programa, već i sve prateće dinamički povezane biblioteke, kao npr.~C biblioteku i grafičke biblioteke \cite{ValgrindCore}.
 
 Za korišćenje \textit{Valgrind}-ovih alata, korisno je ponovo kompajlirati aplikaciju i podržati biblioteke sa omogućenim informacijama o otklanjanju grešaka (opcija \texttt{-g}). Bez ovih informacija, najbolje što \textit{Valgrind}-ovi alati mogu da urade je da pogode kojoj funkciji pripada određeni komad koda, što čini i poruke o greškama i profajliranje rezultata značajno manje korisnim. Korišćenjem opcije \texttt{-g} prilikom kompilacije, dobijaju se poruke koje vode direktno do odgovarajuće linije izvornog koda \cite{ValgrindCore}.
 
@@ -239,12 +240,12 @@ Ova poruka kaže da je program izvršio ilegalno 4-bajtno čitanje adrese 0xBFFF
 
 \textit{Valgrind} pamti sve izveštaje o greškama. Kada se otkrije greška, ona se upoređuje sa starim izveštajima da bi se videlo da li je duplikat. Ako je tako, greška je zabeležena, ali dalji komentari se ne emituju. Na ovaj način, alat izbegava zatrpavanje velikim brojem duplikata izveštaja o greškama.  
 
-Greške se prijavljuju pre nego što se pridružena operacija zaista dogodi. Na primer, ako se koristi \textit{Memcheck} i program pokušava da čita sa adrese nula, \textit{Memcheck} će poslati poruku u tom smislu, a program će verovatno zaustaviti rad sa greškom \textit{Segmentation fault}. Generalno, dobra je praksa ispravljati greške redosledom u kojem su prijavljene. Ukoliko se ne primeni pomenuta praksa, to može da zbuni korisnika. Na primer, program koji kopira neinicijalizovane vrednosti na nekoliko memorijskih lokacija i kasnije ih koristi, generisaće nekoliko poruka o grešci kada se pokrene na \textit{Memcheck}-u. Prva takva poruka o grešci može sasvim direktno dati osnovni uzrok problema. 
+Greške se prijavljuju pre nego što se pridružena operacija zaista dogodi. Na primer, ako se koristi \textit{Memcheck} i program pokušava da čita sa adrese nula, \textit{Memcheck} šalje poruku u tom smislu, a program se nakon toga verovatno zaustavlja sa greškom \textit{Segmentation fault}. Generalno, dobra je praksa ispravljati greške redosledom u kojem su prijavljene. Ukoliko se ne primeni pomenuta praksa, to može da zbuni korisnika. Na primer, program koji kopira neinicijalizovane vrednosti na nekoliko memorijskih lokacija i kasnije ih koristi, uzrokuje nekoliko poruka o grešci kada se pokrene sa \textit{Memcheck}-om. Prva takva poruka o grešci može sasvim direktno dati osnovni uzrok problema. 
 
-Proces otkrivanja duplikata grešaka prilično je skup i može prouzrokovati značajno usporenje ako program generiše ogromne količine grešaka. Da bi izbegao probleme, \textit{Valgrind} će jednostavno zaustaviti prikupljanje grešaka nakon što uoči 1.000 različitih grešaka ili ukupno 10.000.000 grešaka. U ovoj situaciji potrebno je zaustaviti program i popraviti ga, jer \textit{Valgrind} neće prijaviti ništa drugo nakon ovoga. Ograničenja od 1.000 / 10.000.000 primenjuju se nakon uklanjanja potisnutih grešaka, odnosno onih grešaka za koje \textit{Memcheck} utvrdi da su duplikati. Ova ograničenja su definisana u \textit{m\_errormgr.c} i mogu se povećati ako je potrebno. Promena ove datoteke podrazumeva ponovnu izgradnju alata \textit{Valgrind} \cite{ValgrindCore}.
+Proces otkrivanja duplikata grešaka prilično je skup i može prouzrokovati značajno usporenje ako program generiše ogromne količine grešaka. Da bi izbegao probleme, \textit{Valgrind} jednostavno zaustavlja prikupljanje grešaka nakon što uoči 1.000 različitih grešaka ili ukupno 10.000.000 grešaka. U ovoj situaciji potrebno je zaustaviti program i popraviti ga, jer \textit{Valgrind} ne prijavljuje ništa drugo nakon ovoga. Ograničenja od 1.000 / 10.000.000 primenjuju se nakon uklanjanja potisnutih grešaka, odnosno onih grešaka za koje \textit{Memcheck} utvrdi da su duplikati. Ova ograničenja su definisana u \textit{m\_errormgr.c} i mogu se povećati ako je potrebno. Promena ove datoteke podrazumeva ponovnu izgradnju alata \textit{Valgrind} \cite{ValgrindCore}.
 
-\section{Memcheck}
-\textit{Memcheck} je alat koji vrši detekciju grešaka u radu sa memorijom \cite{Memcheck}. Može da otkrije sledeće probleme koji su česti u programima C i C ++:
+\section{Alat Memcheck}
+\textit{Memcheck} je alat koji vrši detekciju grešaka u radu sa memorijom \cite{Memcheck}. Može da otkrije sledeće probleme koji su česti u C i C ++ programima:
 \begin{itemize}
 \item Pristup memoriji kojoj ne biste smeli, tj.~prekoračenje i potkoračenje blokova hipa, prekoračenje vrha steka i pristup memoriji nakon što se oslobodi.
 \item Korišćenje nedefinisanih vrednosti, tj.~vrednosti koje nisu inicijalizovane ili su izvedene iz drugih nedefinisanih vrednosti.
@@ -260,7 +261,7 @@ Kao što je rečeno u prethodnoj sekciji, da bi se dobile detaljne, a pritom i n
 
 % (Korišćenje \texttt{-Wall} je takođe dobra ideja u celini.)
 
-Za korišćenje ovog alata naodi se opcija \texttt{--tool = memcheck} u komandnoj liniji prilikom pokretanja \textit{Valgrind}-a.
+Za korišćenje ovog alata navodi se opcija \texttt{--tool = memcheck} u komandnoj liniji prilikom pokretanja \textit{Valgrind}-a.
  \begin{center}
 \texttt{valgrind –tool=memcheck [argumenti memchecka] program [argumenti programa]}
 \end{center}
@@ -274,11 +275,11 @@ U ovoj sekciji opisani su mehanizmi koje \textit{Memcheck} koristi u detektovanj
 \subsubsection{Bitovi valjane vrednosti (V bitovi)}
 Najjednostavnije je razmišljati o \textit{Memcheck}-u kao alatu koji implementira sintetički CPU koji je identičan stvarnom CPU, osim jednog ključnog detalja. Svaki bit (doslovno) podataka koje obrađuje, čuva i njima rukuje stvarni CPU, dok u sintetičkom CPU ima pridruženi bit ,,valjane vrednosti'' (eng. \textit{valid-value bit}), koji govori da li prateći bit ima legitimnu vrednost ili ne. U daljem tekstu ovaj bit se naziva \texttt{V} bitom (valjane vrednosti).
 
-Svaki bajt u sistemu iz tog razloga ima i 8\texttt{V} bitova koji ga prate. Na primer, kada CPU učita reč veličine 4 bajta iz memorije, takođe učitava odgovarajućih 32\texttt{V} bita iz bitmape koja čuva \texttt{V} bitove za čitav adresni prostor procesa. Ako bi CPU kasnije trebalo da upiše celu ili neki deo te vrednosti u memoriju na drugoj adresi, relevantni V bitovi će se sačuvati nazad u \texttt{V}-bitnoj bitmapi.
+Svaki bajt u sistemu iz tog razloga ima i 8\texttt{V} bitova koji ga prate. Na primer, kada CPU učita reč veličine 4 bajta iz memorije, takođe učitava odgovarajućih 32\texttt{V} bita iz bitmape koja čuva \texttt{V} bitove za čitav adresni prostor procesa. Ako bi CPU kasnije trebalo da upiše celu ili neki deo te vrednosti u memoriju na drugoj adresi, relevantni V bitovi se u tom slučaju čuvaju nazad u \texttt{V}-bitnoj bitmapi.
 
 Ukratko, svaki bit u sistemu ima (konceptualno) pridruženi \texttt{V} bit, koji ga prati svuda, čak i unutar CPU-a. Svi registri CPU-a (celi brojevi, registri za brojeve u pokretnom zarezu, vektori i uslovi) imaju svoje \texttt{V} bitne vektore. Da bi ovo moglo da funkcioniše dovoljno efikasno, \textit{Memcheck} koristi veliku količinu kompresije da bi kompaktno prikazao \texttt{V} bitove.
 
-Kopiranje vrednosti ne dovodi do toga da \textit{Memcheck} proverava greške ili izveštava o njima. Međutim, kada se vrednost koristi na način koji bi mogao da utiče na spoljno-vidljivo ponašanje programa, pridruženi \texttt{V} bitovi se tada proveravaju. Ako bilo koji od njih ukazuje da je vrednost nedefinisana (odnosno promenljiva definisana ali neinicijalizovana), čak i delimično, prijaviće se greška.
+Kopiranje vrednosti ne dovodi do toga da \textit{Memcheck} proverava greške ili izveštava o njima. Međutim, kada se vrednost koristi na način koji bi mogao da utiče na spoljno-vidljivo ponašanje programa, pridruženi \texttt{V} bitovi se tada proveravaju. Ako bilo koji od njih ukazuje da je vrednost nedefinisana (odnosno promenljiva definisana ali neinicijalizovana), čak i delimično, prijavljuje se greška.
 
 Većina operacija na niskom nivou, kao što je sabiranje, uzrokuje da \textit{Memcheck} koristi \texttt{V} bitove za operande za izračunavanje \texttt{V} bitova za rezultat. Čak i ako je rezultat delimično ili u potpunosti nedefinisan, alat ne prijavljuje grešku. Provere definisanosti dešavaju se samo na tri mesta:
 \begin{itemize}
@@ -308,10 +309,10 @@ s2=s1;
 %  \label{fig:slika2.2}
 %\end{figure}
 
-Nakon analize koda sa listinga \ref{lst:slika2.2}, može da deluje da struktura \texttt{S}, kako tip podataka \texttt{int} zauzima 4 bajta, a tip podataka \texttt{char} jedan bajt, zauzima 5 bajtova. Međutim, svi kompajleri, u normalnom režimu rada, zaokružiće veličinu strukture \texttt{S} na ceo broj reči, tj.~na 8 bajtova. Dakle, \texttt{s1} zauzima 8 bajtova, ali će samo njih 5 biti inicijalizovano. Za zadatak \texttt{s2=s1}, GCC generiše k\^od za kopiranje svih 8 bajtova u \texttt{s2} bez obzira na njihovo značenje. Ako bi \textit{Memcheck} jednostavno proveravao vrednosti redom kako su izašle iz memorije, oglasio bi svaki put kad bi se desilo ovakvo dodeljivanje strukture. Dakle, neophodno je komplikovanije ponašanje opisano gore. Ovo omogućava GCC-u da kopira \texttt{s1} u \texttt{s2} na bilo koji način, a upozorenje će se emitovati samo ako se kasnije koriste neinicijalizovane vrednosti \cite{Memcheck}. 
+Nakon analize koda sa listinga \ref{lst:slika2.2}, može da deluje da struktura \texttt{S}, kako tip podataka \texttt{int} zauzima 4 bajta, a tip podataka \texttt{char} jedan bajt, zauzima 5 bajtova. Međutim, svi kompajleri, u normalnom režimu rada, zaokružiće veličinu strukture \texttt{S} na ceo broj reči, tj.~na 8 bajtova. Dakle, \texttt{s1} zauzima 8 bajtova, ali je samo 5 njih inicijalizovano. Za zadatak \texttt{s2=s1}, GCC generiše k\^od za kopiranje svih 8 bajtova u \texttt{s2} bez obzira na njihovo značenje. Ako bi \textit{Memcheck} jednostavno proveravao vrednosti redom kako su izašle iz memorije, oglasio bi svaki put kad bi se desilo ovakvo dodeljivanje strukture. Dakle, neophodno je komplikovanije ponašanje opisano gore. Ovo omogućava GCC-u da kopira \texttt{s1} u \texttt{s2} na bilo koji način, a upozorenje se emituje samo ako se kasnije koriste neinicijalizovane vrednosti \cite{Memcheck}. 
 
 \subsubsection{Bitovi važeće adrese (A bitovi)}
-Prethodna sekcija opisuje kako se uspostavlja i održava valjanost vrednosti bez potrebe da se kaže da li program ima ili nema pravo na pristup bilo kojoj određenoj memorijskoj lokaciji. U ovoj sekciji ćemo razmotriti to pitanje.
+Prethodna sekcija opisuje kako se uspostavlja i održava valjanost vrednosti bez potrebe da se kaže da li program ima ili nema pravo na pristup bilo kojoj određenoj memorijskoj lokaciji. U ovoj sekciji razmotreno je to pitanje.
 
 Svaki bit u memoriji ili u procesoru ima pridruženi bit valjane vrednosti (\texttt{V}). Pored toga, svi bajtovi u memoriji, ali ne i u procesoru, imaju pridruženi bit valjane adrese (\texttt{A}, eng. \textit{valid-address bit}). Ovo ukazuje na to da li program može legitimno čitati ili pisati u tu lokaciju. To ne daje nikakve naznake valjanosti podataka na toj lokaciji, kako je to zadatak V bitova već samo da li se toj lokaciji može pristupiti ili ne. Svaki put kada program čita ili upisuje u memoriju, \textit{Memcheck} proverava \texttt{A} bitove povezane sa adresom. Ako bilo koji od njih označi neispravnu adresu, prijavljuje se greška. Sama čitanja i pisanja ne menjaju \texttt{A} bitove, već ih samo konsultuju. Ovaj naizgled čudan izbor smanjuje količinu zbunjujućih informacija koje se predstavljaju korisniku. Izbegava neprijatnu pojavu u kojoj se memorija čita sa mesta koje je i nedostupno i sadrži nevažeće vrednosti, a kao rezultat toga dobila bi se ne samo greška sa nevažećom adresom (čitanje / pisanje), već i potencijalno veliki skup greškaka neinicijalizovanih vrednosti --- jedna za svaki put kada se vrednost koristi.
 
@@ -365,7 +366,7 @@ Greške nevalidnog čitanja/pisanja (eng. \textit{invalid read/write errors}) se
 
 U primeru sa listinga \ref{lst:slika2.3}, \textit{Memcheck} ne može da identifikuje adresu. Zapravo se adresa nalazi na steku, ali iz nekog razloga ovo nije važeća adresa steka --- nalazi se ispod pokazivača steka i to nije dozvoljeno. U ovom konkretnom slučaju greška je verovatno uzrokovana GCC-om koji generiše nevažeći k\^od, što je poznata greška u nekim starim verzijama GCC-a.
 
-Treba imati na umu da \textit{Memcheck} samo govori da će program uskoro pristupiti memoriji na nedozvoljenoj adresi i da pritom taj pristup ne može sprečiti. Dakle, kada program pristupi, što bi obično rezultiralo greškom (eng. \textit{Segmentation fault}), program će i dalje imati isto ponašanje, ali \textit{Memcheck}-a će izdati poruku neposredno pre toga. U ovom konkretnom primeru čitanje loših (nevalidnih) vrednosti sa steku nije fatalno, i program nastavlja sa radom \cite{Memcheck}. 
+Treba imati na umu da \textit{Memcheck} samo govori da će program uskoro pristupiti memoriji na nedozvoljenoj adresi i da pritom taj pristup ne može sprečiti. Dakle, kada program pristupi, što bi obično rezultiralo greškom (eng. \textit{Segmentation fault}), program i dalje ima isto ponašanje, ali \textit{Memcheck}-a izdaje poruku neposredno pre toga. U ovom konkretnom primeru čitanje loših (nevalidnih) vrednosti sa steku nije fatalno, i program nastavlja sa radom \cite{Memcheck}. 
 
 \subsection{Korišćenje neinicijalizovanih vrednosti}
 Greška pri korišćenju neinicijalizovane vrednosti se prijavljuje kada program koristi vrednost koja nije inicijalizovana --- drugim rečima, nije definisana. Ovde se nedefinisana vrednost koristi negde unutar funkcije \texttt{printf} iz standardne C biblioteke. Ova greška je prijavljena prilikom pokretanja programa sa listinga \ref{lst:slika2.4}, dok je njen ispis dat na listingu \ref{lst:slika2.5}.
@@ -432,7 +433,7 @@ int main(){
 \end{lstlisting}
 
 %Važno je shvatiti da program može kopirati neželjene (neinicijalizovane) podatke koliko god želi. \textit{Memcheck} to posmatra i evidentira podatke, ali se ne žali.
-Poruka o grešci se izdaje samo kada program pokušava da koristi neinicijalizovane podatke na način koji može uticati na spolja vidljivo ponašanje programa, iako \textit{Memcheck} prati i evidentira svako korišćenje neinicijalizovanih podataka. U ovom primeru, \textit{x} je neinicijalizovano. \textit{Memcheck} primećuje vrednost koja se prosleđuje \textit{\_IO\_printf} i odatle \textit{\_IO\_vfprintf}, ali ne daje komentar. Međutim, \textit{\_IO\_vfprintf} mora ispitati vrednost  kako bi je mogao pretvoriti u odgovarajući ASCI niz i \textit{Memcheck} u ovom trenutku prijavljuje grešku.
+Poruka o grešci se izdaje samo kada program pokušava da koristi neinicijalizovane podatke na način koji može uticati na spolja vidljivo ponašanje programa, iako \textit{Memcheck} prati i evidentira svako korišćenje neinicijalizovanih podataka. U ovom primeru, \textit{x} je neinicijalizovano. \textit{Memcheck} primećuje vrednost koja se prosleđuje \textit{\_IO\_printf} i odatle \textit{\_IO\_vfprintf}, ali ne daje komentar. Međutim, \textit{\_IO\_vfprintf} mora ispitati vrednost  kako bi je mogao pretvoriti u odgovarajući ASCII niz i \textit{Memcheck} u ovom trenutku prijavljuje grešku.
 
 Izvori grešaka neinicijalizovanih vrednosti su sledeći:
 \begin{itemize}
@@ -513,7 +514,7 @@ int main(){
 %  \label{fig:slika2.8}
 %\end{figure}
 
-Kao i kod grešaka nevalidnog čitanja/pisanja, \textit{Memcheck} pokušava da dokuči oslobođenu adresu. Ako je, kao ovde, slučaj da je adresa koja je prethodno oslobođena, to će biti prijavljeno i učiniće duplikate oslobađanja istog bloka lako uočljivim. Ova poruka će biti emitovana i ako program pokuša da oslobodi pokazivač koji ne pokazuje na početak hip bloka. Listing \ref{lst:slika2.9} ilustruje izlaz dobijen puštanjem programa sa listinga \ref{lst:slika2.8} na analizu alatom \textit{Memcheck} \cite{ValgrindDOC}. 
+Kao i kod grešaka nevalidnog čitanja/pisanja, \textit{Memcheck} pokušava da dokuči oslobođenu adresu. Ako je, kao ovde, slučaj da je adresa koja je prethodno oslobođena, to se prijavljuje, a duplikati oslobađanja istog bloka postaju lako uočljivi. Ova poruka se emituje i ako program pokuša da oslobodi pokazivač koji ne pokazuje na početak hip bloka. Listing \ref{lst:slika2.9} ilustruje izlaz dobijen puštanjem programa sa listinga \ref{lst:slika2.8} na analizu alatom \textit{Memcheck} \cite{ValgrindDOC}. 
 
 %\begin{figure}[!ht]
 %  \centering
@@ -615,7 +616,7 @@ Svaki mogući slučaj može se svesti na jedan od gore navedenih devet. \textit
 \item[$\textendash$] \textbf{Moguće izgubljen (eng. \textit{possibly lost})} – Ova klasa obuhvata slučajeve 5-8 navedene na slici \ref{fig:slika2.12}. To znači da je pronađen jedan ili više pokazivača na memorijski blok, ali bar jedan od pokazivača pokazuje na unutrašnjost memorijskog bloka. To bi mogla biti  slučajna vrednost u memoriji koja pokazuje na unutrašnjost bloka, što ne treba smatrati validnim sve dok se ne razreši slučaj pokazivača koji pokazuje na unutrašnjost bloka \cite{ValgrindDOC}.
 \end{itemize}
 
-Treba napomenuti da ovo mapiranje devet mogućih slučajeva na četiri vrste curenja nije nužno najbolji način za prijavljivanje curenja memorije. Naročito se prema unutrašnjim pokazivačima postupa nedosledno. Moguće je da će se kategorizacija u budućnosti poboljšati. Na listingu  \ref{lst:slika2.13} dat je rezime curenja memorije koji ispisuje \textit{Memcheck}.
+Treba napomenuti da ovo mapiranje devet mogućih slučajeva na četiri vrste curenja nije nužno najbolji način za prijavljivanje curenja memorije. Naročito se prema unutrašnjim pokazivačima postupa nedosledno. Moguće je poboljšanje kategorizacije u budućnosti. Na listingu  \ref{lst:slika2.13} dat je rezime curenja memorije koji ispisuje \textit{Memcheck}.
 
 %\begin{figure}[!ht]
 %  \centering
@@ -633,9 +634,9 @@ LEAK SUMMARY:
      suppressed: 0 bytes in 0 blocks
 \end{lstlisting}
 
-Ako je uključena opcija \texttt{--leak-check = full}, \textit{Memcheck} će dati detaljan izveštaj za svaki definitivno izgubljeni ili moguće izgubljeni blok, uključujući i mesto gde je alociran. Međutim, \textit{Memcheck} ne može reći kada, kako ili zašto se izgubio pokazivač na iscureli blok. Generalno, treba težiti tome da programi nemaju definitivno izgubljene ili moguće izgubljene blokove na izlazu.
+Ako je uključena opcija \texttt{--leak-check = full}, \textit{Memcheck} daje detaljan izveštaj za svaki definitivno izgubljeni ili moguće izgubljeni blok, uključujući i mesto gde je alociran. Međutim, \textit{Memcheck} ne može reći kada, kako ili zašto se izgubio pokazivač na iscureli blok. Generalno, treba težiti tome da programi nemaju definitivno izgubljene ili moguće izgubljene blokove na izlazu.
 
-Opcija \texttt{--show-leak-kind = <set>} kontroliše skup vrsta curenja koje će se prikazati kada je uključena opcija \texttt{--leak-check = full}. Inače, podrazumevana vrednost opcije \texttt{–leak-check} je \texttt{summary}.
+Opcija \texttt{--show-leak-kind = <set>} kontroliše skup vrsta curenja koje se prikazuju kada je uključena opcija \texttt{--leak-check = full}. Inače, podrazumevana vrednost opcije \texttt{–leak-check} je \texttt{summary}.
 
 \texttt{<set>} se definiše na jedan od sledećih načina:
 \begin{enumerate}
@@ -678,30 +679,30 @@ HEAP SUMMARY:
 \item[$\textendash$] Definitivno i moguće izgubljeni blokovi se smatraju za pravu ,,grešku'', dok indirektno izgubljeni i još uvek dospuni blokovi se ne smatraju kao greška \cite{ValgrindDOC}. 
 \end{itemize}
 
-\section{Ostali važni alati distribucije Valgrind}
+\section{Ostali važni alati platforme Valgrind}
 
 U ovoj sekciji obrađeni su ostali važni alati distribucije \textit{Valgrind}. Navedena je njihova osnovna namena i način korišćenja. 
 
 Da bi uspešno izvršili analizu alatima \textit{Cachegrind}, \textit{Callgrind} i \textit{DHAT} neophodno je kompajlirati program sa opcijom za debug mod (opcija \texttt{-g}) i uključenom optimizacijom, jer nema smisla profajlirati k\^od koji je drugačiji od onoga koji se normalno izvršava. Za analizu programa alatom \textit{Massif} neophodno je kompajlirati program sa opcijom \texttt{-g}, dok nivo optimizacije nije od presudnog značaja. Što se alata \textit{Helgrind} i \textit{DRD} tiče, oni nisu zavisni od uslova kompilacije, tj.~opcije \texttt{-g} i uključene optimizacije.
 
-\subsection{Cachegrind}
+\subsection{Alat Cachegrind}
 \textit{Cachegrind} je alat koji simulira i prati kako program pristupa keš memoriji \cite{Cachegrind}. Takođe, može se koristiti i za profajliranje izvršavanja grana. Simulira mašinu sa nezavisnim kešom instrukcija prvog nivoa i kešom podataka (I1 i D1), potpomognutim objedinjenom keš memorijom drugog nivoa (L2). 
 
 Što se modernih mašina tiče, tj. onih mašina sa tri ili četiri nivoa keš memorije, u slučajevima kada \textit{Cachegrind} može automatski otkriti konfiguraciju keš memorije, \textit{Cachegrind} simulira pristup kešu prvog i poslednjeg nivoa, tj.~\textit{Cachegrind} simulira \textit{I1, D1 i LL}. Ovakav pristup posledica je toga što keš memorija poslednjeg nivoa (\textit{LL}) ima najveći uticaj na vreme izvršavanja, jer maskira pristupe glavnoj memoriji \cite{Cachegrind}.% Dalje, \textit{L1} keš memorije često imaju malu asocijativnost, pa se njihovom simulacijom mogu otkriti slučajevi kada k\^od loše interaguje sa ovom keš memorijom \cite{Cachegrind}.
 
-Da bi se koristio alat \textit{Cachegrind} neophodno je podesiti opciju \texttt{–tool=cachegrind}. Izvršavanje programa će trajati dugo, a po završetku štampaće se sažeti statistički podaci. Pored štampanja sažetka na standardni izlaz, \textit{Cachegrind} u odgovarajuću datoteku upisuje i detaljnije informacije o profajliranju. Za dobijanje detaljnijih informacija koristimo pomenutu datoteku kao ulaz za \texttt{cg\_annotate}, koji je deo paketa \textit{Valgrind}. Alternativno, možete koristiti \texttt{cg\_diff} za razlikovanje više izlaza iz alata \textit{Cachegrind}, koje kasnije koristimo kao ulaz za \texttt{cg\_annotate} \cite{Cachegrind}.
+Za korišćenje alata \textit{Cachegrind} neophodno je podesiti opciju \texttt{–tool=cachegrind}. Izvršavanje programa traje dugo, a po završetku štampaju se sažeti statistički podaci. Pored štampanja sažetka na standardni izlaz, \textit{Cachegrind} u odgovarajuću datoteku upisuje i detaljnije informacije o profajliranju. Za dobijanje detaljnijih informacija koristimo pomenutu datoteku kao ulaz za \texttt{cg\_annotate}, koji je deo paketa \textit{Valgrind}. Alternativno, može se koristiti \texttt{cg\_diff} za razlikovanje više izlaza iz alata \textit{Cachegrind}, koji se kasnije koriste kao ulaz za \texttt{cg\_annotate} \cite{Cachegrind}.
 
-\subsection{Callgrind}
+\subsection{Alat Callgrind}
 
 \textit{Callgrind} je alat za profajliranje koji generiše istoriju poziva funkcija korisničkog programa u vidu grafa. Prikupljeni podaci podrazumevano se sastoje od broja izvršenih instrukcija, njihovog odnosa sa linijama izvršnog koda, odnosa pozivaoc/pozvan između funkcija, kao i broja takvih poziva. Opciono, simulacija keš memorije i/ili profajliranje grana (slično \textit{Cachegrind}-u) mogu dati dodatne informacije o ponašanju aplikacije u toku izvršavanja \cite{Callgrind}. Alat sadrži neka preklapanja sa \textit{Cachegrind}-om, ali takođe pruža neke informacije koje \textit{Cachegrind} ne pruža.
 
-Da bi se koristio \textit{Callgrind}, potrebno je navesti opciju komandne linije \texttt{--tool = callgrind} u komandnoj liniji \textit{Valgrind}-a. Nakon završetka programa i rada alata, generiše se odgovarajuća datoteka sa podacima o izvršenom profajliranju. Za prezentaciju podataka i interaktivnu kontrolu profajliranja na osnovu date datoteke, obezbeđena su dva alata komandne linije. Jedan je \texttt{callgrind\_annotate}, koji čita generisanu datoteku i ispisuje sortirane liste funkcija, opciono sa anotacijom izvora. Drugi je \texttt{callgrind\_control} koji omogućava interaktivno posmatranje i kontrolisanje statusa programa koji se trenutno izvršava pod kontrolom \textit{Callgrind}-a, bez zaustavljanja programa. Mogu se dobiti statistički podaci kao npr.~stanje steka, a u svakom trenutku se takođe može generisati i profil \cite{Callgrind}. Za grafičku vizuelizaciju podataka preporučuje se alat \textit{KCachegrind}, koji olakšava obradu i pregled velike količine podataka koje proizvodi \textit{Cachegrind}.
+Za korišćenje alata \textit{Callgrind}, potrebno je navesti opciju komandne linije \texttt{--tool = callgrind} u komandnoj liniji \textit{Valgrind}-a. Nakon završetka programa i rada alata, generiše se odgovarajuća datoteka sa podacima o izvršenom profajliranju. Za prezentaciju podataka i interaktivnu kontrolu profajliranja na osnovu date datoteke, obezbeđena su dva alata komandne linije. Jedan je \texttt{callgrind\_annotate}, koji čita generisanu datoteku i ispisuje sortirane liste funkcija, opciono sa anotacijom izvora. Drugi je \texttt{callgrind\_control} koji omogućava interaktivno posmatranje i kontrolisanje statusa programa koji se trenutno izvršava pod kontrolom \textit{Callgrind}-a, bez zaustavljanja programa. Mogu se dobiti statistički podaci kao npr.~stanje steka, a u svakom trenutku se takođe može generisati i profil \cite{Callgrind}. Za grafičku vizuelizaciju podataka preporučuje se alat \textit{KCachegrind}, koji olakšava obradu i pregled velike količine podataka koje proizvodi \textit{Cachegrind}.
 
-\subsection{Helgrind}
+\subsection{Alat Helgrind}
 
 \textit{Helgrind} je \textit{Valgrind}-ov alat za otkrivanje grešaka sinhronizacije u programima C, C++ i Fortran prilikom upotreba modela niti \textit{POSIX} \cite{Helgrind}. Model niti \textit{POSIX} prate određene apstrakcije --- skup niti koji dele zajednički adresni prostor, formiranje niti, spajanje niti, izlaz iz funkcije niti, muteksi (katanci), uslovne promenljive (obaveštenja o događajima među nitima), čitaj-piši zaključavanje, spinlokovi, semafori i barijere \cite{Helgrind}. 
 
-Da bi se koristio ovaj alat, potrebno je navesti opciju komandne linije \texttt{--tool = helgrind} u komandnoj liniji \textit{Valgrind}-a.
+Za korišćenje ovog alata, potrebno je navesti opciju komandne linije \texttt{--tool = helgrind} u komandnoj liniji \textit{Valgrind}-a.
 
 \textit{Helgrind} može otkriti sledeća tri tipa grešaka:
 \begin{enumerate}
@@ -722,10 +723,10 @@ Problemi poput ovih često rezultiraju ponovljivim padovima, vremenski zavisnim 
 
 Što se trke sa podacima tiče, \textit{Helgrind}-ov algoritam je (konceptualno) vrlo jednostavan - nadgleda sve pristupe memorijskim lokacijama. Ako lokaciji pristupaju dve različite niti, \textit{Helgrind} proverava da li su dva pristupa uređena relacijom ,,dogodilo se pre'' (eng. \textit{happens-before relation}). Ako je tako, to je u redu, ali ukoliko nije, \textit{Helgrind} prijavljuje trku sa podacima.
 
-\subsection{DRD}
+\subsection{Alat DRD}
 \textit{DRD} je \textit{Valgrind}-ov alat za otkrivanje grešaka u višenitnim programima napisanim u programskim jezicima C i C++ \cite{Drd}. Alat radi za bilo koji program koji koristi niti bazirane na modelu \textit{POSIX} \cite{Drd}. Sličan je \textit{Helgrind}-u, ali koristi različite tehnike analize i tako može naći različite probleme.
 
-Da bi se koristio ovaj alat, potrebno je navesti opciju komandne linije \texttt{--tool = drd} u komandnoj liniji \textit{Valgrind}-a.
+Za korišćenje ovog alata, potrebno je navesti opciju komandne linije \texttt{--tool = drd} u komandnoj liniji \textit{Valgrind}-a.
 
 U zavisnosti od toga koja se višenitna paradigma koristi u programu, može se pojaviti jedna ili više grešaka:
 \begin{itemize}
@@ -733,22 +734,22 @@ U zavisnosti od toga koja se višenitna paradigma koristi u programu, može se p
 \item Zadržavanje katanaca --- jedna nit blokira napredovanje jedne ili više drugih niti držeći predugo katanac zaključanim.
 \item Pogrešna upotreba interfejsa za programiranje \textit{POSIX} niti.
 \item Potencijalno blokiranje prouzrokovano redosledom zaključavanja.
-\item Lažno deljenje --- ako niti koje rade na različitim procesorskim jezgrima često pristupaju različitim promenljivim smeštenim u istoj liniji keš memorije, to će usporiti uključene niti zbog česte razmene linija keš memorije.
+\item Lažno deljenje --- ako niti koje rade na različitim procesorskim jezgrima često pristupaju različitim promenljivim smeštenim u istoj liniji keš memorije, to usporava uključene niti zbog česte razmene linija keš memorije.
 \end{itemize} 
 
 Što se tiče grešaka vezanih za pogrešnu upotrebu interfejsa za programiranje \textit{POSIX} niti, kao i trke sa podacima, greške koje \textit{DRD} otkriva su veoma slične onim koje otkriva \textit{Helgrind}, a koje su opisane u sekciji o \textit{Helgrind}-u. Kada je u pitanju greška vezana za trku sa podacima, \textit{DRD} ispisuje poruku svaki put kada otkrije da je došlo do trke podataka \cite{Drd}. Alat \textit{DRD} svakoj niti dodeljuje jedinstveni ID broj. Brojevi koji se dodeljuju nitima u svojstvu identifikatora počinju od jedinice i dodeljuju se jednokratno, odnosno jednom iskorišćeni broj ne može se više koristiti. Segment uvek započinje i završava se operacijom sinhronizacije, a sam termin se odnosi na uzastopni niz operacija učitavanja, skladištenja i sinhronizacije - sve izvršene u istoj niti. Da bi detektovao grešku trke sa podacima, \textit{DRD} analizu vrši između segmenata, što kao rezultat daje bolje performanse \cite{Drd}.
 
 Niti moraju biti u stanju da napreduju, a da ih druge niti predugo ne blokiraju. Ponekad nit mora da sačeka dok muteks ili objekat sinhronizacije ne otključa druga nit. Pojava u kojoj jedna nit ne može da nastavi sa radom zbog blokiranja drugih niti naziva se zadržavanje katanaca (eng. \textit{lock contention})  \cite{Drd}. Ovakva pojava je nepoželjna u višenitnim sistemima, a u njenom otklanjanju pomaže alat \textit{DRD} koji otkriva ovaj tip problema. 
 
-\subsection{Massif}
+\subsection{Alat Massif}
 
 \textit{Massif} je alat za profajliranje hipa. Meri koliko memorije hipa program koristi, i na koji način. To uključuje memoriju kojoj korisnik može pristupiti, kao i memoriju koja se koristi za dodatne koncepte, poput prostora za poravnanje, kao i \textit{book-keeping} bajtova, tj.~dodatnih bajtova odvojenih prilikom svake alokacije memorije u kojima se čuvaju informacije o alociranim memorijskim blokovima \cite{Massif}. Takođe može izmeriti veličinu steka  programa, s tim da to ne radi podrazumevano. Profajliranje hipa može pomoći u smanjivanju količine memorije koju program koristi. Na modernim mašinama ovo pruža prednosti u vidu ubrzanja programa i smanjenja šansi za izgladnjivanje prostora za razmenu\footnote{Prostor za razmenu je deo virtuelne memorije koji se nalazi na hard disku, i koristi se kada je RAM pun.} (eng. \textit{swap space})\cite{Massif}.
 
 Može se desiti da postoji pokazivač na memoriju, ali da se ta memorija ne koristi, što je jedan vid curenja memorije. Programi koji imaju ovakvo curenje mogu s vremenom nepotrebno povećati količinu memorije koju koriste. \textit{Massif} može pomoći u identifikovanju ovakvog tipa curenja memorije \cite{Massif}.
 
-Da bi se koristio ovaj alat, potrebno je navesti opciju komandne linije \texttt{--tool = massif} u komandnoj liniji \textit{Valgrind}-a. Nakon završetka procesa profajliranja, podaci se smeštaju u odgovarajuću datoteku. Nakon toga treba pokrenuti \texttt{ms\_print} da bi podatke iz datoteke predstavili na čitljiv način. 
+Za korišćenje ovog alata, potrebno je navesti opciju komandne linije \texttt{--tool = massif} u komandnoj liniji \textit{Valgrind}-a. Nakon završetka procesa profajliranja, podaci se smeštaju u odgovarajuću datoteku. Nakon toga treba pokrenuti \texttt{ms\_print} da bi podatke iz datoteke predstavili na čitljiv način. 
 
-\subsection{DHAT}
+\subsection{Alat DHAT}
 
 \textit{DHAT} je alat za ispitivanje kako programi koriste alociranu memoriju na hipu. Prati dodeljene blokove i pregleda svaki pristup memoriji da bi pronašao kom bloku, ako takav blok postoji, se pristupa. Na osnovu tačke dodeljivanja predstavlja informacije o tim blokovima, kao što su veličina, životni vek, broj čitanja i pisanja i obrasce čitanja i pisanja \cite{DHAT}. Korišćenjem ovih informacija moguće je identifikovati mesta alokacije sa sledećim karakteristikama:
 \begin{itemize}
@@ -759,15 +760,15 @@ Da bi se koristio ovaj alat, potrebno je navesti opciju komandne linije \texttt{
 \item Blokovi sa neefikasnim rasporedom --- segmenti kojima se nikada nije pristupilo ili sa poljima raštrkanim po bloku.
 \end{itemize}
 
-Da bi se koristio alat \textit{ DHAT} potrebno je navesti opciju komandne linije \texttt{–-tool=dhat} u komandnoj liniji \textit{Valgrind}-a. Analiza programa alatom \textit{DHAT} će se izvršavati prilično sporo, a po završetku, štampaće se sažeti statistički podaci. Korisnije informacije mogu se videti sa \textit{DHAT}-ovim prikazivačem. To omogućava činjenica da pored štampanja rezimea, \textit{DHAT} u datoteku upisuje i detaljnije informacije o profajliranju. Ova datoteka je u JSON formatu i namenjena je pregledu \textit{DHAT}-ovog pregledača \cite{DHAT}. 
+Za korišćenje alata \textit{ DHAT} potrebno je navesti opciju komandne linije \texttt{–-tool=dhat} u komandnoj liniji \textit{Valgrind}-a. Analiza programa alatom \textit{DHAT} izvršava se prilično sporo, a po završetku, štampaju se sažeti statistički podaci. Korisnije informacije mogu se videti sa \textit{DHAT}-ovim prikazivačem. To omogućava činjenica da pored štampanja rezimea, \textit{DHAT} u datoteku upisuje i detaljnije informacije o profajliranju. Ova datoteka je u JSON formatu i namenjena je pregledu \textit{DHAT}-ovog pregledača \cite{DHAT}. 
 
-\subsection{BBV}
+\subsection{Alat BBV}
 
 \textit{BBV} je alat koji generiše osnovne blok vektore za upotrebu sa alatkom za analizu \textit{SimPoint}. Osnovni blok je sekvencijalni niz instrukcija, pri čemu postoji jedna ulazna tačka u blok, a poslednja instrukcija je izlazna tačka iz bloka. Vektor osnovnog bloka (eng. \textit{basic block vector - BBV}) je lista svih osnovnih blokova unetih tokom izvršavanja programa i broj koliko je puta svaki osnovni blok pokrenut \cite{BBV}.\textit{SimPoint} metodologija omogućava brže dobijanje rezultata ukupnog izvršavanja programa na arhitekturi koja se simulira. To ostvaruje tako što eksploatiše ukupno ponašanje programa samo na osnovu pokretanja malog dela programa. Većina programa pokazuje ponašanje zasnovano na fazama, što znači da će u različito vreme tokom izvršavanja program naići na vremenske intervale u kojima se k\^od ponaša slično prethodnom intervalu. Na kraju, to znači da ako možemo da detektujemo ove intervale i grupišemo ih, približna vrednost ukupnog ponašanja programa može se dobiti samo simulacijom najmanjeg broja intervala, a zatim skaliranjem rezultata \cite{BBV}.
 
 U istraživanju računarske arhitekture, pokretanje testova na simulatoru sa tačnošću ciklusa može prouzrokovati usporavanje do 1000 puta. To znači da su potrebni dani, nedelje ili čak i duži vremenski period da se pokrenu kompletni testovi. Korišćenjem \textit{SimPoint}-a ovo se može značajno smanjiti, obično za 90-95\% \cite{BBV}.
 
-Da bi se kreirala datoteka koja sadrži vektor osnovnog bloka, neophodno je izvršiti analizu alatom \textit{BBV}, tj.~ u komandnoj liniji \textit{Valgrind}-a navesti opciju \texttt{–tool=exp-bbv}. Za kreiranje stvarnih \textit{SimPoint} rezultata na osnovu pređašnje generisane datoteke, potreban je uslužni program \textit{SimPoint}, dostupan na \href{http://cseweb.ucsd.edu/~calder/simpoint/}{\textit{SimPoint} veb stranici} \cite{BBV}.  
+Za kreiranje datoteke koja sadrži vektor osnovnog bloka, neophodno je izvršiti analizu alatom \textit{BBV}, tj.~ u komandnoj liniji \textit{Valgrind}-a navesti opciju \texttt{–tool=exp-bbv}. Za kreiranje stvarnih \textit{SimPoint} rezultata na osnovu pređašnje generisane datoteke, potreban je uslužni program \textit{SimPoint}, dostupan na \href{http://cseweb.ucsd.edu/~calder/simpoint/}{\textit{SimPoint} veb stranici} \cite{BBV}.  
 
 % ------------------------------------------------------------------------------
 \chapter{Regularni izrazi}
@@ -827,38 +828,38 @@ Za opisivanje jezika koristimo regularne izraze. Međutim, ne mogu se svi jezici
 Ukoliko se jezik može predstaviti regularnim izrazom, takav jezik se smatra regularnim.
 \end{defn}
 
-Važnost ove notacije ogleda se u tome što se na isti način zapisuju simbol azbuke, reč koja se sastoji od tog simbola, regularni izraz koji predstavlja taj simbol, i na kraju jezik predstavljen tim regularnim izrazom \cite{Vitas}. Kažemo da je za neki regularni izraz \texttt{$p$}, jezik $L(p)$ jezik opisan regularnim izrazom \texttt{$p$}.
+Važnost ove notacije ogleda se u tome što se na isti način zapisuju simbol azbuke, reč koja se sastoji od tog simbola, regularni izraz koji predstavlja taj simbol, i na kraju jezik predstavljen tim regularnim izrazom \cite{Vitas}. Kažemo da je za neki regularni izraz \texttt{p}, jezik $L(p)$ jezik opisan regularnim izrazom \texttt{p}.
 
 \begin{defn}
 Regularni izrazi nad azbukom $\Sigma$ opisuju se rekurzivno na sledeći način:
 \begin{enumerate}
 \item Prazan skup je regularni izraz koji se prikazuje simpolom \texttt{$\emptyset$}.
 \item Regularni izraz \texttt{$\varepsilon$} predstavlja jezik $\{\varepsilon\}$.
-\item Ako je $a \in \Sigma$, onda regularni izraz \texttt{$a$} predstavlja jezik $\{a\}$.
-\item Ako su \texttt{$p$} i \texttt{$q$} regularni izrazi jezika $L(p)$ i $L(q)$, onda je:
+\item Ako je $a \in \Sigma$, onda regularni izraz \texttt{a} predstavlja jezik $\{a\}$.
+\item Ako su \texttt{p} i \texttt{q} regularni izrazi jezika $L(p)$ i $L(q)$, onda je:
 \begin{itemize}
-\item \texttt{$(p|q)$} regularni izraz koji predstavlja jezik $L(p) \cup L(q)$.
-\item \texttt{$(pq)$} regularni izraz koji predstavlja jezik $L(p)L(q)$.
+\item \texttt{(p|q)} regularni izraz koji predstavlja jezik $L(p) \cup L(q)$.
+\item \texttt{(pq)} regularni izraz koji predstavlja jezik $L(p)L(q)$.
 \item \texttt{$(p)^*$} regularni izraz koji predstavlja jezik $(L(p))^*$.
-\item \texttt{$(p)$} regularni izraz koji predstavlja jezik $L(p)$.
+\item \texttt{(p)} regularni izraz koji predstavlja jezik $L(p)$.
 \end{itemize}
 \end{enumerate}
 \end{defn}
 
 Opisani jezik se neće promeniti ako se zagrade izostave iz regularnog izraza \cite{Vitas}. Kada prioritet operacija nije eksplicitno naveden, primenjuju se podrazumevani prioriteti nad operatorima regularnih izraza, tj.~jezika, u sledećem redosledu:
 \begin{enumerate}
-	\item Operator $*$
+	\item Operator \texttt{*}
 	\item Konkatenacija
-	\item Operator $+$
+	\item Operator \texttt{+}
 \end{enumerate}
 
 Zapisivanje regularnih izraza može se znatno pojednostaviti uvođenjem sledećih konvencija:
 \begin{itemize}
-\item Neka je \texttt{$r$} regularni izraz koji opisuje jezik $L(r)$. Jezik $(L(r))(L(r))^*$ se opisuje regularnim izrazom \texttt{$(r)^+$} , dok se jezik $L(r) \cup \{\varepsilon\}$ opisuje regularnim izrazom \texttt{$(r)?$}.
+\item Neka je \texttt{r} regularni izraz koji opisuje jezik $L(r)$. Jezik $(L(r))(L(r))^*$ se opisuje regularnim izrazom \texttt{$(r)^+$} , dok se jezik $L(r) \cup \{\varepsilon\}$ opisuje regularnim izrazom \texttt{(r)?}.
 \item Ako su $c_1, c_2, …, c_n$ karakteri, tada se regularni izraz \texttt{$c_1 + c_2 + … + c_n$} može obeležiti sa \texttt{$[c_1, c_2, …, c_n]$}. Izraz \texttt{$[c_1-c_2]$} označava sekvencu svih karaktera $c$ tako da važi $c_1 \leq c \leq c_2$.
 \end{itemize}
 
-Tako na primer slova engleske abecede označavamo sa \texttt{$[A-Za-z]$}, dok cifre označavamo sa \texttt{$[0-9]$}.
+Tako na primer slova engleske abecede označavamo sa \texttt{[A-Za-z]}, dok cifre označavamo sa \texttt{[0-9]}.
  
 \section{Modul re}
 
@@ -893,10 +894,10 @@ Potpisi nekih od funkcija koje ovaj modul pruža, a koje su iskorišćene u alat
 
 \begin{description}
 \item  \texttt{MatchObject} \textit{search(\texttt{string} pattern, \texttt{string} string, \texttt{int} flags=0)} --- Vraća odgovarajući objekat podudaranja koji dobija tražeći u nisci \textit{string} prvu lokaciju na kojoj obrazac regularnog izraza \textit{pattern} daje podudaranje. Vraća \textit{None}\footnote{U \textit{Python}-u ključna reč \textit{None} je objekat klase \textit{NoneType}. Može se dodeliti bilo kojoj promenljivoj, ali ne može se kreirati novi \textit{NoneType} objekat.}, ako nijedna pozicija u nizu karaktera ne odgovara obrascu. 
-\item  \texttt{MatchObject} \textit{match(\texttt{string} pattern, \texttt{string} string, \texttt{int} flags=0)} --- Vraća odgovarajući objekat podudaranja, ako se nula ili više znakova na početku niza karaktera \textit{string} podudaraju sa regularnim izrazom. Vratiće \textit{None} ako se niz ne podudara sa obrascem.
-\item  \texttt{List} \textit{split(\texttt{string} pattern, \texttt{string} string, \texttt{int} maxsplit=0, \texttt{int} flags=0)} --- Vraća podeljenu nisku \textit{string} kao listu niski. Nisku \textit{string} deli koristeći kao separator za deljenje sva podudaranja sa regularnim izrazom \textit{pattern}. Ako argument \textit{maxsplit} nije 0, u rezultatu će se javiti maksimum \textit{maxsplit} podeljenih niski.  
+\item  \texttt{MatchObject} \textit{match(\texttt{string} pattern, \texttt{string} string, \texttt{int} flags=0)} --- Vraća odgovarajući objekat podudaranja, ako se nula ili više znakova na početku niza karaktera \textit{string} podudaraju sa regularnim izrazom. Vraća \textit{None} ako se niz ne podudara sa obrascem.
+\item  \texttt{List} \textit{split(\texttt{string} pattern, \texttt{string} string, \texttt{int} maxsplit=0, \texttt{int} flags=0)} --- Vraća podeljenu nisku \textit{string} kao listu niski. Nisku \textit{string} deli koristeći kao separator za deljenje sva podudaranja sa regularnim izrazom \textit{pattern}. Ako argument \textit{maxsplit} nije 0, u rezultatu se javlja maksimum \textit{maxsplit} podeljenih niski.  
 \item  \texttt{List} \textit{re.findall(\texttt{string} pattern, \texttt{string} string, \texttt{int} flags=0)} - Vraća sva podudaranja \textit{pattern}-a u \textit{string}-u kao listu niski. Niska u kojoj se traže podudaranja - \textit{string}, skenira se s leva na desno, a podudaranja se vraćaju u redosledu u kom se i javljaju. 
-\item  \texttt{string} \textit{sub(\texttt{string} pattern, \texttt{string|function} repl, \texttt{string} string, \texttt{int} count=0, \texttt{int} flags=0)} --- Vraća string dobijen zamenom krajnjeg levog podudaranja sa \textit{pattern}-om u \textit{string}-u sa \textit{repl}. Ako podudaranje nije pronađeno, \textit{string} se vraća nepromenjen. Argument \textit{repl} može biti niz ili funkcija. U tom slučaju će se za svako podudaranje sa regularnim izrazom \textit{pattern}, biće pozvana funkcija \textit{repl}. Funkcija \textit{repl} kao argument ima odgovarajući objekat poklapanja, i vraća nisku zamene.
+\item  \texttt{string} \textit{sub(\texttt{string} pattern, \texttt{string|function} repl, \texttt{string} string, \texttt{int} count=0, \texttt{int} flags=0)} --- Vraća string dobijen zamenom krajnjeg levog podudaranja sa \textit{pattern}-om u \textit{string}-u sa \textit{repl}. Ako podudaranje nije pronađeno, \textit{string} se vraća nepromenjen. Argument \textit{repl} može biti niz ili funkcija. U tom slučaju se za svako podudaranje sa regularnim izrazom \textit{pattern}, pozviva funkcija \textit{repl}. Funkcija \textit{repl} kao argument ima odgovarajući objekat poklapanja, i vraća nisku zamene.
 \end{description}
 
 Kompajlirani objekti regularnog izraza podržavaju slične metode i atribute, s tim da je pozivanje istih u formi
@@ -909,7 +910,7 @@ Tako proveru da li je postojalo podudaranje možemo ostvariti jednostavnim \text
 
 Objekti podudaranja podržavaju mnoge metode i atribute. Najiskorišćenija u alatu koji je razvijen, a u cilju izvlačenja potrebnih informacija iz podudaranja sa regularnim izrazom je:
 \begin{description}
-\item \textit{Match.group(groupNum [, groupNum2, ...])} --- Vraća jednu ili više podgrupa podudaranja. Grupa je definisana delom regularnog izraza u okviru zagrada (). Indeksiranje grupa vrši se s leva na desno, počevši od 1. Ako postoji jedan argument, rezultat je jedan string, koji odgovara grupi čiji je indeks dati argument, dok ako postoji više argumenata, rezultat je torka sa jednom stavkom po argumentu. Bez argumenata, \textit{groupNum} je  podrazumevano nula, tj.~vraća se ceo \textit{Match} objekat. Ako je indeks \textit{groupNum} u opsegu [1,99], to je string koji odgovara odgovarajućoj grupi u zagradama na toj poziciji. Ako je broj grupe negativan ili veći od broja grupa definisanih u obrascu, biće izbačen izuzetak \textit{IndexError}. Ako je grupa sadržana u delu uzorka koji se ne podudara, odgovarajući rezultat je \textit{None}. Ako je grupa sadržana u delu uzorka koji se podudarao više puta, vraća se poslednje podudaranje \cite{reModule}.
+\item \texttt{Match.group(groupNum [, groupNum2, ...])} --- Vraća jednu ili više podgrupa podudaranja. Grupa je definisana delom regularnog izraza u okviru zagrada (). Indeksiranje grupa vrši se s leva na desno, počevši od 1. Ako postoji jedan argument, rezultat je jedan string, koji odgovara grupi čiji je indeks dati argument, dok ako postoji više argumenata, rezultat je torka sa jednom stavkom po argumentu. Bez argumenata, \textit{groupNum} je  podrazumevano nula, tj.~vraća se ceo \textit{Match} objekat. Ako je indeks \textit{groupNum} u opsegu [1,99], to je string koji odgovara odgovarajućoj grupi u zagradama na toj poziciji. Ako je broj grupe negativan ili veći od broja grupa definisanih u obrascu, izbacuje se izuzetak \textit{IndexError}. Ako je grupa sadržana u delu uzorka koji se ne podudara, odgovarajući rezultat je \textit{None}. Ako je grupa sadržana u delu uzorka koji se podudarao više puta, vraća se poslednje podudaranje \cite{reModule}.
 \end{description}
 
 Primer korišćenja funkcije \textit{group} dat je na listingu \ref{lst:slika3.1}.
@@ -938,23 +939,23 @@ Primer korišćenja funkcije \textit{group} dat je na listingu \ref{lst:slika3.1
 
 % ------------------------------------------------------------------------------
 \chapter{Alat Koronka}
-Alat \textit{Koronka} predstavlja alat koji automatski otkriva greške u kodu napisanom u programskom jeziku C koristeći alat \textit{Memcheck}, a zatim ih ispravlja ukoliko je to u njegovoj moći. Greške koje otkriva alat \textit{Memcheck} mogu se ispraviti na više načina. Alat \textit{Koronka} daje jedno rešenje. Ukoliko to rešenje ne zadovoljava norme softvera koji se razvija, svakako će pomoći u analiranju greške i pronalasku njenog rešenja na osnovu izveštaja i predloženog rešenja koje je alat dao. Alat je razvijan pod \textit{Linux} okruženjem, a implementiran u programskom jeziku \textit{Python}. Alat je nazvan \textit{Koronka}, zbog situacije u kojoj se ceo svet našao početkom 2020. godine. Osnovna svrha alata je demonstracija rada alata \textit{Valgrind}, kao i tumačenje izveštaja o greškama koje \textit{Valgrind} daje i njihovo uspešno otklanjanje. Alat je slobodno dostupan i nalazi se na linku \url{https://github.com/LMladenovic/Error_fixing_tool}. Na pomenutom linku se nalaze neophodne datoteke alata, opis sistema, kao i skup test primera i njihova pokretanja.
+Alat \textit{Koronka} predstavlja alat koji automatski otkriva greške u kodu napisanom u programskom jeziku C koristeći alat \textit{Memcheck}, a zatim ih ispravlja ukoliko je to u njegovoj moći. Greške koje otkriva alat \textit{Memcheck} mogu se ispraviti na više načina. Alat \textit{Koronka} daje jedno rešenje. Ukoliko to rešenje ne zadovoljava norme softvera koji se razvija, svakako pomaže u anuliranju greške i pronalasku njenog rešenja na osnovu izveštaja i predloženog rešenja koje je alat dao. Alat je razvijan pod \textit{Linux} okruženjem, a implementiran u programskom jeziku \textit{Python}. Alat je nazvan \textit{Koronka}, zbog situacije u kojoj se ceo svet našao početkom 2020. godine. Osnovna svrha alata je demonstracija rada alata \textit{Valgrind}, kao i tumačenje izveštaja o greškama koje \textit{Valgrind} daje i njihovo uspešno otklanjanje. Alat je slobodno dostupan i nalazi se na linku \url{https://github.com/LMladenovic/Error_fixing_tool}. Na pomenutom linku se nalaze neophodne datoteke alata, opis sistema, kao i skup test primera i njihova pokretanja.
 
 \section{Korišćenje alata}
-Da biste pokrenuli alat \textit{Koronka} neophodno je da prethodno instalirate \textit{GCC} kompajler, sam alat \textit{Valgrind}, kao i \textit{Python}. U razvoju alata korišćen je \textit{Python3.6}. Alat se pokreće sledećom komandom:
+Za korišćenje alata \textit{Koronka} neophodno je da prethodno instalirate \textit{GCC} kompajler, sam alat \textit{Valgrind}, kao i \textit{Python}. U razvoju alata korišćen je \textit{Python3.6}. Alat se pokreće sledećom komandom:
 \begin{center}
 \texttt{python koronka.py [files=[list of files]] [structures=[list of user defined structures]] path to c file [other arguments]}
 \end{center}
 Navedeni arumenti podrazumevaju sledeće:
 \begin{itemize}
-\item \texttt{files} - sadrži dodatne datoteke glavnog programa (navedenog u okviru \textit{path to c file}) koji se analizira (npr. \textit{.h} datoteke). Ukoliko se program sastoji iz više datoteka, neophodno je da se navedu kao argument. Ako se ne navede argument \textit{files}, niz \textit{files} će sadržati samo glavni program (\textit{c file}) i u tom slučaju alat je u mogućnosti da vrši promene samo nad njim.
-\item \texttt{structures} - predstavlja korisnički definisane strukture u okviru programa. Kako alat podrazumevano radi samo sa primitivnim tipovima podataka, ukoliko u programu postoje korisnički definisane strukture, a ne navedu se kao argument, \textit{Koronka} neće biti u mogućnosti da ispravi greške povezane sa tim strukturama, naravno, ukoliko postoje.
+\item \texttt{files} - sadrži dodatne datoteke glavnog programa (navedenog u okviru \textit{path to c file}) koji se analizira (npr. \textit{.h} datoteke). Ukoliko se program sastoji iz više datoteka, neophodno je da se navedu kao argument. U slučaju da se ne navede argument \textit{files}, podrazumeva se da on sadrži samo glavni program (\textit{c file}) i u tom slučaju alat je u mogućnosti da vrši promene samo nad njim.
+\item \texttt{structures} - predstavlja korisnički definisane strukture u okviru programa. Kako alat podrazumevano radi samo sa primitivnim tipovima podataka, ukoliko u programu postoje korisnički definisane strukture, a ne navedu se kao argument, \textit{Koronka} nije u mogućnosti da ispravi greške povezane sa tim strukturama, naravno, ukoliko postoje.
 \item \texttt{other args} - argumenti programa koji se analizira.
 \end{itemize}
 
 Takođe, alat \textit{Koronka} sadrži i opciju \texttt{--help } čijim se navođenjem ispisuje uputstvo za upotrebu alata. 
 
-Sve argumente koji se navedu prilikom pokretanja alata \textit{Koronka} obrađuje funkcija za obrađivanje argumenata komandne linije. Nakon pokretanja alata, u direktorijumu alata kreira se direktorijum u formatu \textit{datum pokretanja-vreme pokretanja}. U njega se zatim kopiraju svi podaci navedeni kao arugment \textit{files}, kao i glavni program nad kojim se vrši analiza i nad njima će biti vršene odgovarajuće promene u skladu sa otkrivenim greškama. Originalne datoteke ostaće nepromenjene. Po završetku rada alata, u pomenutom direktorijumu će se naći još dve datoteke. Prva je \textit{ExecutionReport} koja sadrži detaljan izveštaj o radu alata, koje greške je našao, na koji način ih je rešio, koje datoteke, odnosno linije koda u njima je izmenio. Druga, pod nazivom \textit{ValgrindLOG.txt}, predstavlja izlaz alata \textit{Valgrind}, koji će se u procesu rada alata koristiti za parsiranje grešaka koje nađe alat \textit{Memcheck}. Ukoliko se analizira ispravljeni program nakon završetka rada alata alatom \textit{Memcheck}, biće dobijen isti izlaz koji možete videti u datoteci \textit{ValgrindLOG.txt}. Način i logika rada alata opisani su u sekcijama koje slede.
+Sve argumente koji se navedu prilikom pokretanja alata \textit{Koronka} obrađuje funkcija za obrađivanje argumenata komandne linije. Nakon pokretanja alata, u direktorijumu alata kreira se direktorijum u formatu \textit{datum pokretanja-vreme pokretanja}. U njega se zatim kopiraju svi podaci navedeni kao arugment \textit{files}, kao i glavni program nad kojim se vrši analiza i nad kojim se vrše odgovarajuće promene u skladu sa otkrivenim greškama. Originalne datoteke ostaju nepromenjene. Po završetku rada alata, u pomenutom direktorijumu nalaze se još dve datoteke. Prva je \textit{ExecutionReport} koja sadrži detaljan izveštaj o radu alata, koje greške je našao, na koji način ih je rešio, koje datoteke, odnosno linije koda u njima je izmenio. Druga, pod nazivom \textit{ValgrindLOG.txt}, predstavlja izlaz alata \textit{Valgrind}, koji se u procesu rada alata koristiti za parsiranje grešaka koje nađe alat \textit{Memcheck}. Ukoliko se analizira ispravljeni program nakon završetka rada alata alatom \textit{Memcheck}, dobija se isti izlaz koji se može videti u datoteci \textit{ValgrindLOG.txt}. Način i logika rada alata opisani su u sekcijama koje slede.
 
 \section{Algoritam izvršavanja}\label{algoritam}
 Pri pokretanju alata generiše se odgovarajući direktorijum, u njega se kopiraju sve navedene (potrebne) datoteke, formiraju se nizovi \textit{structures}, \textit{files} i \textit{history}. Nakon početnih podešavanja sledi kompilacija programa i analiza \textit{Valgrind}-ovim alatom \textit{Memcheck} čiji izlaz se smešta u datoteku \textit{ValgrindLOG.txt}. Ova datoteka se parsira, nakon čega se dobija niz grešaka koje je alat \textit{Memcheck} detektovao. Greške ovog niza obrađuju se redom, tj.~kad alat naiđe na grešku, parsira je, nakon čega proba da je ispravi ukoliko je u mogućnosti. U slučaju da nije u mogućnosti da ispravi grešku koju trenutno obrađuje, alat  uzima sledeću grešku iz niza na obradu, ukoliko postoji. Ukoliko nađe rešenje koje već nije primenjeno, biće implementirano nakon čega alat ide u novu iteraciju kompilacije i provere grešaka, uz prethodno ažuriranje istorije i izveštaja o ispravljenim greškama. Dakle, svaka ispravljena greška uslovljava kompilaciju prorama i ponovnu analizu alatom \textit{Memcheck}. Proces se ponavlja dokle god ima grešaka koje nisu ispravljene, a koje je \textit{Koronka} u mogućnosti da ispravi. Grafički prikaz algoritma dat je na slici \ref{fig:slika4.4}.
@@ -985,7 +986,7 @@ Analiza i ispravka programa sa slike \ref{fig:slika4.15} predstavljena je u ovom
   \label{fig:slika4.15}
 \end{figure}
 
-Dati program sadrži grešku upotrebe neinicijalizovane promenljive koja će biti ispravljena. Alat pokrećemo komandom u komandnoj liniji:
+Dati program sadrži grešku upotrebe neinicijalizovane promenljive se ispravlja. Alat se pokreće komandom u komandnoj liniji:
 \begin{center}
 \textit{python koronka.py program.c}.
 \end{center}
@@ -1424,19 +1425,19 @@ Changed 19. line
 \end{lstlisting}
 
 \section{Klasa greške}
-Prilikom ispravljanja grešaka, greška koja se trenutno obrađuje biće predstavljena kao objekat klase \textit{ErrorInfo}. Na listingu \ref{lst:slika4.1} prikazana je pomenuta klasa.
+Prilikom ispravljanja grešaka, greška koja se trenutno obrađuje predstavljena je kao objekat klase \textit{ErrorInfo}. Na listingu \ref{lst:slika4.1} prikazana je pomenuta klasa.
 
 Podaci koje klasa sadrži su sledeći:
 \begin{itemize}
 \item \textit{errorType} - sadrži informaciju o tipu greške, npr. nevalidno oslobađanje memorije, nedozvoljeno čitanje/pisanje itd.
 \item \textit{valgrindOutput} - sadrži kompletan segment teksta koji je \textit{Valgrind} ispisao za grešku koja se trenutno obrađuje za potrebe dodatnog parsiranja informacija o grešci. Primer sadržaja za jednu grešku prikazan je na slici \ref{fig:slika4.3}.
-\item \textit{files} - sadrži niz datoteka koje su povezane sa greškom, a koje bi eventualno bile ispravljene.
+\item \textit{files} - sadrži niz datoteka koje su povezane sa greškom, a koje se eventualno ispravljaju.
 \item \textit{changedFile} - sadrži ime promenjene datoteke.
 \item \textit{changedLine} - sadrži tačnu liniju koda u datoteci \textit{changedFile} koja je promenjena.
 \item \textit{problemLines} - sadrži linije u kodu koje su izazvale grešku koja se ispravlja.
 \item \textit{errorReason} - sadrži razlog koji je izazvao grešku, npr. upotreba neinicijalizovane vrednosti sa steka, odnosno hipa.
 \item \textit{bug} - sadrži bag u kodu, tj.~sadržaj linije koda koji je izazvao grešku.
-\item \textit{bugFix} - sadrži ispravku greške, tj.~sadržaj kojim treba zameniti sadržaj linije koda koji je izvazvao grešku, da bi greška bila ispravljena.
+\item \textit{bugFix} - sadrži ispravku greške, tj.~sadržaj kojim treba zameniti sadržaj linije koda koji je izvazvao grešku, da se greška ispravi.
 \end{itemize}
 
 \begin{lstlisting}[style=mystyle,caption={Potpis klase \textit{ErrorInfo}}, label={lst:slika4.1},language={Python}] 
@@ -1478,7 +1479,7 @@ def isKnownReason(self, newReason):
 %  \label{fig:slika4.2}
 %\end{figure}
 
-Na slici \ref{fig:slika4.3} prikazan je segment izveštaja alata \textit{Valgrind} koji predstavlja jednu grešku koju treba ispraviti. Žutom bojom je obeležen deo koji predstavlja tip greške, zelenom bojom deo koji predstavlja razlog greške, dok su plavom bojom obeležene sumnjive (problematične) linije. Ti podaci će redom biti smešteni u \textit{errorType}, \textit{errorReason} i \textit{problemLines}. Sve potrebne informacije od značaja iz datog segmenta izveštaja dobijamo upotrebom regularnih izraza.
+Na slici \ref{fig:slika4.3} prikazan je segment izveštaja alata \textit{Valgrind} koji predstavlja jednu grešku koju treba ispraviti. Žutom bojom je obeležen deo koji predstavlja tip greške, zelenom bojom deo koji predstavlja razlog greške, dok su plavom bojom obeležene sumnjive (problematične) linije. Ti podaci se redom smeštaju u \textit{errorType}, \textit{errorReason} i \textit{problemLines}. Sve potrebne informacije od značaja iz datog segmenta izveštaja dobijamo upotrebom regularnih izraza.
 
 \begin{figure}[!ht]
   \centering
@@ -1487,20 +1488,20 @@ Na slici \ref{fig:slika4.3} prikazan je segment izveštaja alata \textit{Valgrin
   \label{fig:slika4.3}
 \end{figure}
 
-Na osnovu \textit{errorType} i \textit{errorReason} biće određeno koji će šablon biti upotrebljen za ispravljanje greške. Na osnovu \textit{problemLines} biće pronađena tačna linija koda koja je izazvala grešku, a iz nje izvučeni podaci koji su neophodni za ispravljanje greške, kao i iz ostalih linija ukoliko sadrže informacije od značaja. Kada se neophodni podaci o grešci izvuku i nađe njeno rešenje, biće postavljene vrednosti \textit{changedFile}, \textit{changedLine}, \textit{bug}, \textit{bugFix}. Kada se obezbede svi podaci, dalje izvršavanje alata prepušta se sistemu za praćenje istorije promena.
+Na osnovu \textit{errorType} i \textit{errorReason} određeno je koji će šablon biti upotrebljen za ispravljanje greške. Na osnovu \textit{problemLines} pronalazi se tačna linija koda koja je izazvala grešku, a iz nje se izvlače podaci koji su neophodni za ispravljanje greške, kao i iz ostalih linija ukoliko sadrže informacije od značaja. Kada se neophodni podaci o grešci izvuku i nađe njeno rešenje, postavljaju se vrednosti \textit{changedFile}, \textit{changedLine}, \textit{bug}, \textit{bugFix}. Kada se obezbede svi podaci, dalje izvršavanje alata prepušta se sistemu za praćenje istorije promena.
 
 \section{Mehanizam praćenja istorije}\label{istorija}
-Sve promene koje je alat \textit{Коronka} izvršio nad datotekama praćene su pomoću mehanizma za praćenje istorije. Svaka promena biće sačuvana pojedinačno u nizu \textit{history} u vidu uređene trojke \textit{(izmena u kodu, promenjena linja koda, datoteka nad kojom se vrši promena)}. Ovakav vid praćenja istorije je dobar iz više razloga. Na primer, može se desiti da imamo iste naredbe koje izazivaju grešku u dve različite datoteke. Promena tih naredbi bez praćenja datoteke nad kojom se vrši promena ne bi bila moguća u obe datoteke, ukoliko je ispravka greške opet ista naredba sa određenim dodacima. Takođe, može se desiti na primer da u istoj datoteci imamo dva bloka unutar kojih postoji linija koja izaziva problem. To su dakle dve greške, čije rešenje mogu biti dve potupuno iste naredbe, izmenjene u dve različite linije koda u istoj datoteci. Ukoliko mehanizam praćenja istorije ne bi pamtio i liniju koda u kojoj su promene izvršene, onda praćenje ovakve situacije ne bi bilo moguće.
+Sve promene koje je alat \textit{Коronka} izvršio nad datotekama praćene su pomoću mehanizma za praćenje istorije. Svaka promena čuva se pojedinačno u nizu \textit{history} u vidu uređene trojke \textit{(izmena u kodu, promenjena linja koda, datoteka nad kojom se vrši promena)}. Ovakav vid praćenja istorije je dobar iz više razloga. Na primer, može se desiti da imamo iste naredbe koje izazivaju grešku u dve različite datoteke. Promena tih naredbi bez praćenja datoteke nad kojom se vrši promena ne bi bila moguća u obe datoteke, ukoliko je ispravka greške opet ista naredba sa određenim dodacima. Takođe, može se desiti na primer da u istoj datoteci imamo dva bloka unutar kojih postoji linija koja izaziva problem. To su dakle dve greške, čije rešenje mogu biti dve potupuno iste naredbe, izmenjene u dve različite linije koda u istoj datoteci. Ukoliko mehanizam praćenja istorije ne bi pamtio i liniju koda u kojoj su promene izvršene, onda praćenje ovakve situacije ne bi bilo moguće.
 
-Prilikom pokretanja alata niz \textit{history} sadrži samo jednu trojku, tj.~\textit{(' ', -1, ' ')}. Kako se greške iterativno ispravljaju, svaka iteracija predstavlja pokušaj alata da datu grešku ispravi, što je bliže opisano u sekciji \ref{algoritam}. Za mehanizam praćenja istorije je to važno jer će on validirati trenutni predlog za ispravku greške koje je alat našao. Prvi slučaj je da se predlog ispravke ne nalazi u istoriji, on će biti implementiran i dodat istoriji izmena u nadi da će se greška uspešno ispraviti. U drugom slučaju, predlog ispravke se već nalazi u istoriji izmena, što je signal alatu da je predlog rešenja već implementiran i da ta implementacija nije ispravila grešku, te da alat nastavi sa traženjem novog rešenja. Ukoliko alat iskoristi sve mehanizme za ispravljanje određene greške koje poseduje, tj.~implementira sve predloge rešenja koje je u mogućnosti da predloži, a greška ostane neispravljena, alat će nastaviti sa radom i pokušati da ispravi ostale greške, ukoliko postoje. Navedena greška će ostati neispravljena, a korisnik će biti obavešten da postoji greška koja nažalost nije ispravljena, samim tim što će se izveštaj o njoj nalaziti u datoteci \textit{ValgrindLOG.txt}. Prilikom nalaženja rešenja koje će zaista i biti implementirano, to rešenje biva dodato u istoriju, a alat nastavlja sa iteracijama ispravljanja ostalih grešaka.
+Prilikom pokretanja alata niz \textit{history} sadrži samo jednu trojku, tj.~\textit{(' ', -1, ' ')}. Kako se greške iterativno ispravljaju, svaka iteracija predstavlja pokušaj alata da datu grešku ispravi, što je bliže opisano u sekciji \ref{algoritam}. Za mehanizam praćenja istorije je to važno jer on validira trenutni predlog za ispravku greške koji je alat našao. Prvi slučaj je da se predlog ispravke ne nalazi u istoriji. Tada se on implementira i dodaje istoriji izmena u nadi da je greška uspešno ispravljena. U drugom slučaju, predlog ispravke se već nalazi u istoriji izmena, što je signal alatu da je predlog rešenja već implementiran i da ta implementacija nije ispravila grešku, te da alat nastavi sa traženjem novog rešenja. Ukoliko alat iskoristi sve mehanizme za ispravljanje određene greške koje poseduje, tj.~implementira sve predloge rešenja koje je u mogućnosti da predloži, a greška ostane neispravljena, alat nastavlja sa radom i pokušava da ispravi ostale greške, ukoliko postoje. Navedena greška ostaje neispravljena, a korisnik je obavešten da postoji greška koja nažalost nije ispravljena, samim tim što se izveštaj o njoj nalazi u datoteci \textit{ValgrindLOG.txt}. Prilikom nalaženja rešenja koje se zaista i implementira, to rešenje se dodaje u istoriju, a alat nastavlja sa iteracijama ispravljanja ostalih grešaka.
 
 \section{Šabloni za ispravljanje grešaka}
-Alat \textit{Koronka} sadrži nekoliko šablona od kojih svaki ispravlja određenu vrstu grešaka. Šablon koji će biti primenjen za ispravljanje date greške određen je vrstom greške kao i razlogom koji je datu grešku izazvao, a koje dobijamo iz izveštaja koji daje \textit{Memcheck}. Bez obzira na optimizaciju koji \textit{Memcheck} poseduje za ispisivanje izveštaja o grešci, i dalje ispisuje par paragrafa koji se odnose na istu grešku, sa različitim razlogom, odnosno tipom (pogledati npr. listing \ref{lst:slika2.7}). To je posledica principa rada alata \textit{Memcheck}, koji prati izvršavanje od početka, odnosno prati indirektan put te greške. To dalje znači da ne moramo da mapiramo sve tipove i razloge grešaka, već samo one koje će nam dati dovoljno informacija za ispravljanje greške. Nakon što se greška ispravi i program pusti na novu fazu kompilacije i analize alatom \textit{Memcheck}, izveštaj koji će se generisati neće sadržati paragrafe koje je sadržao ranije, a za čije smo ispravljanje koristili samo jedan paragraf. Ovakva implementacija doprinosi efikasnosti alata, kako smo za otklanjanje određene greške koristili samo neophodnu količinu podataka, a ne sve podatke koje smo imali. Šabloni su smešteni u datoteke sa sufiksom \textit{Fix}, dok u imenu sadrže i tip greške koji ispravljaju. 
+Alat \textit{Koronka} sadrži nekoliko šablona od kojih svaki ispravlja određenu vrstu grešaka. Šablon koji se primenjuje za ispravljanje date greške određen je vrstom greške kao i razlogom koji je datu grešku izazvao, a koji se dobijaju iz izveštaja koji daje \textit{Memcheck}. Bez obzira na optimizaciju koji \textit{Memcheck} poseduje za ispisivanje izveštaja o grešci, i dalje ispisuje par paragrafa koji se odnose na istu grešku, sa različitim razlogom, odnosno tipom (pogledati npr. listing \ref{lst:slika2.7}). To je posledica principa rada alata \textit{Memcheck}, koji prati izvršavanje od početka, odnosno prati indirektan put te greške. To dalje znači da ne moraju da se mapiraju svi tipovi i razlozi grešaka, već samo oni koji daju dovoljno informacija za ispravljanje greške. Nakon što se greška ispravi i program pusti na novu fazu kompilacije i analize alatom \textit{Memcheck}, izveštaj koji se generiše ne sadrži paragrafe o grešci koje je sadržao ranije, a za čije smo ispravljanje koristili samo jedan paragraf. Ovakva implementacija doprinosi efikasnosti alata, kako se za otklanjanje određene greške koristi samo neophodna količina podataka, a ne svi raspoloživi podaci. Šabloni su smešteni u datoteke sa sufiksom \textit{Fix}, dok u imenu sadrže i tip greške koji ispravljaju. 
 
-Kao što je već rečeno, šabloni su orijentisani prvenstveno prema tipu greške koju ispravljaju, pa će njihovo izlaganje biti realizovano kroz tipove grešaka koje ispravljaju. 
+Kao što je već rečeno, šabloni su orijentisani prvenstveno prema tipu greške koju ispravljaju, pa je njihovo izlaganje realizovano kroz tipove grešaka koje ispravljaju. 
 
 \subsection{Korišćenje neinicijalizovane vrednosti}
-Šablon koji ispravlja greške korišćenja neinicijalizovane vrednosti mapiran je na osnovu opisa koji daje alat \textit{Memcheck}, tj.~\textit{,,Conditional jump or move depends on uninitialised value(s)''}, dok razlozi za grešku mogu biti \textit{,,Uninitialised value was created by a stack allocation''} i \textit{''Uninitialised value was created by a heap allocation''}, u zavisnosti od toga da li je reč o statičkoj, odnosno dinamički alociranoj memoriji. Ispis alata \textit{Valgrind} koji dobijamo za ovaj tip greške u slučaju statičke memorije, a na osnovu kog je ispravljamo, dat je na listingu \ref{lst:slika4.5}.
+Šablon koji ispravlja greške korišćenja neinicijalizovane vrednosti mapiran je na osnovu opisa koji daje alat \textit{Memcheck}, tj.~\textit{,,Conditional jump or move depends on uninitialised value(s)''}, dok razlozi za grešku mogu biti \textit{,,Uninitialised value was created by a stack allocation''} i \textit{''Uninitialised value was created by a heap allocation''}, u zavisnosti od toga da li je reč o statičkoj, odnosno dinamički alociranoj memoriji. Ispis alata \textit{Valgrind} koji dobijamo za ovaj tip greške u slučaju statičke memorije, a na osnovu kog se ona ispravlja, dat je na listingu \ref{lst:slika4.5}.
 
 %\begin{figure}[!ht]
 %  \centering
@@ -1518,16 +1519,16 @@ Kao što je već rečeno, šabloni su orijentisani prvenstveno prema tipu grešk
 ==7863==      at 0x109155: main (1.c:5)
 \end{lstlisting}
 
-Iz datog izveštaja dobijamo informacije od važnosti za ispravljanje greške kao što su linije koda u kojima se koristi neinicijalizovana promenljiva, kao i liniju koda i datoteku u kojoj počinje blok u kom je ta promenljiva definisana. Kako nemamo tačnu liniju koda u kojoj je promenljiva definisana, već blok, grešku ćemo ispraviti inicijalizovanjem svih neinicijalizovanih vrednosti u okviru tog bloka. 
+Iz datog izveštaja dobijaju se informacije od važnosti za ispravljanje greške kao što su linije koda u kojima se koristi neinicijalizovana promenljiva, kao i linija koda i datoteka u kojoj počinje blok u kom je ta promenljiva definisana. Kako alat nema informaciju o tačnoj liniji koda u kojoj je promenljiva definisana, već blok, grešku ispravlja inicijalizovanjem svih neinicijalizovanih vrednosti u okviru tog bloka. 
 
 Analizom linija koda datog bloka poklapanjem sa regularnim izrazom 
 \texttt{$$ ([\quad\textbackslash t]*)([a-zA-Z_-]+)[\quad]+([a-zA-Z0-9_-]+).*\textbackslash s*; $$}
-dobijamo liniju koda gde imamo neinicijalizovanu definisanu promenljivu. Navedeni regularni izraz označava da linija može početi nizom blanko karaktera ili tabulatora, nakon čega će slediti niz karaktera koji mogu da čine mala ili velika slova, brojevi, crte i donje crte, što će odgovarati tipu promenljive. Nakon toga se bar jednom mora naći razmak iza koga mora da sledi niz karaktera koji mogu da čine mala ili velika slova, brojevi, crte i donje crte, koji će odgovarati imenu promenljive, nakon čega može da se nađe bilo koji ASCII karakter proizvoljan broj puta. Na kraju mora se pojavi karakter \texttt{;}, pre koga može da se javi razmak, tabuilator ili novi red (\textbackslash n) proizvoljan broj puta. Podudaranje sa ovim regularnim izrazom može sadržati i karakter \texttt{=}, što takođe proveravamo. Ukoliko je to slučaj, to je signal da je ta promenljiva već inicijalizovana i da nastavljamo dalje potragu za neinicijalizovanom promenljivom. Promenljiva može biti i višedimenziona, pa pre inicijalizacije vršimo i tu proveru da bi je, ukoliko je to slučaj, adekvatno inicijalizovali. Iz rezultata dobijenih poklapanjem sa regularnim izrazi izvlačimo podatke poput tipa promenljive, imena, a u slučaju višedimenzionog niza još i dimenzije. Na primer, primenom navedenog regularnog izraza koristeći funkciju \textit{search} modula \textit{re} nad odgovarajućom linijom koda dobijamo objekat poklapanja. Iz datog objekta, primenom funkcije \textit{group} dobijamo segmente koje odgovaraju uparenim zagradama, i to:
+dobija se linija koda gde je neinicijalizovana definisana promenljiva. Navedeni regularni izraz označava da linija može početi nizom blanko karaktera ili tabulatora, nakon čega sledi niz karaktera koji mogu da čine mala ili velika slova, brojevi, crte i donje crte, što odgovara tipu promenljive. Nakon toga se bar jednom mora naći razmak iza koga mora da sledi niz karaktera koji mogu da čine mala ili velika slova, brojevi, crte i donje crte, koji odgovaraju imenu promenljive, nakon čega može da se nađe bilo koji ASCII karakter proizvoljan broj puta. Na kraju mora se pojavi karakter \texttt{;}, pre koga može da se javi razmak, tabuilator ili novi red (\textbackslash n) proizvoljan broj puta. Podudaranje sa ovim regularnim izrazom može sadržati i karakter \texttt{=}, što se takođe proverava. Ukoliko je to slučaj, to je signal da je ta promenljiva već inicijalizovana i da se potraga za neinicijalizovanom promenljivom nastavlja. Promenljiva može biti i višedimenziona, pa pre inicijalizacije se vrši i ta provera da se, ukoliko je to slučaj, adekvatno inicijalizuje. Iz rezultata dobijenih poklapanjem sa regularnim izrazima izvlače se podaci poput tipa promenljive, imena, a u slučaju višedimenzionog niza još i dimenzije. Na primer, primenom navedenog regularnog izraza koristeći funkciju \textit{search} modula \textit{re} nad odgovarajućom linijom koda dobija se objekat poklapanja. Iz datog objekta, primenom funkcije \textit{group} dobijaju se segmenti koje odgovaraju uparenim zagradama, i to:
 \begin{itemize}
-\item Tip promenljive na osnovu \textit{matchObject.group(2)}.
-\item Ime promenljive na osnovu \textit{matchObject.group(3)}.
+\item Tip promenljive na osnovu \texttt{matchObject.group(2)}.
+\item Ime promenljive na osnovu \texttt{matchObject.group(3)}.
 \end{itemize} 
-Za inicijalizaciju promenljivih koristimo funkciju prikazanu na listingu \ref{lst:slika4.6}, dok u slučaju nizova, odnosno višedimenzionih nizova, koristimo pomoćnu funkciju koja koristi petlje za inicijalizaciju, a koja se suštinski oslanja na funkciju sa listinga \ref{lst:slika4.6}.
+Za inicijalizaciju promenljivih koristi se funkcija prikazana na listingu \ref{lst:slika4.6}, dok se u slučaju nizova, odnosno višedimenzionih nizova, koristi pomoćna funkcija koja koristi petlje za inicijalizaciju, a koja se suštinski oslanja na funkciju sa listinga \ref{lst:slika4.6}.
 
 \begin{lstlisting}[style=mystyle,caption={Funkcija inicijalizacije}, label={lst:slika4.6},language={Python}] 
 def initialise(varType):
@@ -1554,11 +1555,11 @@ def initialise(varType):
 %  \label{fig:slika4.6}
 %\end{figure} 
 
-U slučaju da je neinicijalizovana promenljiva korisnički definisana struktura, ukoliko je ona navedena kao argument komandne linije, alat će biti u mogućnosti da ispravi ovu grešku. Ispravljanje se sastoji u tome što će alat pronaći kako je ta struktura definisana, odnosno koji su njeni činioci. Koristeći odgovarajuću funkciju iz \textit{userDefinedStructuresHandler}-a, u kome su definisane sve operacije nad korisnčkim strukturama, inicijalizovaće celu strukturu, redom, inicijalizujući njene činioce, indirektno koristeći funkciju sa listinga \ref{lst:slika4.6}. Takođe, podržana je i inicijalizacija nizova, odnosno višedimenzionih nizova korisničkih struktura. 
+U slučaju da je neinicijalizovana promenljiva korisnički definisana struktura, ukoliko je ona navedena kao argument komandne linije, alat je u mogućnosti da ispravi ovu grešku. Ispravljanje se sastoji u tome što alat pronalazi kako je ta struktura definisana, odnosno koji su njeni činioci. Koristeći odgovarajuću funkciju iz \textit{userDefinedStructuresHandler}-a, u kome su definisane sve operacije nad korisnčkim strukturama, inicijalizovaće celu strukturu, redom, inicijalizujući njene činioce, indirektno koristeći funkciju sa listinga \ref{lst:slika4.6}. Takođe, podržana je i inicijalizacija nizova, odnosno višedimenzionih nizova korisničkih struktura. 
 
-Ispravku greške formiramo tako što zamenimo problematičnu liniju koda linijom gde je promenljiva definisana i inicijalizovana, dok u slučaju nizova i višedimenzionih nizova, problematičnu liniju menjamo blokom koda koji se sastoji iz definicije promenljive nakon koje sledi inicijalizacija korišćenjem petlje, odnosno petlji u slučaju višedimenzionih nizova. 
+Ispravka greške formira se tako što se zameni problematična linija koda linijom gde je promenljiva definisana i inicijalizovana, dok se u slučaju nizova i višedimenzionih nizova, problematična linija menja blokom koda koji se sastoji iz definicije promenljive nakon koje sledi inicijalizacija korišćenjem petlje, odnosno petlji u slučaju višedimenzionih nizova. 
 
-Ispis alata \textit{Valgrind} koji dobijamo za ovaj tip greške u slučaju dinamički alocirane memorije, tj.~upotrebe pokazivača, a na osnovu kog je ispravljamo, dat je na listingu \ref{lst:slika4.7}.
+Ispis alata \textit{Valgrind} koji se dobija za ovaj tip greške u slučaju dinamički alocirane memorije, tj.~upotrebe pokazivača, a na osnovu kog se ispravlja, dat je na listingu \ref{lst:slika4.7}.
 
 %\begin{figure}[!ht]
 %  \centering
@@ -1577,11 +1578,11 @@ Ispis alata \textit{Valgrind} koji dobijamo za ovaj tip greške u slučaju dinam
 ==3756==      by Ox10917C: main (1.c:9)
 \end{lstlisting}
 
-Za razliku od greške upotrebe neinicijalizovane promenljive koja je statički definisana, ovde, u izveštaju pored linija koda u kojima se koristi ta promenljiva dobijamo i informaciju o tačnoj liniji koda i datoteci u kojoj je promenljiva kreirana. Način inicijalizacije je isti kao kod statički definisanih promenljivih, dok potrebne informacije dobijamo primenom odgovarajućih regularnih izraza. Takođe, ukoliko je promenljiva samo pokazivač, bez alokacije memorije prilikom definicije iste, njena vrednost biće postavljena na \textit{NULL}. Regularni izraz koji koristimo u ovom slučaju jeste 
-\texttt{$$ (malloc|calloc|realloc)(.+); $$}
-dok se preciznije dobijanje informacije o grešci dobija specijalizacijom pomenutog izraza. Dati regularni izraz označava da se u poklapanju mora naći \texttt{malloc}, \texttt{calloc} ili \texttt{realloc}, iza čega mora da sledi bar jedan ASCI karakter. Na kraju se mora naći karakter \texttt{;}. Na osnovu rezultata primene pomenutih regularnih izraza dobijamo informacije o tipu pokazivača, imena pokazivača kao i veličini alocirane memorije. Primenom funkcije \textit{search} koristeći navedeni regularni izraz na osnovu \textit{matchObject.group(1)} dobijamo informaciju koja funkcija alokacije je iskorišćena. Dalje, u zavisnosti od te funkcije primenjuju se pomenuti specijalizovani regularni izrazi i odgovarajuće transformacije nad \textit{matchObject.group(2)} u cilju dobijanja svih preostalih neophodnih informacija. Takođe, i u ovom slučaju alat poseduje podršku za rad sa korisnički definisanim strukturama. 
+Za razliku od greške upotrebe neinicijalizovane promenljive koja je statički definisana, ovde, u izveštaju pored linija koda u kojima se koristi ta promenljiva dobijaju se i informacije o tačnoj liniji koda i datoteci u kojoj je promenljiva kreirana. Način inicijalizacije je isti kao kod statički definisanih promenljivih, dok se potrebne informacije dobijaju primenom odgovarajućih regularnih izraza. Takođe, ukoliko je promenljiva samo pokazivač, bez alokacije memorije prilikom definicije iste, njena vrednost biće postavljena na \textit{NULL}. Regularni izraz koji se koristi u ovom slučaju jeste 
+\texttt{$$ (malloc|calloc|realloc)(.+)\textbackslash s*; $$}
+dok se preciznije dobijanje informacija o grešci dobija specijalizacijom pomenutog izraza. Dati regularni izraz označava da se u poklapanju mora naći \texttt{malloc}, \texttt{calloc} ili \texttt{realloc}, iza čega mora da sledi bar jedan ASCII karakter. Na kraju se mora naći karakter \texttt{;}. Na osnovu rezultata primene pomenutih regularnih izraza dobijaju se informacije o tipu pokazivača, imenu pokazivača kao i veličini alocirane memorije. Primenom funkcije \textit{search} koristeći navedeni regularni izraz na osnovu \textit{matchObject.group(1)} dobija se informacija koja funkcija alokacije je iskorišćena. Dalje, u zavisnosti od te funkcije primenjuju se pomenuti specijalizovani regularni izrazi i odgovarajuće transformacije nad \textit{matchObject.group(2)} u cilju dobijanja svih preostalih neophodnih informacija. Takođe, i u ovom slučaju alat poseduje podršku za rad sa korisnički definisanim strukturama. 
 
-Nakon sakupljanja potrebnih informacija, ispravku greške formiramo na isti način kao i kod statiči definisanih promenljivih, tj.~problematičnu liniju menjamo blokom koji pored te linije sadrži i k\^od koji vrši inicijalizaciju, indirektno naslonjen na funkciju sa listinga \ref{lst:slika4.6} i inicijalizacione funkcije koje koriste petlje.
+Nakon sakupljanja potrebnih informacija, ispravka greške formira se na isti način kao i kod statiči definisanih promenljivih, tj.~problematična linija menja se blokom koji pored te linije sadrži i k\^od koji vrši inicijalizaciju, indirektno naslonjen na funkciju sa listinga \ref{lst:slika4.6} i inicijalizacione funkcije koje koriste petlje.
 
 \subsection{Nevalidno čitanje/pisanje}
 Šablon koji ispravlja greške nevalidnog čitanja/pisanja mapiran je na osnovu opisa koji daje alat \textit{Memcheck}, tj.~\textit{,,Invalid read of size x''} u slučaju nevalidnog čitanja, odnosno \textit{,,Invalid write of size x''} u slučaju nevalidnog pisanja, gde je \textit{x} broj bajtova. Razlog greške kojim se ova greška mapira je \textit{,,Address adr is y bytes after a block of size z alloc'd''} u slučaju prekoračenja s desne strane, odnosno \textit{,,Address adr is y bytes before a block of size z alloc'd''} u slučaju prekoračenja s leve strane, gde \textit{adr} predstavlja heksadekadni zapis adrese, a \textit{y} i \textit{z} broj bajtova. To se jasno može videti na listingu \ref{lst:slika4.8}.
@@ -1601,7 +1602,7 @@ Nakon sakupljanja potrebnih informacija, ispravku greške formiramo na isti nač
 ==4289==      by Ox10916D: main (4.c:7)
 \end{lstlisting}
 
-Analizom segmenta sa listinga \ref{lst:slika4.8}, odnosno samo razloga i tipa greške, možemo da dobijemo informaciju koliko je velika memorija kojoj pokušavamo da pristupimo, ili da je izmenimo, a koja nije alocirana. Moguća ispravka je adkevatno računanje izraza koji se koristi za indeksiranje, ali tu vrstu ispravke ovde nije moguće uraditi. Druga ispravka bi bila da memoriju koju program alocira, a sa kojom je pokušana interakcija, proširimo za vrednost koju dobijamo primenom pomenutih informacija. Takođe, na listingu \ref{lst:slika4.8} vidimo da dobijamo i tačnu liniju koda, odnosno datoteku gde je memorija alocirana. Baš tu liniju koda menjamo ispravnom, a ispravka se sastoji u tome da pogrešnu veličinu memorije koja se alocira zamenimo ispravnom, uvećanom za broj bajtova koji dobijemo analizom greške. Na ovaj način ispravljamo greške koje su povezane sa prekoračenjem s desne strane. 
+Analizom segmenta sa listinga \ref{lst:slika4.8}, odnosno samo razloga i tipa greške, može da se dobije informaciju koliko je velika memorija kojoj pokušavamo da pristupimo, ili da je izmenimo, a koja nije alocirana. Moguća ispravka je adkevatno računanje izraza koji se koristi za indeksiranje, ali tu vrstu ispravke ovde nije moguće uraditi. Druga ispravka bi bila da memoriju koju program alocira, a sa kojom je pokušana interakcija, proširimo za vrednost koju dobijamo primenom pomenutih informacija. Takođe, na listingu \ref{lst:slika4.8} vidimo da dobijamo i tačnu liniju koda, odnosno datoteku gde je memorija alocirana. Baš tu liniju koda menjamo ispravnom, a ispravka se sastoji u tome da pogrešnu veličinu memorije koja se alocira zamenimo ispravnom, uvećanom za broj bajtova koji dobijemo analizom greške. Na ovaj način ispravljamo greške koje su povezane sa prekoračenjem s desne strane. 
 
 U slučaju prekoračenja s leve strane, pristupamo memoriji kojoj nam nije dozvoljeno, odnosno argument pristupa je vrednost manja od 0, kako znamo da indeksi pristupa alociranoj memoriji kreću od 0. Ovu grešku ispravljamo tako što pogrešan indeks pristupa zamenimo njegovom apsolutnom vrednošću i na taj način ispravni indeksi ostaju takvi, dok pogrešne stavljamo u interval ispravnih. U slučaju da apsolutna vrednost pomenutog indeksa izaziva grešku prekoračenja s desne strane, memorija će biti proširena, odnosno ispravljaće se greška nevalidnog čitanja/pisanja u slučaju prekoračenja s desne strane.  
 
