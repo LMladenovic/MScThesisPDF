@@ -840,7 +840,7 @@ Regularni izrazi nad azbukom $\Sigma$ opisuju se rekurzivno na sledeći način:
 \begin{itemize}
 \item \texttt{(p|q)} regularni izraz koji predstavlja jezik $L(p) \cup L(q)$.
 \item \texttt{(pq)} regularni izraz koji predstavlja jezik $L(p)L(q)$.
-\item \texttt{$(p)^*$} regularni izraz koji predstavlja jezik $(L(p))^*$.
+\item \texttt{(p)$^*$} regularni izraz koji predstavlja jezik $(L(p))^*$.
 \item \texttt{(p)} regularni izraz koji predstavlja jezik $L(p)$.
 \end{itemize}
 \end{enumerate}
@@ -850,13 +850,13 @@ Opisani jezik se neće promeniti ako se zagrade izostave iz regularnog izraza \c
 \begin{enumerate}
 	\item Operator \texttt{*}
 	\item Konkatenacija
-	\item Operator \texttt{|}
+	\item Operator \texttt{+}
 \end{enumerate}
 
 Zapisivanje regularnih izraza može se znatno pojednostaviti uvođenjem sledećih konvencija:
 \begin{itemize}
-\item Neka je \texttt{r} regularni izraz koji opisuje jezik $L(r)$. Jezik $(L(r))(L(r))^*$ se opisuje regularnim izrazom \texttt{$(r)^+$} , dok se jezik $L(r) \cup \{\varepsilon\}$ opisuje regularnim izrazom \texttt{(r)?}.
-\item Ako su $c_1, c_2, …, c_n$ karakteri, tada se regularni izraz \texttt{$c_1 | c_2 | … | c_n$} može obeležiti sa \texttt{$[c_1, c_2, …, c_n]$}. Izraz \texttt{$[c_1-c_2]$} označava sekvencu svih karaktera $c$ tako da važi $c_1 \leq c \leq c_2$.
+\item Neka je \texttt{r} regularni izraz koji opisuje jezik $L(r)$. Jezik $(L(r))(L(r))^*$ se opisuje regularnim izrazom \texttt{(r)$^+$} , dok se jezik $L(r) \cup \{\varepsilon\}$ opisuje regularnim izrazom \texttt{(r)?}.
+\item Ako su $c_1, c_2, …, c_n$ karakteri, tada se regularni izraz \texttt{c$_1$ + c$_2$ + … + c$_n$} može obeležiti sa \texttt{[c$_1$, c$_2$, …, c$_n$]}. Izraz \texttt{[c$_1$-c$_2$]} označava sekvencu svih karaktera $c$ tako da važi $c_1 \leq c \leq c_2$.
 \end{itemize}
 
 Tako na primer slova engleske abecede označavamo sa \texttt{[A-Za-z]}, dok cifre označavamo sa \texttt{[0-9]}.
@@ -869,15 +869,15 @@ Regularni izraz predstavljen je odgovarajućom niskom, dok funkcije u ovom modul
 %OPIS REGULARNIH IZRAZA
 Kada je u pitanju sintaksa proširenih regularnih izraza, postoji niz karaktera sa specijalnim značenjem, koji omogućavaju lakše opisivanje raznih specifičnosti regularnih izraza koji se pišu. Neki od njih su:
 \begin{description}
-	\item \texttt{[]} --- označava skup karaktera. Na primer, podudaranje sa regularnim izrazom \texttt{[A-Z]} je karakter \texttt{L}.
-	\item \texttt{\textbackslash} --- koristi se za izbegavanje specijalnog karaktera. Na primer, regularni izraz \texttt{\textbackslash[} ima podudaranje \texttt{[}. Takođe, koristi se i u nekim predefinisanim karakterskim klasama. Na primer, regularni izraz \texttt{\textbackslash d}  predstavlja broj, dok regularni izraz \texttt{\textbackslash s} označava novi red, razmak ili tabulator.
-	\item \texttt{$\^$} --- oznaka da početak. Za regularni izraz\quad \texttt{$\^$Hello}, podudaranje sa niskom \texttt{Hello world} je niska \texttt{Hello}.
-	\item \texttt{\$} --- oznaka za kraj. Za regularni izraz \texttt{world\$}, podudaranje sa niskom \texttt{Hello world} je niska \texttt{world}.
-	\item \texttt{*} --- označava pojavljivanje nula ili više puta. Primer regularnog izraza je \texttt{[A-Za-z]*}, dok je primer podudaranja sa navedenim regularnim izrazom, kako niska \texttt{Koronka}, tako i prazna reč.
-	\item \texttt{+} --- označava pojavljivanje bar jednom. Primer regularnog izraza je \texttt{[A-Za-z]+}, dok je primer podudaranja sa navedenim regularnim izrazom, kako niska \texttt{Koronka}, tako i samo jedno slovo.
-	\item \texttt{\{\}} --- služi za definisanje određenog broja pojavljivanja. Primer regularnog izraza je \texttt{Mo\{2\}n}, dok je podudaranje datog regularnog izraza sa niskom \texttt{Moon is shining!} niska \texttt{Moon}.
-	\item \texttt{|} --- operator izbora. Na primer, podudaranje sa regularnim izrazom \texttt{a|b} je kako karakter \texttt{a}, tako i karakter \texttt{b}.
-	\item \texttt{()} --- služi da definiše grupu unutar regularnog izraza.
+	\item \texttt{[]} --- označava skup karaktera, odnosno ove zagrade odgovaraju zagradama \texttt{\{\}} koje se koriste kod definisanja skupova u teoriji. Na primer, podudaranje sa regularnim izrazom \texttt{[A-Z]} je karakter \texttt{L}.
+	\item \texttt{\textbackslash} --- koristi se za izbegavanje specijalnog karaktera, i predstavlja proširenje osnovnih regularnih izraza. Na primer, regularni izraz \texttt{\textbackslash[} ima podudaranje \texttt{[}. Takođe, koristi se i u nekim predefinisanim karakterskim klasama. Na primer, regularni izraz \texttt{\textbackslash d}  predstavlja broj, dok regularni izraz \texttt{\textbackslash s} označava novi red, razmak ili tabulator.
+	\item \texttt{$\^$} --- oznaka da početak, i predstavlja proširenje osnovnih regularnih izraza. Za regularni izraz\quad \texttt{$\^$Hello}, podudaranje sa niskom \texttt{Hello world} je niska \texttt{Hello}.
+	\item \texttt{\$} --- oznaka za kraj, i predstavlja proširenje osnovnih regularnih izraza. Za regularni izraz \texttt{world\$}, podudaranje sa niskom \texttt{Hello world} je niska \texttt{world}.
+	\item \texttt{*} --- označava pojavljivanje nula ili više puta, odnosno obeležavaju isto što i u teoriji. Primer regularnog izraza je \texttt{[A-Za-z]*}, dok je primer podudaranja sa navedenim regularnim izrazom, kako niska \texttt{Koronka}, tako i prazna reč.
+	\item \texttt{+} --- označava pojavljivanje bar jednom,  odnosno obeležavaju isto što i u teoriji. Primer regularnog izraza je \texttt{[A-Za-z]+}, dok je primer podudaranja sa navedenim regularnim izrazom, kako niska \texttt{Koronka}, tako i samo jedno slovo.
+	\item \texttt{\{\}} --- služi za definisanje određenog broja pojavljivanja, i predstavlja proširenje osnovnih regularnih izraza.  Primer regularnog izraza je \texttt{Mo\{2\}n}, dok je podudaranje datog regularnog izraza sa niskom \texttt{Moon is shining!} niska \texttt{Moon}.
+	\item \texttt{|} --- operator izbora, odnosno označava operaciju unije u teoriji. Na primer, podudaranje sa regularnim izrazom \texttt{a|b} je kako karakter \texttt{a}, tako i karakter \texttt{b}.
+	\item \texttt{()} --- služi da definiše grupu unutar regularnog izraza, i predstavlja proširenje osnovnih regularnih izraza.
 \end{description}
 
 Jedan od regularnih izraza koji opisuje email adrese relativno precizno je: 
@@ -888,16 +888,16 @@ Značenje ovog regularnog izraza jeste niska koja počinje brojem ili malim, odn
 
 %OPIS PARAMETARA FUNKCIJE
 
-Potpisi nekih od funkcija koje ovaj modul pruža, a koje su iskorišćene u alatu koji ovaj rad prati, navedene su u nastavku. U okviru tih potpisa, \textit{pattern} predstavlja regularni izraz zadat odgovarajućim nizom karaktera, dok se osobine regularnog izraza mogu izmeniti navođenjem vrednosti argumenta \textit{flags}. Na primer, navođenjem argumenta \texttt{flags=re.IGNORECASE} prilikom pretrage podudaranja nema razlike između velikih i malih slova. Podrazumevana vrednost argumenta \textit{flag} je 0, što označava da nijedan vid specijalnih osobina nije uključen prilikom pretrage podudaranja. Argument \textit{string} predstavlja nisku u okviru koje se traži podudaranje za regularnim izrazom.
+Potpisi nekih od funkcija koje ovaj modul pruža, a koje su iskorišćene u alatu koji ovaj rad prati, navedene su u nastavku. U okviru tih potpisa, \texttt{pattern} predstavlja regularni izraz zadat odgovarajućim nizom karaktera, dok se osobine regularnog izraza mogu izmeniti navođenjem vrednosti argumenta \texttt{flags}. Na primer, navođenjem argumenta \texttt{flags=re.IGNORECASE} prilikom pretrage podudaranja nema razlike između velikih i malih slova. Podrazumevana vrednost argumenta \texttt{flag} je 0, što označava da nijedan vid specijalnih osobina nije uključen prilikom pretrage podudaranja. Argument \texttt{string} predstavlja nisku u okviru koje se traži podudaranje za regularnim izrazom.
 
 %FUNKCIJE
 
 \begin{description}
-\item  \texttt{MatchObject} \textit{search(\texttt{string} pattern, \texttt{string} string, \texttt{int} flags=0)} --- Vraća prvi pronađeni objekat podudaranja u odnosu na obrazac regularnog izraza pattern ili vraća None\footnote{U \textit{Python}-u ključna reč \textit{None} je objekat klase \textit{NoneType}. Može se dodeliti bilo kojoj promenljivoj, ali ne može se kreirati novi \textit{NoneType} objekat.}, ako nijedna pozicija u nizu karaktera ne odgovara obrascu.
-\item  \texttt{MatchObject} \textit{match(\texttt{string} pattern, \texttt{string} string, \texttt{int} flags=0)} --- Vraća odgovarajući objekat podudaranja, ako se nula ili više znakova na početku niza karaktera \textit{string} podudaraju sa regularnim izrazom, ili vraća \textit{None} ako se niz ne podudara sa obrascem.
-\item  \texttt{List} \textit{split(\texttt{string} pattern, \texttt{string} string, \texttt{int} maxsplit=0, \texttt{int} flags=0)} --- Vraća podeljenu nisku \textit{string} kao listu niski, koristeći kao separator za deljenje sva podudaranja sa regularnim izrazom \textit{pattern}. Ako argument \textit{maxsplit} nije 0, u rezultatu se javlja maksimum \textit{maxsplit} podeljenih niski.  
-\item  \texttt{List} \textit{re.findall(\texttt{string} pattern, \texttt{string} string, \texttt{int} flags=0)} - Vraća sva podudaranja \textit{pattern}-a u \textit{string}-u kao listu niski.
-\item  \texttt{string} \textit{sub(\texttt{string} pattern, \texttt{string|function} repl, \texttt{string} string, \texttt{int} count=0, \texttt{int} flags=0)} --- Vraća string dobijen zamenom krajnjeg levog podudaranja sa \textit{pattern}-om u \textit{string}-u sa \textit{repl}, ili nepromenjen \textit{string} ako podudaranje nije pronađeno. Argument \textit{repl} može biti niz ili funkcija. U tom slučaju se za svako podudaranje sa regularnim izrazom \textit{pattern}, pozviva funkcija \textit{repl}. Funkcija \textit{repl} kao argument ima odgovarajući objekat podudaranja, i vraća nisku zamene.
+\item  \texttt{\texttt{MatchObject} \textit{search}(\texttt{string} pattern, \texttt{string} string, \texttt{int} flags=0)} --- Vraća prvi pronađeni objekat podudaranja u odnosu na obrazac regularnog izraza \texttt{pattern} ili vraća \texttt{None}\footnote{U \textit{Python}-u ključna reč \texttt{None} je objekat klase \texttt{NoneType}. Može se dodeliti bilo kojoj promenljivoj, ali ne može se kreirati novi \texttt{NoneType} objekat.}, ako nijedna pozicija u nizu karaktera ne odgovara obrascu.
+\item  \texttt{\texttt{MatchObject} \textit{match}(\texttt{string} pattern, \texttt{string} string, \texttt{int} flags=0)} --- Vraća odgovarajući objekat podudaranja, ako se nula ili više znakova na početku niza karaktera \texttt{string} podudaraju sa regularnim izrazom, ili vraća \texttt{None} ako se niz ne podudara sa obrascem.
+\item  \texttt{\texttt{List} \textit{split}(\texttt{string} pattern, \texttt{string} string, \texttt{int} maxsplit=0, \texttt{int} flags=0)} --- Vraća podeljenu nisku \texttt{string} kao listu niski, koristeći kao separator za deljenje sva podudaranja sa regularnim izrazom \texttt{pattern}. Ako argument \texttt{maxsplit} nije 0, u rezultatu se javlja maksimum \texttt{maxsplit} podeljenih niski.  
+\item  \texttt{\texttt{List} \textit{re.findall}(\texttt{string} pattern, \texttt{string} string, \texttt{int} flags=0)} - Vraća sva podudaranja \texttt{pattern}-a u \texttt{string}-u kao listu niski.
+\item  \texttt{\texttt{string} \textit{sub}(\texttt{string} pattern, \texttt{string|function} repl, \texttt{string} string, \texttt{int} count=0, \texttt{int} flags=0)} --- Vraća string dobijen zamenom krajnjeg levog podudaranja sa \texttt{pattern}-om u \texttt{string}-u sa \texttt{repl}, ili nepromenjen \texttt{string} ako podudaranje nije pronađeno. Argument \texttt{repl} može biti niz ili funkcija. Ukoliko je funkcija, tada se za svako podudaranje sa regularnim izrazom \texttt{pattern}, pozviva funkcija \texttt{repl}. Funkcija \texttt{repl} kao argument ima odgovarajući objekat podudaranja, i vraća nisku zamene.
 \end{description}
 
 Kompajlirani objekti regularnog izraza podržavaju slične metode i atribute, s tim da je pozivanje istih u formi
@@ -905,15 +905,15 @@ Kompajlirani objekti regularnog izraza podržavaju slične metode i atribute, s 
 \texttt{pattern.funkcija(argumenti).}
 \end{center}
 
-Objekti podudaranja sadrže ono što se podudarilo sa navedenim regularnim izrazom, što se u okviru \textit{if} izraza i \textit{if} naredbe, kao takvo, tretira kao logička vrednost \textit{True}. Ukoliko nije bilo podudaranja, funkcije \textit{match()} i \textit{search()} vraćaju \textit{None}. 
-Tako proveru da li je postojalo podudaranje možemo ostvariti jednostavnim \textit{if} izrazom --- \texttt{if(matchObject)}, koji vraća \textit{True} ukoliko je bilo podudaranja, dok u suprotnom vraća \textit{False}.
+Objekti podudaranja sadrže ono što se podudarilo sa navedenim regularnim izrazom, što se u okviru \texttt{if} izraza i \texttt{if} naredbe, kao takvo, tretira kao logička vrednost \texttt{True}. Ukoliko nije bilo podudaranja, funkcije \texttt{match()} i \texttt{search()} vraćaju \texttt{None}. 
+Tako proveru da li je postojalo podudaranje možemo ostvariti jednostavnim \texttt{if} izrazom --- \texttt{if(matchObject)}, koji vraća \texttt{True} ukoliko je bilo podudaranja, dok u suprotnom vraća \texttt{False}.
 
 Objekti podudaranja podržavaju mnoge metode i atribute. Najiskorišćenija u alatu koji je razvijen, a u cilju izvlačenja potrebnih informacija iz podudaranja sa regularnim izrazom je:
 \begin{description}
-\item \texttt{Match.group(groupNum [, groupNum2, ...])} --- Vraća jednu ili više podgrupa podudaranja. Grupa je definisana delom regularnog izraza u okviru zagrada (). Indeksiranje grupa vrši se s leva na desno, počevši od 1. Ako postoji jedan argument, rezultat je jedan string, koji odgovara grupi čiji je indeks dati argument, dok ako postoji više argumenata, rezultat je torka sa jednom stavkom po argumentu. Bez argumenata, \textit{groupNum} je  podrazumevano nula, tj.~vraća se ceo \textit{Match} objekat. Ako je indeks \textit{groupNum} u opsegu [1,99], to je string koji odgovara odgovarajućoj grupi u zagradama na toj poziciji. Ako je broj grupe negativan ili veći od broja grupa definisanih u obrascu, izbacuje se izuzetak \textit{IndexError}. Ako je grupa sadržana u delu uzorka koji se ne podudara, odgovarajući rezultat je \textit{None}. Ako je grupa sadržana u delu uzorka koji se podudarao više puta, vraća se poslednje podudaranje \cite{reModule}.
+\item \texttt{Match.group(groupNum [, groupNum2, ...])} --- Vraća jednu ili više podgrupa podudaranja. Grupa je definisana delom regularnog izraza u okviru zagrada (). Indeksiranje grupa vrši se s leva na desno, počevši od 1. Ako postoji jedan argument, rezultat je jedan string, koji odgovara grupi čiji je indeks dati argument, dok ako postoji više argumenata, rezultat je torka sa jednom stavkom po argumentu. Bez argumenata, \texttt{groupNum} je  podrazumevano nula, tj.~vraća se ceo \texttt{Match} objekat. Ako je indeks \texttt{groupNum} u opsegu [1,99], to je string koji odgovara odgovarajućoj grupi u zagradama na toj poziciji. Ako je broj grupe negativan ili veći od broja grupa definisanih u obrascu, izbacuje se izuzetak \textit{IndexError}. Ako je grupa sadržana u delu uzorka koji se ne podudara, odgovarajući rezultat je \texttt{None}. Ako je grupa sadržana u delu uzorka koji se podudarao više puta, vraća se poslednje podudaranje \cite{reModule}.
 \end{description}
 
-Primer korišćenja funkcije \textit{group} dat je na listingu \ref{lst:slika3.1}.
+Primer korišćenja funkcije \texttt{group} dat je na listingu \ref{lst:slika3.1}.
 %\begin{figure}[!ht]
 %  \centering
 %  \includegraphics[width=0.7\textwidth]{reModule.png}
@@ -921,7 +921,7 @@ Primer korišćenja funkcije \textit{group} dat je na listingu \ref{lst:slika3.1
 %  \label{fig:slika3.1}
 %\end{figure}
 
-\begin{lstlisting}[style=terminal,caption={Primer korišćenja funkcije \textit{group} modula \textit{re}}, label={lst:slika3.1},language={bash}] 
+\begin{lstlisting}[style=terminal,caption={Primer korišćenja funkcije \texttt{group} modula \texttt{re}}, label={lst:slika3.1},language={bash}] 
 >>> import re
 >>> m = re.match(r"(\w+) (\w+)", "Petar Petrovic, student")
 >>> m.group(0)
@@ -988,7 +988,7 @@ Analiza i ispravka programa sa slike \ref{fig:slika4.15} predstavljena je u ovom
 
 Dati program sadrži grešku vezanu za upotrebu neinicijalizovane promenljive, a koju alat \textit{Koronka} ispravlja. Alat se pokreće komandom u komandnoj liniji:
 \begin{center}
-\textit{python koronka.py program.c}.
+\texttt{python koronka.py program.c}.
 \end{center}
 
 Izgled komandne linije nakon pokretanja alata prikazan je na slici \ref{fig:slika4.11}. 
@@ -1429,15 +1429,15 @@ Prilikom ispravljanja grešaka, greška koja se trenutno obrađuje predstavljena
 
 Podaci koje klasa sadrži su sledeći:
 \begin{itemize}
-\item \textit{errorType} - sadrži informaciju o tipu greške, npr. nevalidno oslobađanje memorije, nedozvoljeno čitanje/pisanje itd.
-\item \textit{valgrindOutput} - sadrži kompletan segment teksta koji je \textit{Valgrind} ispisao za grešku koja se trenutno obrađuje za potrebe dodatnog parsiranja informacija o grešci. Primer sadržaja za jednu grešku prikazan je na slici \ref{fig:slika4.3}.
-\item \textit{files} - sadrži niz datoteka koje su povezane sa greškom, a koje se eventualno ispravljaju.
-\item \textit{changedFile} - sadrži ime promenjene datoteke.
-\item \textit{changedLine} - sadrži tačnu liniju koda u datoteci \textit{changedFile} koja je promenjena.
-\item \textit{problemLines} - sadrži linije u kodu koje su izazvale grešku koja se ispravlja.
-\item \textit{errorReason} - sadrži razlog koji je izazvao grešku, npr. upotreba neinicijalizovane vrednosti sa steka, odnosno hipa.
-\item \textit{bug} - sadrži bag u kodu, tj.~sadržaj linije koda koji je izazvao grešku.
-\item \textit{bugFix} - sadrži ispravku greške, tj.~sadržaj kojim treba zameniti sadržaj linije koda koji je izvazvao grešku, da se greška ispravi.
+\item \texttt{errorType} - sadrži informaciju o tipu greške, npr. nevalidno oslobađanje memorije, nedozvoljeno čitanje/pisanje itd.
+\item \texttt{valgrindOutput} - sadrži kompletan segment teksta koji je \textit{Valgrind} ispisao za grešku koja se trenutno obrađuje za potrebe dodatnog parsiranja informacija o grešci. Primer sadržaja za jednu grešku prikazan je na slici \ref{fig:slika4.3}.
+\item \texttt{files} - sadrži niz datoteka koje su povezane sa greškom, a koje se eventualno ispravljaju.
+\item \texttt{changedFile} - sadrži ime promenjene datoteke.
+\item \texttt{changedLine} - sadrži tačnu liniju koda u datoteci \textit{changedFile} koja je promenjena.
+\item \texttt{problemLines} - sadrži linije u kodu koje su izazvale grešku koja se ispravlja.
+\item \texttt{errorReason} - sadrži razlog koji je izazvao grešku, npr. upotreba neinicijalizovane vrednosti sa steka, odnosno hipa.
+\item \texttt{bug} - sadrži bag u kodu, tj.~sadržaj linije koda koji je izazvao grešku.
+\item \texttt{bugFix} - sadrži ispravku greške, tj.~sadržaj kojim treba zameniti sadržaj linije koda koji je izvazvao grešku, da se greška ispravi.
 \end{itemize}
 
 \begin{lstlisting}[style=mystyle,caption={Potpis klase \textit{ErrorInfo}}, label={lst:slika4.1},language={Python}] 
@@ -1462,7 +1462,7 @@ class ErrorInfo:
 %  \label{fig:slika4.1}
 %\end{figure}
 
-Za sve atribute klasa sadrži odgovarajuće metode za postavljanje i čitanje vrednosti, kao i funkciju  \textit{isKnownReason} koja proverava da li je razlog greške poslat kao argument, zaista razlog koji je izazvao grešku koja se obrađuje. Prikaz funkcije dat je na listingu \ref{lst:slika4.2}.
+Za sve atribute klasa sadrži odgovarajuće metode za postavljanje i čitanje vrednosti, kao i funkciju  \texttt{isKnownReason} koja proverava da li je razlog greške poslat kao argument, zaista razlog koji je izazvao grešku koja se obrađuje. Prikaz funkcije dat je na listingu \ref{lst:slika4.2}.
 
 \begin{lstlisting}[style=mystyle,caption={Prikaz funkcije koja proverava validnost razloga greške}, label={lst:slika4.2},language={Python}] 
 def isKnownReason(self, newReason):
@@ -1523,7 +1523,7 @@ Iz datog izveštaja dobijaju se informacije od važnosti za ispravljanje greške
 
 Analizom linija koda datog bloka podudaranjem sa regularnim izrazom 
 \begin{center}
-\texttt{$ ([\quad\textbackslash t]*)([a-zA-Z_-]+)[\quad]+([a-zA-Z0-9_-]+)[$ $\^$ $;]*; $}
+\texttt{([$\quad \textbackslash$t]*)([a-zA-Z$\_$-]+)[$\quad $]+([a-zA-Z0-9$\_$-]+)[ $\^$;]*;}
 \end{center}
 dobija se linija koda gde je neinicijalizovana definisana promenljiva. Navedeni regularni izraz označava da linija može početi nizom razmaka ili tabulatora, nakon čega sledi niz karaktera koji mogu da čine mala ili velika slova, brojevi, crte i donje crte, što odgovara tipu promenljive. Nakon toga se bar jednom mora naći razmak iza koga mora da sledi niz karaktera koji mogu da čine mala ili velika slova, brojevi, crte i donje crte, koji odgovaraju imenu promenljive, nakon čega može da se nađe bilo koji ASCII karakter sem ;, proizvoljan broj puta. Na kraju mora da se pojavi karakter \texttt{;}. Pre \texttt{;}, a posle definicije promenljive, ne može da se nađe ništa drugo sem razmaka, tabulatora ili novog reda, jer je kod već kompajliran, pa samim tim i ispravan. Podudaranje sa ovim regularnim izrazom može sadržati i karakter \texttt{=}, što se takođe proverava. Ukoliko je to slučaj, to je signal da je ta promenljiva već inicijalizovana i da se potraga za neinicijalizovanom promenljivom nastavlja. Promenljiva može biti i višedimenziona, pa pre inicijalizacije se vrši i ta provera, da se ukoliko je to slučaj, adekvatno inicijalizuje. Iz rezultata dobijenih podudaranjem sa regularnim izrazima izvlače se podaci poput tipa promenljive, imena, a u slučaju višedimenzionog niza još i dimenzije. Na primer, primenom navedenog regularnog izraza koristeći funkciju \textit{search} modula \textit{re} nad odgovarajućom linijom koda dobija se objekat podudaranja. Iz datog objekta, primenom funkcije \textit{group} dobijaju se segmenti koje odgovaraju uparenim zagradama, i to:
 \begin{itemize}
@@ -1582,9 +1582,9 @@ Ispis alata \textit{Valgrind} koji se dobija za ovaj tip greške u slučaju dina
 
 Za razliku od greške upotrebe neinicijalizovane promenljive koja je statički definisana, ovde, u izveštaju pored linija koda u kojima se koristi ta promenljiva dobijaju se i informacije o tačnoj liniji koda i datoteci u kojoj je promenljiva kreirana. Način inicijalizacije je isti kao kod statički definisanih promenljivih, dok se potrebne informacije dobijaju primenom odgovarajućih regularnih izraza. Takođe, ukoliko je promenljiva samo pokazivač, bez alokacije memorije prilikom definicije iste, njena vrednost se postavlja na \textit{NULL}. Regularni izraz koji se koristi u ovom slučaju jeste 
 \begin{center}
-\texttt{$ (malloc|calloc|realloc)[$ $\^$ $;]+; $}
+\texttt{(malloc|calloc|realloc)[ $\^$;]+;}
 \end{center}
-dok se preciznije informacije o grešci dobijaju specijalizacijom pomenutog izraza. Dati regularni izraz označava da se u podudaranju mora naći \texttt{malloc}, \texttt{calloc} ili \texttt{realloc}, iza čega mora da sledi bar jedan ASCII karakter. Na kraju se mora naći karakter \texttt{;}. Na osnovu rezultata primene pomenutih regularnih izraza dobijaju se informacije o tipu pokazivača, imenu pokazivača kao i veličini alocirane memorije. Primenom funkcije \textit{search} koristeći navedeni regularni izraz na osnovu \textit{matchObject.group(1)} dobija se informacija koja funkcija alokacije je iskorišćena. Dalje, u zavisnosti od te funkcije primenjuju se pomenuti specijalizovani regularni izrazi i odgovarajuće transformacije nad \textit{matchObject.group(2)} u cilju dobijanja svih preostalih neophodnih informacija. Takođe, i u ovom slučaju alat poseduje podršku za rad sa korisnički definisanim strukturama. 
+dok se preciznije informacije o grešci dobijaju specijalizacijom pomenutog izraza. Dati regularni izraz označava da se u podudaranju mora naći \texttt{malloc}, \texttt{calloc} ili \texttt{realloc}, iza čega mora da sledi bar jedan ASCII karakter. Na kraju se mora naći karakter \texttt{;}. Na osnovu rezultata primene pomenutih regularnih izraza dobijaju se informacije o tipu pokazivača, imenu pokazivača kao i veličini alocirane memorije. Primenom funkcije \textit{search} koristeći navedeni regularni izraz na osnovu \texttt{matchObject.group(1)} dobija se informacija koja funkcija alokacije je iskorišćena. Dalje, u zavisnosti od te funkcije primenjuju se pomenuti specijalizovani regularni izrazi i odgovarajuće transformacije nad \texttt{matchObject.group(2)} u cilju dobijanja svih preostalih neophodnih informacija. Takođe, i u ovom slučaju alat poseduje podršku za rad sa korisnički definisanim strukturama. 
 
 Nakon sakupljanja potrebnih informacija, ispravka greške formira se na isti način kao i kod statiči definisanih promenljivih, tj.~problematična linija menja se blokom koji pored te linije sadrži i k\^od koji vrši inicijalizaciju, indirektno naslonjen na funkciju sa listinga \ref{lst:slika4.6} i inicijalizacione funkcije koje koriste petlje.
 
@@ -1611,7 +1611,7 @@ Analizom segmenta sa listinga \ref{lst:slika4.8}, odnosno samo razloga i tipa gr
 U slučaju prekoračenja s leve strane, pristupa se memoriji kojoj nije dozvoljeno, odnosno argument pristupa je vrednost manja od 0, kako se zna da indeksi pristupa alociranoj memoriji kreću od 0. Ispravka ove greške sastoji se u otkrivanju razloga prosleđivanja negativnog argumenta pristupa, i ispravljanje onog što je do toga dovelo. To u ovom slučaju nije moguće. Alat ovu grešku ispravlja tako što pogrešan indeks pristupa zamenjuje njegovom apsolutnom vrednošću i na taj način ispravni indeksi ostaju takvi, dok pogrešne stavljamo u interval ispravnih. U slučaju da apsolutna vrednost pomenutog indeksa izaziva grešku prekoračenja, memorija se proširuje, odnosno ispravlja se greška nevalidnog čitanja/pisanja u slučaju prekoračenja. To najverovatnije nije ponašanje koje je programer inicijalno želeo od svog programa, međutim na osnovu izveštaja i predloga rešenja koji je alat \textit{Koronka} dala, on može da otkloni uzrok pojavljivanja greške potkoračenja memorije.
 
 \subsection{Nevalidno oslobađanje memorije}
-Greška nevalidnog oslobađanja memorije javljaja se prilikom pokušaja da se oslobodi već oslobođena memorija. Greška se ispravlja tako što se otklone  svi pokušaji oslobađanja memorije koji se odnose na već oslobođenu memoriju. Šablon koji ispravlja greške nevalidnog oslobađanja memorije mapiran je na osnovu opisa koji daje alat \textit{Memcheck}, tj.~\textit{,,Invalid free() / delete / delete[] / realloc()''}. Za ovaj tip greške razlog nije od presudnog značaja, tako da se mapiranje vrši samo nad opisom greške. Na listingu \ref{lst:slika4.9} prikazan je segment ispisa greške koji se koristi za njeno ispravljanje. Analizom ispisa sa listinga dobija se precizna informacija o liniji koda, kao i o datoteci gde je izvršeno nevalidno oslobađanje memorije. Ova greška ispravlja se tako što se ta linija izbriše, odnosno otkloni se nevalidno oslobađanje memorije. U slučaju da je programer želeo da oslobodi neku drugu memoriju, a da je pritom slučajno poslao pokazivač na neželjeni memorijski blok koji je već oslobođen, ta memorija će svakako biti detektovana alatom \textit{Memcheck} kao curenje memorije, a greška nevalidnog oslobađanja memorije se i u ovom slučaju otklanja uklanjanjem nevalidnog zahteva za oslobađanje memorije.
+Greška nevalidnog oslobađanja memorije javljaja se prilikom pokušaja da se oslobodi već oslobođena memorija. Greška se ispravlja tako što se otklone  svi pokušaji oslobađanja memorije koji se odnose na već oslobođenu memoriju. Šablon koji ispravlja greške nevalidnog oslobađanja memorije mapiran je na osnovu opisa koji daje alat \textit{Memcheck}, tj.~\textit{,,Invalid free() / delete / delete[] / realloc()''}. Za ovaj tip greške razlog nije od presudnog značaja, tako da se mapiranje vrši samo nad opisom greške. Na listingu \ref{lst:slika4.9} prikazan je segment ispisa greške koji se koristi za njeno ispravljanje. Analizom ispisa sa listinga dobija se precizna informacija o liniji koda, kao i o datoteci gde je izvršeno nevalidno oslobađanje memorije. Ova greška ispravlja se tako što se ta linija izbriše, odnosno otkloni se nevalidno oslobađanje memorije. U slučaju da je programer želeo da oslobodi neku drugu memoriju, a da je pritom slučajno poslao pokazivač na neželjeni memorijski blok koji je već oslobođen, ta memorija svakako biva detektovana alatom \textit{Memcheck} kao curenje memorije, a greška nevalidnog oslobađanja memorije se i u ovom slučaju otklanja uklanjanjem nevalidnog zahteva za oslobađanje memorije.
 
 %Alat \textit{Memcheck} nevalidnim oslobađanjem memorije smatra pokušaj oslobađanja memorije koja je već oslobođena. Ova greška se prijavljuje tek onda kada alat \textit{Memcheck} detektuje da je memorija oslobođena pre pokušaja da se memorija oslobodi, za koji je prijavljena greška. 
 
