@@ -943,9 +943,9 @@ Primer korišćenja funkcije \texttt{group} dat je na listingu \ref{lst:slika3.1
 Alat \textit{Koronka} predstavlja alat koji automatski otkriva greške u kodu napisanom u programskom jeziku C koristeći alat \textit{Memcheck}, a zatim ih ispravlja ukoliko je to u njegovoj moći. Greške koje otkriva alat \textit{Memcheck} mogu se ispraviti na više načina. Alat \textit{Koronka} nudi jedno rešenje. Ukoliko to rešenje ne zadovoljava norme softvera koji se razvija, svakako pomaže u anuliranju greške i pronalasku njenog rešenja na osnovu izveštaja i predloženog rešenja koje je alat dao. Alat je razvijan pod \textit{Linux} okruženjem, a implementiran u programskom jeziku \textit{Python}. Alat je nazvan \textit{Koronka}, zbog situacije u kojoj se ceo svet našao početkom 2020. godine. Osnovna svrha alata je demonstracija rada alata \textit{Valgrind}, kao i tumačenje izveštaja o greškama koje \textit{Valgrind} daje i njihovo uspešno otklanjanje. Alat je slobodno dostupan i nalazi se na linku \url{https://github.com/LMladenovic/Error_fixing_tool}. Na pomenutom linku se nalaze neophodne datoteke alata, opis sistema, kao i skup test primera i njihova pokretanja.
 
 \section{Korišćenje alata}
-Za korišćenje alata \textit{Koronka} neophodno je da prethodno instalirate \textit{GCC} kompajler, sam alat \textit{Valgrind}, kao i \textit{Python}. U razvoju alata korišćen je \textit{Python3.6}. Alat se pokreće sledećom komandom:
+Za korišćenje alata \textit{Koronka} neophodno je da prethodno instalirate \textit{GCC} kompajler, sam alat \textit{Valgrind}, kao i \textit{Python}. U razvoju alata korišćen je \textit{Python3.8.2}. Alat se pokreće sledećom komandom:
 \begin{center}
-\texttt{python koronka.py [files=[list of files]] [structures=[list of user defined structures]] path to c file [other arguments]}
+\texttt{python3 koronka.py [files=[list of files]] [structures=[list of user defined structures]] path to c file [other arguments]}
 \end{center}
 Navedeni arumenti podrazumevaju sledeće:
 \begin{itemize}
@@ -989,7 +989,7 @@ Analiza i ispravka programa sa slike \ref{fig:slika4.15} predstavljena je u ovom
 
 Dati program sadrži grešku vezanu za upotrebu neinicijalizovane promenljive, a koju alat \textit{Koronka} ispravlja. Alat se pokreće komandom u komandnoj liniji:
 \begin{center}
-\texttt{python koronka.py program.c}.
+\texttt{python3 koronka.py program.c}.
 \end{center}
 
 Izgled komandne linije nakon pokretanja alata prikazan je na slici \ref{fig:slika4.11}. 
